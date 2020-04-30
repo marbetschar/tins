@@ -1,8 +1,8 @@
 # Boxes
 
-A user experience similar to virtual machines but for lightweight Linux containers.
+Use lightweight containers just like full blown virtual machines.
 
-<img src="data/screenshots/App.png?raw=true" width="262" align="right">
+<img src="data/screenshots/Sketch.png?raw=true" width="262" align="right">
 
 ## Usage
 
