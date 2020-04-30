@@ -2,7 +2,7 @@
 
 Use lightweight containers just like full blown virtual machines.
 
-<img src="data/screenshots/Sketch.png?raw=true" width="262" align="right">
+<img src="data/screenshots/Sketch.png?raw=true" width="512" />
 
 ## Usage
 
