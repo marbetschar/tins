@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gresources>
+  <gresource prefix="/com/github/marbetschar/boxes">
+    <file alias="centos" compressed="true" preprocess="xml-stripblanks">os/centos.svg</file>
+    <file alias="elementary" compressed="true" preprocess="xml-stripblanks">os/elementary.svg</file>
+    <file alias="fedora" compressed="true" preprocess="xml-stripblanks">os/fedora.svg</file>
+    <file alias="linux" compressed="true" preprocess="xml-stripblanks">os/linux.svg</file>
+    <file alias="ubuntu" compressed="true" preprocess="xml-stripblanks">os/ubuntu.svg</file>
+    <file alias="ContainerLogo" compressed="true" preprocess="xml-stripblanks">ui/ContainerLogo.glade</file>
+  </gresource>
+</gresources>
+

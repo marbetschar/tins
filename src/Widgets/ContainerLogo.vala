@@ -19,26 +19,23 @@
 * Authored by: Marco Betschart <boxes@marco.betschart.name>
 */
 
-public class Boxes.Application : Gtk.Application {
+public class Boxes.ContainerLogo : Gtk.Overlay {
 
-    public Application () {
-        Object (
-            application_id: "com.github.marbetschar.boxes",
-            flags: ApplicationFlags.FLAGS_NONE
-        );
-    }
+    public Gtk.Image logo;
 
-    protected override void activate () {
-        var main_window = new Gtk.ApplicationWindow (this);
-        main_window.default_height = 300;
-        main_window.default_width = 300;
-        main_window.title = "Boxes";
-        main_window.show_all ();
-    }
+    public Gtk.Stack action_stack;
+    public Gtk.Image action_start;
+    public Gtk.Image action_stop;
 
-    public static int main (string[] args) {
-        var app = new Application ();
-        return app.run (args);
+    public void signal toggle_state();
+
+    construct {
+        toggle_state.connect (() => {
+            if (action_stack.visible_child == action_start) {
+                action_stack.visible_child = action_stop;
+            } else {
+                action_stack.visible_child = action_play;
+            }
+        });
     }
 }
-
