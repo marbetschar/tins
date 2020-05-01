@@ -19,23 +19,33 @@
 * Authored by: Marco Betschart <boxes@marco.betschart.name>
 */
 
-public class Boxes.ContainerLogo : Gtk.Overlay {
+public class Boxes.Widgets.ContainerLogo : Gtk.Overlay {
 
     public Gtk.Image logo;
 
+    [CCode (instance_pos = -1)]
     public Gtk.Stack action_stack;
     public Gtk.Image action_start;
     public Gtk.Image action_stop;
 
-    public void signal toggle_state();
-
     construct {
-        toggle_state.connect (() => {
-            if (action_stack.visible_child == action_start) {
-                action_stack.visible_child = action_stop;
-            } else {
-                action_stack.visible_child = action_play;
-            }
-        });
+        set_template_from_resource ("/com/github/marbetschar/boxes/templates/ContainerLogo.glade");
+        init_template ();
+
+        button_release_event.connect (on_button_release_event);
+    }
+
+    public bool on_button_release_event (Gdk.EventButton event) {
+        debug ("toggle_state...");
+
+        if (action_stack.visible_child == action_start) {
+            action_stack.visible_child = action_stop;
+        } else {
+            action_stack.visible_child = action_start;
+        }
+
+        return Gdk.EVENT_STOP;
     }
 }
+
+

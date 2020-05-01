@@ -5,6 +5,9 @@ project (
     version: '0.0.1'
 )
 
+# GNOME module
+gnome = import('gnome')
+
 # Translation module
 i18n = import ('i18n')
 
@@ -12,6 +15,14 @@ i18n = import ('i18n')
 add_project_arguments (
     '-DGETTEXT_PACKAGE="@0@"'.format (meson.project_name ()),
     language: 'c'
+)
+
+# Project resources
+asresources = gnome.compile_resources(
+    'as-resources',
+    'data/' + meson.project_name() + '.gresource.xml',
+    source_dir: 'data',
+    c_name: 'as'
 )
 
 # Listing dependencies
@@ -25,6 +36,7 @@ subdir ('src')
 # Executable
 executable (
     meson.project_name (),
+    asresources,
     sources,
     dependencies: dependencies,
     install: true
