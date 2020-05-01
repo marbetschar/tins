@@ -1,7 +1,7 @@
 [Desktop Entry]
 Type=Application
 Name=Boxes
-Comment=Use lightweight containers just like full blown virtual machines
+Comment=Use lightweight containers just like any virtual machine
 GenericName=Boxes
 Exec=com.github.marbetschar.boxes %U
 Icon=com.github.marbetschar.boxes

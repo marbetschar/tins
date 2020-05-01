@@ -1,6 +1,6 @@
 # Boxes
 
-Use lightweight containers just like full blown virtual machines.
+Use lightweight containers just like any virtual machine.
 
 **>>>>>> Work in Progress <<<<<<**
 
