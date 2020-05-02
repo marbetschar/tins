@@ -19,29 +19,17 @@
 * Authored by: Marco Betschart <boxes@marco.betschart.name>
 */
 
-public class Boxes.Application : Gtk.Application {
+[GtkTemplate (ui = "/com/github/marbetschar/boxes/templates/ContainerListBoxRow.glade")]
+public class Boxes.Widgets.ContainerListBoxRow : Gtk.ListBoxRow {
 
-    public Application () {
-        Object (
-            application_id: "com.github.marbetschar.boxes",
-            flags: ApplicationFlags.FLAGS_NONE
-        );
-    }
+    [GtkChild]
+    private ContainerLogoBox logo_box;
 
-    protected override void activate () {
-        var main_window = new Gtk.ApplicationWindow (this);
-        main_window.default_height = 300;
-        main_window.default_width = 300;
-        main_window.title = "Boxes";
+    [GtkChild]
+    private Gtk.Label title_label;
 
-        main_window.add (new Boxes.Widgets.ContainerListBoxRow ());
-
-        main_window.show_all ();
-    }
-
-    public static int main (string[] args) {
-        var app = new Application ();
-        return app.run (args);
-    }
+    [GtkChild]
+    private Gtk.Label description_label;
 }
+
 

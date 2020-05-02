@@ -19,8 +19,8 @@
 * Authored by: Marco Betschart <boxes@marco.betschart.name>
 */
 
-[GtkTemplate (ui = "/com/github/marbetschar/boxes/templates/ContainerLogo.glade")]
-public class Boxes.Widgets.ContainerLogo : Gtk.Overlay {
+[GtkTemplate (ui = "/com/github/marbetschar/boxes/templates/ContainerLogoBox.glade")]
+public class Boxes.Widgets.ContainerLogoBox : Gtk.Overlay {
 
     public signal void toggle_enabled (bool enabled);
 
@@ -48,7 +48,7 @@ public class Boxes.Widgets.ContainerLogo : Gtk.Overlay {
     }
 
     [GtkChild]
-    private Gtk.Image logo;
+    private Gtk.Image logo_image;
 
     [GtkChild]
     private Gtk.Stack state_stack;

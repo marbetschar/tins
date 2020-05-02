@@ -1,5 +1,6 @@
 # Listing files to compile
 sources = files (
     'Application.vala',
-    'Widgets/ContainerLogo.vala'
+    'Widgets/ContainerLogoBox.vala',
+    'Widgets/ContainerListBoxRow.vala'
 )

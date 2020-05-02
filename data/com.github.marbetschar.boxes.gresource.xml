@@ -6,7 +6,8 @@
     <file compressed="true" preprocess="xml-stripblanks">os/fedora.svg</file>
     <file compressed="true" preprocess="xml-stripblanks">os/linux.svg</file>
     <file compressed="true" preprocess="xml-stripblanks">os/ubuntu.svg</file>
-    <file compressed="true" preprocess="xml-stripblanks">templates/ContainerLogo.glade</file>
+    <file compressed="true" preprocess="xml-stripblanks">templates/ContainerLogoBox.glade</file>
+    <file compressed="true" preprocess="xml-stripblanks">templates/ContainerListBoxRow.glade</file>
   </gresource>
 </gresources>
 
