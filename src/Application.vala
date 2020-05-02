@@ -34,6 +34,10 @@ public class Boxes.Application : Gtk.Application {
         main_window.default_width = 600;
         main_window.title = "Boxes";
 
+        var style_provider = new Gtk.CssProvider ();
+        style_provider.load_from_resource ("/com/github/marbetschar/boxes/styles/Application.css");
+        Gtk.StyleContext.add_provider_for_screen (Gdk.Screen.get_default (), style_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
+
         main_window.add (new Boxes.Widgets.ContainerListBox ());
 
         main_window.show_all ();

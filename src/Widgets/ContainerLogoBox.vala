@@ -65,7 +65,7 @@ public class Boxes.Widgets.ContainerLogoBox : Gtk.Overlay {
     [GtkCallback]
     private bool on_button_release_event (Gtk.Widget source, Gdk.EventButton event) {
         enabled = !enabled;
-        return Gdk.EVENT_STOP;
+        return Gdk.EVENT_PROPAGATE;
     }
 }
 

@@ -7,11 +7,7 @@
     <property name="height_request">60</property>
     <property name="visible">True</property>
     <property name="can_focus">True</property>
-    <property name="margin_left">12</property>
-    <property name="margin_right">12</property>
-    <property name="margin_top">6</property>
-    <property name="margin_bottom">6</property>
-    <property name="selectable">False</property>
+    <property name="activatable">False</property>
     <child>
       <object class="GtkGrid">
         <property name="visible">True</property>
@@ -24,6 +20,10 @@
             <property name="name">logo</property>
             <property name="visible">True</property>
             <property name="can_focus">False</property>
+            <property name="margin_top">12</property>
+            <property name="margin_right">6</property>
+            <property name="margin_bottom">12</property>
+            <property name="margin_left">6</property>
             <child>
               <placeholder/>
             </child>
@@ -38,6 +38,7 @@
           <object class="GtkLabel" id="title_label">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
+            <property name="events"/>
             <property name="halign">start</property>
             <property name="valign">end</property>
             <property name="hexpand">True</property>

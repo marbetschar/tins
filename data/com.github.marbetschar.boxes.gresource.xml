@@ -11,6 +11,8 @@
     <file compressed="true" preprocess="xml-stripblanks">os/ubuntu.svg</file>
     <file compressed="true" preprocess="xml-stripblanks">ui/BoxesWidgetsContainerLogoBox.glade</file>
     <file compressed="true" preprocess="xml-stripblanks">ui/BoxesWidgetsContainerListBoxRow.glade</file>
+    <file compressed="true">styles/Application.css</file>
+    <file compressed="true">styles/BoxesWidgetsContainerListBox.css</file>
   </gresource>
 </gresources>
 
