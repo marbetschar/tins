@@ -37,7 +37,7 @@
             <property name="can_focus">False</property>
             <property name="halign">start</property>
             <property name="valign">end</property>
-            <property name="icon_name">media-playback-start</property>
+            <property name="icon_name">system-shutdown</property>
             <property name="icon_size">3</property>
           </object>
           <packing>
@@ -49,7 +49,7 @@
           <object class="GtkImage" id="state_disabled">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="icon_name">system-shutdown</property>
+            <property name="icon_name">media-playback-start</property>
             <property name="icon_size">3</property>
           </object>
           <packing>
