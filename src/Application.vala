@@ -31,10 +31,10 @@ public class Boxes.Application : Gtk.Application {
     protected override void activate () {
         var main_window = new Gtk.ApplicationWindow (this);
         main_window.default_height = 300;
-        main_window.default_width = 300;
+        main_window.default_width = 600;
         main_window.title = "Boxes";
 
-        main_window.add (new Boxes.Widgets.ContainerListBoxRow ());
+        main_window.add (new Boxes.Widgets.ContainerListBox ());
 
         main_window.show_all ();
     }

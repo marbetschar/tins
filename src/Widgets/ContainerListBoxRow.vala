@@ -19,8 +19,37 @@
 * Authored by: Marco Betschart <boxes@marco.betschart.name>
 */
 
-[GtkTemplate (ui = "/com/github/marbetschar/boxes/templates/ContainerListBoxRow.glade")]
+[GtkTemplate (ui = "/com/github/marbetschar/boxes/ui/BoxesWidgetsContainerListBoxRow.glade")]
 public class Boxes.Widgets.ContainerListBoxRow : Gtk.ListBoxRow {
+
+    public string title {
+        get { return title_label.label; }
+        set { title_label.label = value; }
+    }
+
+    public string description {
+        get { return description_label.label; }
+        set { description_label.label = value; }
+    }
+
+    public string image_resource {
+        owned get { return logo_box.image_resource; }
+        set { logo_box.image_resource = value; }
+    }
+
+    public bool enabled {
+        get { return logo_box.enabled; }
+        set { logo_box.enabled = value; }
+    }
+
+    public signal void open ();
+
+    public bool gui_enabled {
+        get { return open_button_stack.visible_child == open_button_desktop_image; }
+        set {
+            open_button_stack.visible_child = value ? open_button_desktop_image : open_button_terminal_image;
+        }
+    }
 
     [GtkChild]
     private ContainerLogoBox logo_box;
@@ -30,6 +59,46 @@ public class Boxes.Widgets.ContainerListBoxRow : Gtk.ListBoxRow {
 
     [GtkChild]
     private Gtk.Label description_label;
+
+    [GtkChild]
+    private Gtk.Button open_button;
+
+    [GtkChild]
+    private Gtk.Stack open_button_stack;
+
+    [GtkChild]
+    private Gtk.Image open_button_terminal_image;
+
+    [GtkChild]
+    private Gtk.Image open_button_desktop_image;
+
+    [GtkChild]
+    private Gtk.Button settings_button;
+
+    construct {
+        logo_box.toggle_enabled.connect ((enabled) => {
+            update_request ();
+        });
+        update_request ();
+    }
+
+    private void update_request () {
+        if (enabled) {
+            description = _("Running...");
+            open_button.sensitive = true;
+            settings_button.sensitive = false;
+
+        } else {
+            settings_button.sensitive = true;
+            open_button.sensitive = false;
+            description = _("Stopped.");
+        }
+    }
+
+    [GtkCallback]
+    private void on_open_button_clicked (Gtk.Widget source) {
+        open ();
+    }
 }
 
 

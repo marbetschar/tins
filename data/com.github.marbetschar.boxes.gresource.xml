@@ -1,13 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <gresources>
   <gresource prefix="/com/github/marbetschar/boxes">
+    <file compressed="true" preprocess="xml-stripblanks">actions/desktop.svg</file>
+    <file compressed="true" preprocess="xml-stripblanks">actions/terminal.svg</file>
+    <file compressed="true" preprocess="xml-stripblanks">actions/settings.svg</file>
     <file compressed="true" preprocess="xml-stripblanks">os/centos.svg</file>
     <file compressed="true" preprocess="xml-stripblanks">os/elementary.svg</file>
     <file compressed="true" preprocess="xml-stripblanks">os/fedora.svg</file>
     <file compressed="true" preprocess="xml-stripblanks">os/linux.svg</file>
     <file compressed="true" preprocess="xml-stripblanks">os/ubuntu.svg</file>
-    <file compressed="true" preprocess="xml-stripblanks">templates/ContainerLogoBox.glade</file>
-    <file compressed="true" preprocess="xml-stripblanks">templates/ContainerListBoxRow.glade</file>
+    <file compressed="true" preprocess="xml-stripblanks">ui/BoxesWidgetsContainerLogoBox.glade</file>
+    <file compressed="true" preprocess="xml-stripblanks">ui/BoxesWidgetsContainerListBoxRow.glade</file>
   </gresource>
 </gresources>
 

@@ -19,28 +19,31 @@
 * Authored by: Marco Betschart <boxes@marco.betschart.name>
 */
 
-[GtkTemplate (ui = "/com/github/marbetschar/boxes/templates/ContainerLogoBox.glade")]
+[GtkTemplate (ui = "/com/github/marbetschar/boxes/ui/BoxesWidgetsContainerLogoBox.glade")]
 public class Boxes.Widgets.ContainerLogoBox : Gtk.Overlay {
 
     public signal void toggle_enabled (bool enabled);
 
+    public string image_resource {
+        owned get { return logo_image.resource; }
+        set { logo_image.resource = value; }
+    }
+
     public bool enabled {
-        get {
-            return state_stack.visible_child == state_enabled;
-        }
+        get { return state_stack.visible_child == state_enabled; }
         set {
             if (value == enabled) {
                 return;
             }
-            var style_context = get_style_context ();
+            var logo_image_style_context = logo_image.get_style_context ();
 
             if (value) {
                 state_stack.visible_child = state_enabled;
-                style_context.remove_class (Gtk.STYLE_CLASS_DIM_LABEL);
+                logo_image_style_context.remove_class (Gtk.STYLE_CLASS_DIM_LABEL);
 
             } else {
                 state_stack.visible_child = state_disabled;
-                style_context.add_class (Gtk.STYLE_CLASS_DIM_LABEL);
+                logo_image_style_context.add_class (Gtk.STYLE_CLASS_DIM_LABEL);
             }
 
             toggle_enabled (value);
