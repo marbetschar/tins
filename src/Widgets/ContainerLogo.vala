@@ -19,31 +19,49 @@
 * Authored by: Marco Betschart <boxes@marco.betschart.name>
 */
 
+[GtkTemplate (ui = "/com/github/marbetschar/boxes/templates/ContainerLogo.glade")]
 public class Boxes.Widgets.ContainerLogo : Gtk.Overlay {
 
-    public Gtk.Image logo;
+    public signal void toggle_enabled (bool enabled);
 
-    [CCode (instance_pos = -1)]
-    public Gtk.Stack action_stack;
-    public Gtk.Image action_start;
-    public Gtk.Image action_stop;
+    public bool enabled {
+        get {
+            return state_stack.visible_child == state_enabled;
+        }
+        set {
+            if (value == enabled) {
+                return;
+            }
+            var style_context = get_style_context ();
 
-    construct {
-        set_template_from_resource ("/com/github/marbetschar/boxes/templates/ContainerLogo.glade");
-        init_template ();
+            if (value) {
+                state_stack.visible_child = state_enabled;
+                style_context.remove_class (Gtk.STYLE_CLASS_DIM_LABEL);
 
-        button_release_event.connect (on_button_release_event);
+            } else {
+                state_stack.visible_child = state_disabled;
+                style_context.add_class (Gtk.STYLE_CLASS_DIM_LABEL);
+            }
+
+            toggle_enabled (value);
+        }
     }
 
-    public bool on_button_release_event (Gdk.EventButton event) {
-        debug ("toggle_state...");
+    [GtkChild]
+    private Gtk.Image logo;
 
-        if (action_stack.visible_child == action_start) {
-            action_stack.visible_child = action_stop;
-        } else {
-            action_stack.visible_child = action_start;
-        }
+    [GtkChild]
+    private Gtk.Stack state_stack;
 
+    [GtkChild]
+    private Gtk.Image state_enabled;
+
+    [GtkChild]
+    private Gtk.Image state_disabled;
+
+    [GtkCallback]
+    private bool on_button_release_event (Gtk.Widget source, Gdk.EventButton event) {
+        enabled = !enabled;
         return Gdk.EVENT_STOP;
     }
 }

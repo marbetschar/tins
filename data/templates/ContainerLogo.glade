@@ -5,6 +5,7 @@
   <template class="BoxesWidgetsContainerLogo" parent="GtkOverlay">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
+    <signal name="button-release-event" handler="on_button_release_event" swapped="no"/>
     <child>
       <object class="GtkImage" id="logo">
         <property name="visible">True</property>
@@ -16,14 +17,14 @@
       </packing>
     </child>
     <child type="overlay">
-      <object class="GtkStack" id="action_stack">
+      <object class="GtkStack" id="state_stack">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
         <property name="halign">start</property>
         <property name="valign">end</property>
         <property name="transition_type">crossfade</property>
         <child>
-          <object class="GtkImage" id="action_start">
+          <object class="GtkImage" id="state_enabled">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <property name="halign">start</property>
@@ -37,10 +38,11 @@
           </packing>
         </child>
         <child>
-          <object class="GtkImage" id="action_stop">
+          <object class="GtkImage" id="state_disabled">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <property name="icon_name">system-shutdown</property>
+            <property name="icon_size">3</property>
           </object>
           <packing>
             <property name="name">page1</property>
