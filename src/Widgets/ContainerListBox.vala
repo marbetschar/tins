@@ -21,14 +21,6 @@
 
 public class Boxes.Widgets.ContainerListBox : Gtk.ListBox {
 
-    private static Gtk.CssProvider style_provider;
-
-    static construct {
-        style_provider = new Gtk.CssProvider ();
-        style_provider.load_from_resource ("/com/github/marbetschar/boxes/styles/WidgetsContainerListBox.css");
-    }
-
-
     private struct Container {
         public string name;
         public bool gui_enabled;
@@ -46,13 +38,12 @@ public class Boxes.Widgets.ContainerListBox : Gtk.ListBox {
 
     construct {
         selection_mode = Gtk.SelectionMode.SINGLE;
-        get_style_context ().add_provider (style_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
 
-        add (create_row (Container (){ name = "Ubuntu 18.04 LTS", operating_system = OperatingSystem.UBUNTU, gui_enabled = false, enabled = false }));
-        add (create_row (Container (){ name = "CentOS v7", operating_system = OperatingSystem.CENTOS, gui_enabled = true, enabled = false }));
-        add (create_row (Container (){ name = "elementary OS 6.0", operating_system = OperatingSystem.ELEMENTARY, gui_enabled = false, enabled = true }));
-        add (create_row (Container (){ name = "Fedora v32", operating_system = OperatingSystem.FEDORA, gui_enabled = true, enabled = true }));
-        add (create_row (Container (){ name = "Alpine Test", operating_system = OperatingSystem.LINUX, gui_enabled = true, enabled = true }));
+        add (create_row (Container (){ name = "Ubuntu 18.04 LTS", operating_system = OperatingSystem.UBUNTU, gui_enabled = true, enabled = false }));
+        add (create_row (Container (){ name = "CentOS v7", operating_system = OperatingSystem.CENTOS, gui_enabled = false, enabled = true }));
+        add (create_row (Container (){ name = "elementary OS 6.0", operating_system = OperatingSystem.ELEMENTARY, gui_enabled = true, enabled = true }));
+        add (create_row (Container (){ name = "Fedora v32", operating_system = OperatingSystem.FEDORA, gui_enabled = true, enabled = false }));
+        add (create_row (Container (){ name = "Alpine Test", operating_system = OperatingSystem.LINUX, gui_enabled = false, enabled = true }));
     }
 
     private Gtk.ListBoxRow create_row (Container container) {
@@ -61,7 +52,6 @@ public class Boxes.Widgets.ContainerListBox : Gtk.ListBox {
         row.enabled = container.enabled;
         row.gui_enabled = container.gui_enabled;
         row.image_resource = resource_for_operating_system (container.operating_system);
-        row.get_style_context ().add_provider (style_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
         return row;
     }
 

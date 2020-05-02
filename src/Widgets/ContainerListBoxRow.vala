@@ -22,6 +22,9 @@
 [GtkTemplate (ui = "/com/github/marbetschar/boxes/ui/WidgetsContainerListBoxRow.glade")]
 public class Boxes.Widgets.ContainerListBoxRow : Gtk.ListBoxRow {
 
+    public signal void open_clicked ();
+    public signal void configure_clicked ();
+
     public string title {
         get { return title_label.label; }
         set { title_label.label = value; }
@@ -42,8 +45,6 @@ public class Boxes.Widgets.ContainerListBoxRow : Gtk.ListBoxRow {
         set { logo_box.enabled = value; }
     }
 
-    public signal void open ();
-
     public bool gui_enabled {
         get { return open_button_stack.visible_child == open_button_desktop_image; }
         set {
@@ -61,6 +62,12 @@ public class Boxes.Widgets.ContainerListBoxRow : Gtk.ListBoxRow {
     private Gtk.Label description_label;
 
     [GtkChild]
+    private Gtk.Stack button_stack;
+
+    [GtkChild]
+    private Gtk.Button configure_button;
+
+    [GtkChild]
     private Gtk.Button open_button;
 
     [GtkChild]
@@ -72,9 +79,6 @@ public class Boxes.Widgets.ContainerListBoxRow : Gtk.ListBoxRow {
     [GtkChild]
     private Gtk.Image open_button_desktop_image;
 
-    [GtkChild]
-    private Gtk.Button settings_button;
-
     construct {
         logo_box.toggle_enabled.connect ((enabled) => {
             update_request ();
@@ -85,19 +89,24 @@ public class Boxes.Widgets.ContainerListBoxRow : Gtk.ListBoxRow {
     private void update_request () {
         if (enabled) {
             description = _("Running...");
-            open_button.sensitive = true;
-            settings_button.sensitive = false;
+            button_stack.visible_child = open_button;
 
         } else {
-            settings_button.sensitive = true;
-            open_button.sensitive = false;
+            button_stack.visible_child = configure_button;
             description = _("Stopped.");
         }
     }
 
     [GtkCallback]
     private void on_open_button_clicked (Gtk.Widget source) {
-        open ();
+        debug ("open_button_clicked");
+        open_clicked ();
+    }
+
+    [GtkCallback]
+    private void on_configure_button_clicked (Gtk.Widget source) {
+        debug ("configure_button_clicked");
+        configure_clicked ();
     }
 }
 

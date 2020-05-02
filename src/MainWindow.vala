@@ -47,7 +47,6 @@ public class Boxes.MainWindow : Gtk.ApplicationWindow {
         viewport.add (list_box);
 
         list_box.row_selected.connect ((row) => {
-            debug (@"sensitive: $(row != null)");
             remove_button.sensitive = row != null;
         });
     }

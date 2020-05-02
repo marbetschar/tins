@@ -13,7 +13,6 @@
     <file compressed="true" preprocess="xml-stripblanks">ui/WidgetsContainerListBoxRow.glade</file>
     <file compressed="true" preprocess="xml-stripblanks">ui/WidgetsContainerLogoBox.glade</file>
     <file compressed="true">styles/Application.css</file>
-    <file compressed="true">styles/WidgetsContainerListBox.css</file>
   </gresource>
 </gresources>
 

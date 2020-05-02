@@ -20,3 +20,23 @@
 */
 
 @define-color colorAccent #a56de2;
+
+list row {
+    border-bottom: 1px solid #d4d4d4;
+}
+
+list row:selected {
+    background-color: #fafafa;
+}
+
+list row label {
+    color: @text_color;
+}
+
+list row button {
+    background-color: transparent;
+}
+
+list row button:active {
+    background-color: alpha (@text_color, 0.2);
+}

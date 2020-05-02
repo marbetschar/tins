@@ -7,7 +7,6 @@
     <property name="height_request">60</property>
     <property name="visible">True</property>
     <property name="can_focus">True</property>
-    <property name="activatable">False</property>
     <child>
       <object class="GtkGrid">
         <property name="visible">True</property>
@@ -38,7 +37,6 @@
           <object class="GtkLabel" id="title_label">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="events"/>
             <property name="halign">start</property>
             <property name="valign">end</property>
             <property name="hexpand">True</property>
@@ -69,20 +67,17 @@
           </packing>
         </child>
         <child>
-          <object class="GtkButtonBox">
+          <object class="GtkStack" id="button_stack">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="halign">center</property>
-            <property name="valign">center</property>
-            <property name="homogeneous">True</property>
-            <property name="layout_style">center</property>
+            <property name="margin_right">12</property>
+            <property name="transition_type">crossfade</property>
             <child>
               <object class="GtkButton" id="open_button">
                 <property name="visible">True</property>
-                <property name="sensitive">False</property>
                 <property name="can_focus">True</property>
                 <property name="focus_on_click">False</property>
-                <property name="receives_default">True</property>
+                <property name="receives_default">False</property>
                 <property name="halign">center</property>
                 <property name="valign">center</property>
                 <property name="relief">none</property>
@@ -121,24 +116,27 @@
                     </child>
                   </object>
                 </child>
+                <style>
+                  <class name="circular"/>
+                  <class name="flat"/>
+                  <class name="image-button"/>
+                </style>
               </object>
               <packing>
-                <property name="expand">True</property>
-                <property name="fill">True</property>
-                <property name="pack_type">end</property>
-                <property name="position">0</property>
+                <property name="name">page0</property>
+                <property name="title" translatable="yes">page0</property>
               </packing>
             </child>
             <child>
-              <object class="GtkButton" id="settings_button">
+              <object class="GtkButton" id="configure_button">
                 <property name="visible">True</property>
-                <property name="sensitive">False</property>
                 <property name="can_focus">True</property>
                 <property name="focus_on_click">False</property>
-                <property name="receives_default">True</property>
+                <property name="receives_default">False</property>
                 <property name="halign">center</property>
                 <property name="valign">center</property>
                 <property name="relief">none</property>
+                <signal name="clicked" handler="on_configure_button_clicked" swapped="no"/>
                 <child>
                   <object class="GtkImage">
                     <property name="visible">True</property>
@@ -146,10 +144,15 @@
                     <property name="resource">/com/github/marbetschar/boxes/actions/settings.svg</property>
                   </object>
                 </child>
+                <style>
+                  <class name="circular"/>
+                  <class name="flat"/>
+                  <class name="image-button"/>
+                </style>
               </object>
               <packing>
-                <property name="expand">True</property>
-                <property name="fill">True</property>
+                <property name="name">page1</property>
+                <property name="title" translatable="yes">page1</property>
                 <property name="position">1</property>
               </packing>
             </child>
