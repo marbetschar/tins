@@ -9,10 +9,11 @@
     <file compressed="true" preprocess="xml-stripblanks">os/fedora.svg</file>
     <file compressed="true" preprocess="xml-stripblanks">os/linux.svg</file>
     <file compressed="true" preprocess="xml-stripblanks">os/ubuntu.svg</file>
-    <file compressed="true" preprocess="xml-stripblanks">ui/BoxesWidgetsContainerLogoBox.glade</file>
-    <file compressed="true" preprocess="xml-stripblanks">ui/BoxesWidgetsContainerListBoxRow.glade</file>
+    <file compressed="true" preprocess="xml-stripblanks">ui/MainWindow.glade</file>
+    <file compressed="true" preprocess="xml-stripblanks">ui/WidgetsContainerListBoxRow.glade</file>
+    <file compressed="true" preprocess="xml-stripblanks">ui/WidgetsContainerLogoBox.glade</file>
     <file compressed="true">styles/Application.css</file>
-    <file compressed="true">styles/BoxesWidgetsContainerListBox.css</file>
+    <file compressed="true">styles/WidgetsContainerListBox.css</file>
   </gresource>
 </gresources>
 

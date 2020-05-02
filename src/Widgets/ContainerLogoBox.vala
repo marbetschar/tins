@@ -19,7 +19,7 @@
 * Authored by: Marco Betschart <boxes@marco.betschart.name>
 */
 
-[GtkTemplate (ui = "/com/github/marbetschar/boxes/ui/BoxesWidgetsContainerLogoBox.glade")]
+[GtkTemplate (ui = "/com/github/marbetschar/boxes/ui/WidgetsContainerLogoBox.glade")]
 public class Boxes.Widgets.ContainerLogoBox : Gtk.Overlay {
 
     public signal void toggle_enabled (bool enabled);

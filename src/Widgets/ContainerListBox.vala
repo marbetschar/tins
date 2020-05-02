@@ -25,7 +25,7 @@ public class Boxes.Widgets.ContainerListBox : Gtk.ListBox {
 
     static construct {
         style_provider = new Gtk.CssProvider ();
-        style_provider.load_from_resource ("/com/github/marbetschar/boxes/styles/BoxesWidgetsContainerListBox.css");
+        style_provider.load_from_resource ("/com/github/marbetschar/boxes/styles/WidgetsContainerListBox.css");
     }
 
 

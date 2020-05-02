@@ -20,6 +20,7 @@
 */
 
 public class Boxes.Application : Gtk.Application {
+    public static GLib.Settings settings;
 
     public Application () {
         Object (
@@ -28,19 +29,42 @@ public class Boxes.Application : Gtk.Application {
         );
     }
 
+    static construct {
+        settings = new Settings ("com.github.marbetschar.boxes");
+    }
+
     protected override void activate () {
-        var main_window = new Gtk.ApplicationWindow (this);
-        main_window.default_height = 300;
-        main_window.default_width = 600;
-        main_window.title = "Boxes";
+        if (get_windows ().length () > 0) {
+            get_windows ().data.present ();
+            return;
+        }
+        var main_window = new MainWindow (this);
 
-        var style_provider = new Gtk.CssProvider ();
-        style_provider.load_from_resource ("/com/github/marbetschar/boxes/styles/Application.css");
-        Gtk.StyleContext.add_provider_for_screen (Gdk.Screen.get_default (), style_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
+        int window_x, window_y;
+        var rect = Gtk.Allocation ();
 
-        main_window.add (new Boxes.Widgets.ContainerListBox ());
+        settings.get ("window-position", "(ii)", out window_x, out window_y);
+        settings.get ("window-size", "(ii)", out rect.width, out rect.height);
 
+        if (window_x != -1 || window_y != -1) {
+            main_window.move (window_x, window_y);
+        }
+
+        main_window.set_allocation (rect);
         main_window.show_all ();
+
+        debug ("show_all");
+
+        var quit_action = new SimpleAction ("quit", null);
+
+        add_action (quit_action);
+        set_accels_for_action ("app.quit", {"<Control>q"});
+
+        quit_action.activate.connect (() => {
+            if (main_window != null) {
+                main_window.destroy ();
+            }
+        });
     }
 
     public static int main (string[] args) {

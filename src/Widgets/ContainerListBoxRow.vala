@@ -19,7 +19,7 @@
 * Authored by: Marco Betschart <boxes@marco.betschart.name>
 */
 
-[GtkTemplate (ui = "/com/github/marbetschar/boxes/ui/BoxesWidgetsContainerListBoxRow.glade")]
+[GtkTemplate (ui = "/com/github/marbetschar/boxes/ui/WidgetsContainerListBoxRow.glade")]
 public class Boxes.Widgets.ContainerListBoxRow : Gtk.ListBoxRow {
 
     public string title {
