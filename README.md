@@ -4,7 +4,7 @@ Use lightweight containers just like any virtual machine.
 
 **>>>>>> Work in Progress <<<<<<**
 
-<img src="data/screenshots/App.png?raw=true" width="512" />
+<img src="data/screenshots/App.png?raw=true" width="512" align="right" />
 
 ## Usage
 
