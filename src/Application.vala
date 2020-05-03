@@ -53,8 +53,6 @@ public class Boxes.Application : Gtk.Application {
         main_window.set_allocation (rect);
         main_window.show_all ();
 
-        debug ("show_all");
-
         var quit_action = new SimpleAction ("quit", null);
 
         add_action (quit_action);

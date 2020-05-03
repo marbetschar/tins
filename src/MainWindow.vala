@@ -22,6 +22,7 @@
 public class Boxes.MainWindow : Gtk.ApplicationWindow {
 
     private uint configure_id;
+    private AddContainerAssistant add_container_assistant;
 
     [GtkChild]
     private Gtk.Viewport viewport;
@@ -53,7 +54,13 @@ public class Boxes.MainWindow : Gtk.ApplicationWindow {
 
     [GtkCallback]
     private void on_add_button_clicked (Gtk.Widget source) {
-        debug ("on_add_button_clicked");
+        if (add_container_assistant == null) {
+            add_container_assistant = new AddContainerAssistant ();
+            add_container_assistant.destroy.connect (() => {
+                add_container_assistant = null;
+            });
+        }
+        add_container_assistant.present ();
     }
 
     [GtkCallback]

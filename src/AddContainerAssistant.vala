@@ -19,36 +19,16 @@
 * Authored by: Marco Betschart <boxes@marco.betschart.name>
 */
 
-@define-color colorAccent #a56de2;
+[GtkTemplate (ui = "/com/github/marbetschar/boxes/ui/AddContainerAssistant.glade")]
+public class Boxes.AddContainerAssistant : Gtk.Assistant {
 
-list row {
-    border-bottom: 1px solid #d4d4d4;
-}
+    [GtkCallback]
+    private void on_cancel (Gtk.Widget source) {
+        destroy ();
+    }
 
-list row:selected {
-    background-color: #fafafa;
-}
-
-list row label {
-    color: @text_color;
-}
-
-list row button {
-    background-color: transparent;
-}
-
-list row button:active {
-    background-color: alpha (@text_color, 0.2);
-}
-
-
-/* Add Container Assistant Dialog */
-
-entry {
-    border: 1px solid #d4d4d4;
-    background-color: alpha (#d4d4d4, 0.2);
-}
-
-entry:focus {
-    border-color: @colorAccent;
+    [GtkCallback]
+    private void on_close (Gtk.Widget source) {
+        destroy ();
+    }
 }

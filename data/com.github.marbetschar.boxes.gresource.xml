@@ -2,6 +2,8 @@
 <gresources>
   <gresource prefix="/com/github/marbetschar/boxes">
     <file compressed="true" preprocess="xml-stripblanks">actions/desktop.svg</file>
+    <file compressed="true" preprocess="xml-stripblanks">actions/desktop@assistant.svg</file>
+    <file compressed="true" preprocess="xml-stripblanks">actions/download@assistant.svg</file>
     <file compressed="true" preprocess="xml-stripblanks">actions/terminal.svg</file>
     <file compressed="true" preprocess="xml-stripblanks">actions/settings.svg</file>
     <file compressed="true" preprocess="xml-stripblanks">os/centos.svg</file>
@@ -10,6 +12,7 @@
     <file compressed="true" preprocess="xml-stripblanks">os/linux.svg</file>
     <file compressed="true" preprocess="xml-stripblanks">os/ubuntu.svg</file>
     <file compressed="true" preprocess="xml-stripblanks">ui/MainWindow.glade</file>
+    <file compressed="true" preprocess="xml-stripblanks">ui/AddContainerAssistant.glade</file>
     <file compressed="true" preprocess="xml-stripblanks">ui/WidgetsContainerListBoxRow.glade</file>
     <file compressed="true" preprocess="xml-stripblanks">ui/WidgetsContainerLogoBox.glade</file>
     <file compressed="true">styles/Application.css</file>
