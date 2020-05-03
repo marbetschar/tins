@@ -21,16 +21,18 @@
 
 public class Boxes.Application : Gtk.Application {
     public static GLib.Settings settings;
+    public static LXD.Client lxd_client;
+
+    static construct {
+        settings = new Settings ("com.github.marbetschar.boxes");
+        lxd_client = new LXD.Client ();
+    }
 
     public Application () {
         Object (
             application_id: "com.github.marbetschar.boxes",
             flags: ApplicationFlags.FLAGS_NONE
         );
-    }
-
-    static construct {
-        settings = new Settings ("com.github.marbetschar.boxes");
     }
 
     protected override void activate () {

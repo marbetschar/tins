@@ -50,6 +50,8 @@ public class Boxes.MainWindow : Gtk.ApplicationWindow {
         list_box.row_selected.connect ((row) => {
             remove_button.sensitive = row != null;
         });
+
+        //Application.lxd_client.test ();
     }
 
     [GtkCallback]
