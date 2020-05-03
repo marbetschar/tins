@@ -21,27 +21,8 @@
 
 public class LXD.Client {
 
-    public static const string PATH = ".config/lxc/";
-    public static const string SNAP_ROOT = "~/snap/lxd/current/";
-    public static const string APT_ROOT = "~/";
-    public static const string CERT_FILE_NAME = "client.crt";
-    public static const string KEY_FILE_NAME = "client.key";
-
-    public static string CERT_ROOT_PATH;
-    public static TlsCertificate DEFAULT_CERT;
-
-    static construct {
-        CERT_ROOT_PATH = APT_ROOT + PATH;
-
-        try {
-            DEFAULT_CERT = new TlsCertificate.from_files (
-                CERT_ROOT_PATH + CERT_FILE_NAME,
-                CERT_ROOT_PATH + KEY_FILE_NAME
-            );
-        } catch (Error e) {
-            warning (e.message);
-        }
-    }
+    private string host = "lxd";
+    private string version = "1.0";
 
     private SocketClient client;
     private SocketConnection connection;
@@ -49,62 +30,63 @@ public class LXD.Client {
 
     public Client () throws Error {
         client = new SocketClient ();
-        //client.tls = true;
-
-        //connection = client.connect (new UnixSocketAddress ("/var/lib/lxd/unix.socket"), null);
-        certificate = DEFAULT_CERT;
-
-        //client.event.connect (on_client_event);
+        connection = client.connect (new UnixSocketAddress ("/var/lib/lxd/unix.socket"));
     }
 
-    private void on_client_event (SocketClientEvent event, SocketConnectable connectable, IOStream? connection) {
-        debug ("on_client_event");
-        if (event != SocketClientEvent.TLS_HANDSHAKING) {
-            return;
-        }
-        debug ("set_certificate");
-        var tls_connection = connection as TlsConnection;
-        tls_connection.certificate = certificate;
+    public void test () {
+        var http_response = http_request ("GET", @"/$version");
+        debug (@"http_response: $http_response");
     }
 
-    public async void test () {
-        debug ("test request");
+    private HTTPResponse http_request (string method, string endpoint) throws Error {
+        var message = "%s %s HTTP/1.1\r\nHost: %s\r\n\r\n".printf (
+            method.up (),
+            endpoint,
+            host
+        );
 
-        var message = "GET /1.0/ HTTP/1.1\r\n";
         connection.output_stream.write (message.data);
-        debug ("wrote request");
-
         var response = new DataInputStream (connection.input_stream);
-        var status_line = response.read_line (null).strip ();
-        debug (@"Received status line: $status_line");
+
+        string[] response_header = {};
+        StringBuilder response_body = new StringBuilder ();
+
+        bool response_is_header = true;
+        string current_response_line = "";
+        string? previous_response_line = null;
+
+        while ((current_response_line = response.read_line_utf8 ()) != null) {
+            if (response_is_header) {
+                if (current_response_line.strip () == "") {
+                    response_is_header = false;
+                } else {
+                    response_header += current_response_line.strip ();
+                }
+
+            } else if (previous_response_line != null && previous_response_line.strip () == "" && current_response_line.strip () == "0") {
+                break;
+
+            } else {
+                if (current_response_line.strip () != "117f") {
+                    response_body.append_printf ("%s\n", current_response_line.strip ());
+                }
+            }
+
+            previous_response_line = current_response_line;
+        }
+
+        return HTTPResponse () {
+            header = response_header,
+            body = response_body.str.strip ()
+        };
     }
 
+     private struct HTTPResponse {
+        string[] header;
+        string body;
 
-   /* var host = "www.google.com";
-
-    try {
-        // Resolve hostname to IP address
-        var resolver = Resolver.get_default ();
-        var addresses = resolver.lookup_by_name (host, null);
-        var address = addresses.nth_data (0);
-        print (@"Resolved $host to $address\n");
-
-        // Connect
-        var client = new SocketClient ();
-        var conn = client.connect (new InetSocketAddress (address, 80));
-        print (@"Connected to $host\n");
-
-        // Send HTTP GET request
-        var message = @"GET / HTTP/1.1\r\nHost: $host\r\n\r\n";
-        conn.output_stream.write (message.data);
-        print ("Wrote request\n");
-
-        // Receive response
-        var response = new DataInputStream (conn.input_stream);
-        var status_line = response.read_line (null).strip ();
-        print ("Received status line: %s\n", status_line);
-
-    } catch (Error e) {
-        stderr.printf ("%s\n", e.message);
-    }*/
+        public string? to_string () {
+            return body;
+        }
+    }
 }
