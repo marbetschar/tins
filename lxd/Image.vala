@@ -19,24 +19,12 @@
 * Authored by: Marco Betschart <boxes@marco.betschart.name>
 */
 
-namespace LXD {
+public class LXD.Image : GLib.Object {
 
-    public struct Image {
-
-        public string fingerprint;
-        public Properties properties;
-
-        public static Image from_json_object (Json.Object json) {
-            var image = Image () {
-                fingerprint = json.has_member ("fingerprint") ? json.get_string_member ("fingerprint") : null
-            };
-
-            if (json.has_member ("properties")) {
-                image.properties = Properties.from_json_object (json.get_object_member ("properties"));
-            }
-
-            return image;
-        }
-    }
-
+    //public string fingerprint { get; construct set; }
+    //public string[] aliases { get; set; }
+    public string architecture { get; set; }
+    /*public bool cached { get; set; }
+    public LXD.Properties properties { get; set; }
+    public LXD.Source update_source { get; set; }*/
 }

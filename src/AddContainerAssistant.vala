@@ -22,16 +22,16 @@
 [GtkTemplate (ui = "/com/github/marbetschar/boxes/ui/AddContainerAssistant.glade")]
 public class Boxes.AddContainerAssistant : Gtk.Assistant {
 
-    private static LXD.OperatingSystem[] all_known_operating_systems;
-    private static HashTable<LXD.OperatingSystem, Gee.Collection<LXD.Image?>> all_known_operating_system_images;
+    //private static LXD.OperatingSystem[] all_known_operating_systems;
+    //private static HashTable<LXD.OperatingSystem, Gee.Collection<LXD.Image?>> all_known_operating_system_images;
 
     static construct {
-        all_known_operating_systems = LXD.ALL_KNOWN_OPERATING_SYSTEMS;
-        all_known_operating_system_images = new HashTable<LXD.OperatingSystem, Gee.Collection<LXD.Image?>> (direct_hash, direct_equal);
+       // all_known_operating_systems = LXD.ALL_KNOWN_OPERATING_SYSTEMS;
+        //all_known_operating_system_images = new HashTable<LXD.OperatingSystem, Gee.Collection<LXD.Image?>> (direct_hash, direct_equal);
 
         /* TODO: Put available images in JSON file and parse from there */
 
-        var fedora_images = new Gee.ArrayList<LXD.Image?> ((Gee.EqualDataFunc<LXD.Image>?) direct_equal);
+        /*var fedora_images = new Gee.ArrayList<LXD.Image?> ((Gee.EqualDataFunc<LXD.Image>?) direct_equal);
         fedora_images.add (LXD.Image () { properties = LXD.Properties () { os = LXD.OperatingSystem.FEDORA, release = "30", architecture = "amd64" } });
         fedora_images.add (LXD.Image () { properties = LXD.Properties () { os = LXD.OperatingSystem.FEDORA, release = "31", architecture = "amd64" } });
         fedora_images.add (LXD.Image () { properties = LXD.Properties () { os = LXD.OperatingSystem.FEDORA, release = "32", architecture = "amd64" } });
@@ -42,13 +42,14 @@ public class Boxes.AddContainerAssistant : Gtk.Assistant {
         ubuntu_images.add (LXD.Image () { properties = LXD.Properties () { os = LXD.OperatingSystem.UBUNTU, release = "eoan", architecture = "amd64" } });
         ubuntu_images.add (LXD.Image () { properties = LXD.Properties () { os = LXD.OperatingSystem.UBUNTU, release = "focal", architecture = "amd64" } });
         all_known_operating_system_images.insert (LXD.OperatingSystem.UBUNTU, ubuntu_images);
+        */
     }
 
     construct {
-        for(var i = 0; i < all_known_operating_systems.length; i++) {
+        /*for(var i = 0; i < all_known_operating_systems.length; i++) {
             operating_system_combobox.append_text (_(all_known_operating_systems[i].to_string ()));
         }
-        operating_system_combobox.active = 0;
+        operating_system_combobox.active = 0;*/
     }
 
     [GtkChild]
@@ -71,7 +72,7 @@ public class Boxes.AddContainerAssistant : Gtk.Assistant {
 
     [GtkCallback]
     private void on_changed_operating_system (Gtk.Widget source) {
-        image_combobox.remove_all ();
+        /*image_combobox.remove_all ();
 
         var operating_system = all_known_operating_systems[operating_system_combobox.active];
         var operating_system_images = all_known_operating_system_images[operating_system];
@@ -86,7 +87,7 @@ public class Boxes.AddContainerAssistant : Gtk.Assistant {
             image_combobox.active = 0;
         }
 
-        validate_current_page ();
+        validate_current_page ();*/
     }
 
     [GtkCallback]
@@ -101,7 +102,7 @@ public class Boxes.AddContainerAssistant : Gtk.Assistant {
 
     [GtkCallback]
     private void on_apply (Gtk.Widget source) {
-        string[] profiles = { "default" };
+        /*string[] profiles = { "default" };
         if (gui_enabled_checkbutton.active) {
             profiles += "gui";
         }
@@ -109,9 +110,9 @@ public class Boxes.AddContainerAssistant : Gtk.Assistant {
         var instance = LXD.Instance () {
             name = name_entry.text.strip (),
             profiles = profiles
-        };
+        };*/
 
-        Application.lxd_client.add_instance (instance);
+        //Application.lxd_client.add_instance (instance);
     }
 
     private void validate_current_page () {

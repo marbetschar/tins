@@ -19,9 +19,10 @@
 * Authored by: Marco Betschart <boxes@marco.betschart.name>
 */
 
-namespace LXD {
-    interface JsonSerializable {
-        public Json.Node to_json ();
-        public static void from_json (Json.Node node);
-    }
+public class LXD.ImageFile : GLib.Object {
+
+    public string origin { get; set; }
+    public string created { get; set; }
+
+    public GLib.SList<LXD.Image> metadata { get; owned set; }
 }

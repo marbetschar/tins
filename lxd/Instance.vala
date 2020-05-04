@@ -19,21 +19,13 @@
 * Authored by: Marco Betschart <boxes@marco.betschart.name>
 */
 
-namespace LXD {
+public class LXD.Instance : GLib.Object {
 
-    public struct Properties {
-        public OperatingSystem os;
-        public string release;
-        public string architecture;
-        public string description;
-
-        public static Properties from_json_object (Json.Object json) {
-            return Properties () {
-                os = json.has_member ("os") ? OperatingSystem.from_string (json.get_string_member ("os")) : OperatingSystem.UNKNOWN,
-                release = json.has_member ("release") ? json.get_string_member ("release") : null,
-                architecture = json.has_member ("architecture") ? json.get_string_member ("architecture") : null,
-                description = json.has_member ("description") ? json.get_string_member ("description") : null
-            };
-        }
-    }
+    public string name { get; construct set; }
+    public bool ephemeral { get; set; }
+    public bool stateful { get; set; }
+    public string status { get; set; }
+    public string[] profiles { get; set; }
+    public string architecture { get; set; }
+    public HashTable<string, string> config { get; set; }
 }

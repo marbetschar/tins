@@ -19,21 +19,10 @@
 * Authored by: Marco Betschart <boxes@marco.betschart.name>
 */
 
-namespace LXD {
+public class LXD.Properties : GLib.Object {
 
-    public struct Profile {
-
-        public string name;
-        public string description;
-
-        public static Profile from_json_object (Json.Object json) {
-            return Profile () {
-                name = json.has_member ("name") ? json.get_string_member ("name") : null,
-                description = json.has_member ("description") ? json.get_string_member ("description") : null
-            };
-        }
-    }
-
-    // TODO:
-    // public static Profile GUI_PROFILE = ...
+    public string architecture { get; set; }
+    public string description { get; set; }
+    public string os { get; set; }
+    public string release { get; set; }
 }

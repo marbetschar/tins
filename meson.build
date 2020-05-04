@@ -26,11 +26,14 @@ asresources = gnome.compile_resources(
 )
 
 # Listing dependencies
-dependencies = [
+
+core_deps = [
     dependency ('glib-2.0'),
-    dependency ('gee-0.8'),
-    dependency ('gtk+-3.0'),
     dependency ('json-glib-1.0'),
+    dependency ('gee-0.8')
+]
+ui_deps = [
+    dependency ('gtk+-3.0')
 ]
 
 subdir ('lxd')
@@ -42,10 +45,11 @@ executable (
     asresources,
     lxd_sources,
     sources,
-    dependencies: dependencies,
+    dependencies: core_deps + ui_deps,
     install: true
 )
 
+subdir ('cli')
 subdir ('data')
 subdir ('po')
 

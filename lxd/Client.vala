@@ -21,22 +21,23 @@
 
 errordomain LXDClientError {
     CURL,
-    API
+    API,
+    RESPONSE
 }
 
 public class LXD.Client {
 
-    private string host;
-    private string version;
+    public string host { get; private set; }
+    public string version { get; private set; }
 
     public Client (string host = "lxd", string version = "1.0") {
         this.host = host;
         this.version = version;
     }
 
-    public Instance[] get_instances () throws Error {
-        var json = http_get (@"/$version/containers");
-        var list = json.get_array_member ("metadata");
+    public LXD.Instance[] get_instances () throws Error {
+        var json = json_get (@"/$version/containers");
+        var list = json.get_array ();
         int i;
 
         Instance[] instances = {};
@@ -47,16 +48,16 @@ public class LXD.Client {
         return instances;
     }
 
-    public Instance get_instance (string id_or_endpoint) throws Error {
+    public LXD.Instance get_instance (string id_or_endpoint) throws Error {
         var endpoint = id_or_endpoint;
         if (!endpoint.has_prefix (@"/$version/containers/")) {
             endpoint = @"/$version/containers/$id_or_endpoint";
         }
-        var json = http_get (endpoint);
+        var node = json_get (endpoint);
 
-        return Instance.from_json_object (json.get_object_member ("metadata"));
+        return Json.gobject_deserialize (typeof (LXD.Instance), node) as LXD.Instance;
     }
-
+/*
     public bool add_instance (Instance instance) {
         var json = new Json.Node (Json.NodeType.OBJECT);
         json.set_object (instance.to_json ());
@@ -64,34 +65,37 @@ public class LXD.Client {
         //var response =
         http_post (@"/$version/containers", json);
         return true;
-
-           /* "name": "my-new-instance",                                          // 64 chars max, ASCII, no slash, no colon and no comma
-    "architecture": "x86_64",
-    "profiles": ["default"],                                            // List of profiles
-    "ephemeral": true,                                                  // Whether to destroy the instance on shutdown
-    "config": {"limits.cpu": "2"},                                      // Config override.
-    "devices": {                                                        // Optional list of devices the instance should have
-        "kvm": {
-            "path": "/dev/kvm",
-            "type": "unix-char"
-        },
-    },
-    "source": {"type": "image",                                         // Can be: "image", "migration", "copy" or "none"
-               "properties": {                                          // Properties
-                    "os": "ubuntu",
-                    "release": "18.04",
-                    "architecture": "x86_64"
-                }},*/
-    }
-
-    public Image[] get_images () throws Error {
-        var json = http_get (@"/$version/images");
-        var list = json.get_array_member ("metadata");
+    }*/
+/*
+    public Image[] get_images (string? filter = null) throws Error {
+        var json = json_get (@"/$version/images", (filter == null ? "" : @"filter=$filter"));
+        var list = json.get_array ();
         int i;
 
         Image[] images = {};
         for (i = 0; i < list.get_length (); i++) {
             images += get_image (list.get_string_element (i));
+
+            if (i > 5) {
+                break;
+            }
+        }
+
+        return images;
+    }*/
+
+    public GLib.SList<Image> get_images (string? filter = null) throws Error {
+        var json = json_get (@"/$version/images", (filter == null ? "" : @"filter=$filter"));
+        var list = json.get_array ();
+        int i;
+
+        var images = new GLib.SList<Image> ();
+        for (i = 0; i < list.get_length (); i++) {
+            images.append (get_image (list.get_string_element (i)));
+
+            if (i > 5) {
+                break;
+            }
         }
 
         return images;
@@ -102,11 +106,11 @@ public class LXD.Client {
         if (!endpoint.has_prefix (@"/$version/images/")) {
             endpoint = @"/$version/images/$id_or_endpoint";
         }
-        var json = http_get (endpoint);
+        var node = json_get (endpoint);
 
-        return Image.from_json_object (json.get_object_member ("metadata"));
+        return Json.gobject_deserialize (typeof (LXD.Image), node) as LXD.Image;
     }
-
+/*
     public Profile get_profile (string id_or_endpoint) throws Error {
         var endpoint = id_or_endpoint;
         if (!endpoint.has_prefix (@"/$version/profiles/")) {
@@ -116,14 +120,15 @@ public class LXD.Client {
 
         return Profile.from_json_object (json.get_object_member ("metadata"));
     }
+    */
 
-    private Json.Object http_get (string endpoint) throws Error {
+    private Json.Node json_get (string endpoint, string? data = null) throws Error {
         int exit_code;
         string stdout;
         string stderr;
 
         Process.spawn_command_line_sync (
-            curl_command_line (endpoint),
+            curl_command_line (endpoint, data),
             out stdout,
             out stderr,
             out exit_code
@@ -135,22 +140,26 @@ public class LXD.Client {
             var parser = new Json.Parser ();
             parser.load_from_data (stdout, -1);
 
-            var root = parser.get_root ().get_object ();
+            var root = parser.get_root ();
+            var result = root.get_object ();
 
             int64 error_code = 0;
-            if (root.has_member ("error_code")) {
-                error_code = root.get_int_member ("error_code");
+            if (result.has_member ("error_code")) {
+                error_code = result.get_int_member ("error_code");
             }
 
             if (error_code != 0) {
-                throw new LXDClientError.API ("%f: %s".printf (error_code, root.get_string_member ("error")));
+                throw new LXDClientError.API ("%f: %s".printf (error_code, result.get_string_member ("error")));
             }
 
-            return root;
+            if (result.has_member("metadata")) {
+                return result.get_member ("metadata");
+            }
+            throw new LXDClientError.RESPONSE (stdout);
         }
         throw new LXDClientError.CURL(stderr);
     }
-
+/*
     private void http_post (string endpoint, Json.Node json) {
         var generator = new Json.Generator ();
         generator.root = json;
@@ -160,16 +169,38 @@ public class LXD.Client {
 
         debug (@"json_data: $(data.str)");
 
-        //return null;
-    }
+// https://valadoc.org/json-glib-1.0/Json.gobject_serialize.html
 
-    private string curl_command_line (string endpoint) {
+        MyObject obj = new MyObject ("my string", MyEnum.FOOBAR, 10);
+	Json.Node root = Json.gobject_serialize (obj);
+
+
+
+	// To string: (see gobject_to_data)
+	Json.Generator generator = new Json.Generator ();
+	generator.set_root (root);
+	string data = generator.to_data (null);
+
+	// Output:
+	// ``{"str":"my string","en":2,"num":10}``
+	print (data);
+	print ("\n");
+
+
+        //return null;
+    }    */
+
+    private string curl_command_line (string endpoint, string? data = null) {
         var args = "--silent --show-error --location";
+        if (data != null) {
+            args += @" --data \"$data\"";
+        }
         if (host == "lxd") {
             args += " --unix-socket /var/lib/lxd/unix.socket";
         }
-        var command_line = @"curl $args $host$endpoint";
+        var command_line = @"curl $args \"$host$endpoint\"";
         debug (@"lxd-client: $command_line");
         return command_line;
     }
+
 }
