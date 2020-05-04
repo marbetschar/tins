@@ -24,5 +24,5 @@ public class LXD.ImageFile : GLib.Object {
     public string origin { get; set; }
     public string created { get; set; }
 
-    public GLib.SList<LXD.Image> metadata { get; owned set; }
+    public SList<LXD.Image> metadata { get; owned set; }
 }

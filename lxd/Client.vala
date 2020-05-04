@@ -66,25 +66,8 @@ public class LXD.Client {
         http_post (@"/$version/containers", json);
         return true;
     }*/
-/*
-    public Image[] get_images (string? filter = null) throws Error {
-        var json = json_get (@"/$version/images", (filter == null ? "" : @"filter=$filter"));
-        var list = json.get_array ();
-        int i;
 
-        Image[] images = {};
-        for (i = 0; i < list.get_length (); i++) {
-            images += get_image (list.get_string_element (i));
-
-            if (i > 5) {
-                break;
-            }
-        }
-
-        return images;
-    }*/
-
-    public GLib.SList<Image> get_images (string? filter = null) throws Error {
+    public SList<Image> get_images (string? filter = null) throws Error {
         var json = json_get (@"/$version/images", (filter == null ? "" : @"filter=$filter"));
         var list = json.get_array ();
         int i;

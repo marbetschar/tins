@@ -31,12 +31,18 @@ public class Boxes.Application : GLib.Application {
         var images = lxd_client.get_images ();
 
         var image_file = new LXD.ImageFile ();
-        image_file.metadata = (owned) images;
-
         image_file.origin = lxd_client.host;
         image_file.created = new DateTime.now_utc ().format ("%FT%TZ");
 
         Json.Node root = Json.gobject_serialize (image_file);
+
+        var json_object = root.get_object ();
+        Json.Array json_images = new Json.Array.sized (images.length ());
+        images.@foreach((image) => {
+            json_images.add_object_element (Json.gobject_serialize (image).get_object ());
+        });
+        json_object.set_array_member ("metadata", json_images);
+
         Json.Generator generator = new Json.Generator ();
         generator.set_root (root);
 
