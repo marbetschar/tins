@@ -50,10 +50,6 @@ public class Boxes.MainWindow : Gtk.ApplicationWindow {
         list_box.row_selected.connect ((row) => {
             remove_button.sensitive = row != null;
         });
-
-        var containers = Application.lxd_client.get_containers ();
-
-        debug (@"[name = $(containers[0].name), status = $(containers[0].status)]");
     }
 
     [GtkCallback]

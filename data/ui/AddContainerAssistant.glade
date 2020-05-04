@@ -8,6 +8,7 @@
     <property name="valign">start</property>
     <property name="type_hint">dialog</property>
     <property name="use_header_bar">0</property>
+    <signal name="apply" handler="on_apply" swapped="no"/>
     <signal name="cancel" handler="on_cancel" swapped="no"/>
     <signal name="close" handler="on_close" swapped="no"/>
     <child>
@@ -86,10 +87,11 @@
           </packing>
         </child>
         <child>
-          <object class="GtkEntry">
+          <object class="GtkEntry" id="name_entry">
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="has_frame">False</property>
+            <signal name="key-release-event" handler="on_key_release_name_entry" swapped="no"/>
           </object>
           <packing>
             <property name="left_attach">2</property>
@@ -110,20 +112,11 @@
           </packing>
         </child>
         <child>
-          <object class="GtkComboBoxText">
+          <object class="GtkComboBoxText" id="operating_system_combobox">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <property name="has_frame">False</property>
-            <items>
-              <item id="alpine" translatable="yes">Alpine</item>
-              <item id="archlinux" translatable="yes">Arch Linux</item>
-              <item id="centos" translatable="yes">CentOS</item>
-              <item id="debian" translatable="yes">Debian</item>
-              <item id="fedora" translatable="yes">Fedora</item>
-              <item id="gentoo" translatable="yes">Gentoo</item>
-              <item id="ubuntu" translatable="yes">Ubuntu</item>
-              <item id="other" translatable="yes">Other</item>
-            </items>
+            <signal name="changed" handler="on_changed_operating_system" swapped="no"/>
             <style>
               <class name="flat"/>
             </style>
@@ -147,14 +140,9 @@
           </packing>
         </child>
         <child>
-          <object class="GtkComboBoxText">
+          <object class="GtkComboBoxText" id="image_combobox">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <items>
-              <item id="eon" translatable="yes">Eon</item>
-              <item id="trusty" translatable="yes">Trusty</item>
-              <item id="bionic" translatable="yes">Bionic</item>
-            </items>
             <style>
               <class name="flat"/>
             </style>
@@ -234,7 +222,7 @@
           </packing>
         </child>
         <child>
-          <object class="GtkCheckButton">
+          <object class="GtkCheckButton" id="gui_enabled_checkbutton">
             <property name="label" translatable="yes">Enable graphics support</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
@@ -261,6 +249,12 @@
         <property name="page_type">confirm</property>
         <property name="has_padding">False</property>
       </packing>
+    </child>
+    <child>
+      <placeholder/>
+    </child>
+    <child>
+      <placeholder/>
     </child>
     <child>
       <placeholder/>

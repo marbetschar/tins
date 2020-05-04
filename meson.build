@@ -28,6 +28,7 @@ asresources = gnome.compile_resources(
 # Listing dependencies
 dependencies = [
     dependency ('glib-2.0'),
+    dependency ('gee-0.8'),
     dependency ('gtk+-3.0'),
     dependency ('json-glib-1.0'),
 ]

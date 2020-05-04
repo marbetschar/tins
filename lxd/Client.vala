@@ -21,84 +21,103 @@
 
 errordomain LXDClientError {
     CURL,
-    RESPONSE
+    API
 }
 
 public class LXD.Client {
 
-    private string host = "lxd";
-    private string version = "1.0";
+    private string host;
+    private string version;
 
-    public struct Container {
-        public string name;
-        public string status;
+    public Client (string host = "lxd", string version = "1.0") {
+        this.host = host;
+        this.version = version;
     }
 
-    public Container[] get_containers () throws Error {
-        var list_json = request (@"/$version/containers");
-
-        var list = list_json.get_array_member ("metadata");
+    public Instance[] get_instances () throws Error {
+        var json = http_get (@"/$version/containers");
+        var list = json.get_array_member ("metadata");
         int i;
 
-        Container[] containers = {};
+        Instance[] instances = {};
         for (i = 0; i < list.get_length (); i++) {
-            var endpoint = list.get_string_element (i);
-            var container_json = request (endpoint).get_object_member ("metadata");
-
-            containers += Container () {
-                name = container_json.get_string_member ("name"),
-                status = container_json.get_string_member ("status")
-            };
+            instances += get_instance (list.get_string_element (i));
         }
 
-        return containers;
-
-      /*
-        {
-    "architecture": "x86_64",
-    "config": {
-        "limits.cpu": "3",
-        "volatile.base_image": "97d97a3d1d053840ca19c86cdd0596cf1be060c5157d31407f2a4f9f350c78cc",
-        "volatile.eth0.hwaddr": "00:16:3e:1c:94:38"
-    },
-    "created_at": "2016-02-16T01:05:05Z",
-    "devices": {
-        "rootfs": {
-            "path": "/",
-            "type": "disk"
-        }
-    },
-    "ephemeral": false,
-    "expanded_config": {    // the result of expanding profiles and adding the instance's local config
-        "limits.cpu": "3",
-        "volatile.base_image": "97d97a3d1d053840ca19c86cdd0596cf1be060c5157d31407f2a4f9f350c78cc",
-        "volatile.eth0.hwaddr": "00:16:3e:1c:94:38"
-    },
-    "expanded_devices": {   // the result of expanding profiles and adding the instance's local devices
-        "eth0": {
-            "name": "eth0",
-            "nictype": "bridged",
-            "parent": "lxdbr0",
-            "type": "nic"
-        },
-        "root": {
-            "path": "/",
-            "type": "disk"
-        }
-    },
-    "last_used_at": "2016-02-16T01:05:05Z",
-    "name": "my-instance",
-    "profiles": [
-        "default"
-    ],
-    "stateful": false,      // If true, indicates that the instance has some stored state that can be restored on startup
-    "status": "Running",
-    "status_code": 103
-}*/
-
+        return instances;
     }
 
-    private Json.Object request (string endpoint) throws Error {
+    public Instance get_instance (string id_or_endpoint) throws Error {
+        var endpoint = id_or_endpoint;
+        if (!endpoint.has_prefix (@"/$version/containers/")) {
+            endpoint = @"/$version/containers/$id_or_endpoint";
+        }
+        var json = http_get (endpoint);
+
+        return Instance.from_json_object (json.get_object_member ("metadata"));
+    }
+
+    public bool add_instance (Instance instance) {
+        var json = new Json.Node (Json.NodeType.OBJECT);
+        json.set_object (instance.to_json ());
+
+        //var response =
+        http_post (@"/$version/containers", json);
+        return true;
+
+           /* "name": "my-new-instance",                                          // 64 chars max, ASCII, no slash, no colon and no comma
+    "architecture": "x86_64",
+    "profiles": ["default"],                                            // List of profiles
+    "ephemeral": true,                                                  // Whether to destroy the instance on shutdown
+    "config": {"limits.cpu": "2"},                                      // Config override.
+    "devices": {                                                        // Optional list of devices the instance should have
+        "kvm": {
+            "path": "/dev/kvm",
+            "type": "unix-char"
+        },
+    },
+    "source": {"type": "image",                                         // Can be: "image", "migration", "copy" or "none"
+               "properties": {                                          // Properties
+                    "os": "ubuntu",
+                    "release": "18.04",
+                    "architecture": "x86_64"
+                }},*/
+    }
+
+    public Image[] get_images () throws Error {
+        var json = http_get (@"/$version/images");
+        var list = json.get_array_member ("metadata");
+        int i;
+
+        Image[] images = {};
+        for (i = 0; i < list.get_length (); i++) {
+            images += get_image (list.get_string_element (i));
+        }
+
+        return images;
+    }
+
+    public Image get_image (string id_or_endpoint) throws Error {
+        var endpoint = id_or_endpoint;
+        if (!endpoint.has_prefix (@"/$version/images/")) {
+            endpoint = @"/$version/images/$id_or_endpoint";
+        }
+        var json = http_get (endpoint);
+
+        return Image.from_json_object (json.get_object_member ("metadata"));
+    }
+
+    public Profile get_profile (string id_or_endpoint) throws Error {
+        var endpoint = id_or_endpoint;
+        if (!endpoint.has_prefix (@"/$version/profiles/")) {
+            endpoint = @"/$version/profiles/$id_or_endpoint";
+        }
+        var json = http_get (endpoint);
+
+        return Profile.from_json_object (json.get_object_member ("metadata"));
+    }
+
+    private Json.Object http_get (string endpoint) throws Error {
         int exit_code;
         string stdout;
         string stderr;
@@ -111,6 +130,8 @@ public class LXD.Client {
         );
 
         if (exit_code == 0 && stdout != null && stdout != "") {
+            debug (@"lxd-client: $stdout");
+
             var parser = new Json.Parser ();
             parser.load_from_data (stdout, -1);
 
@@ -122,7 +143,7 @@ public class LXD.Client {
             }
 
             if (error_code != 0) {
-                throw new LXDClientError.RESPONSE ("%f: %s".printf (error_code, root.get_string_member ("error")));
+                throw new LXDClientError.API ("%f: %s".printf (error_code, root.get_string_member ("error")));
             }
 
             return root;
@@ -130,8 +151,20 @@ public class LXD.Client {
         throw new LXDClientError.CURL(stderr);
     }
 
+    private void http_post (string endpoint, Json.Node json) {
+        var generator = new Json.Generator ();
+        generator.root = json;
+
+        var data = new StringBuilder ();
+        generator.to_gstring (data);
+
+        debug (@"json_data: $(data.str)");
+
+        //return null;
+    }
+
     private string curl_command_line (string endpoint) {
-        var args = "--silent --show-error";
+        var args = "--silent --show-error --location";
         if (host == "lxd") {
             args += " --unix-socket /var/lib/lxd/unix.socket";
         }
