@@ -16,7 +16,7 @@
     <file compressed="true" preprocess="xml-stripblanks">ui/WidgetsContainerListBoxRow.glade</file>
     <file compressed="true" preprocess="xml-stripblanks">ui/WidgetsContainerLogoBox.glade</file>
     <file compressed="true">styles/Application.css</file>
-    <file compressed="true">cache/public-image-cache.json</file>
+    <file compressed="true">lxd/image-store.json</file>
   </gresource>
 </gresources>
 

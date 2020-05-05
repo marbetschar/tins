@@ -22,34 +22,14 @@
 [GtkTemplate (ui = "/com/github/marbetschar/boxes/ui/AddContainerAssistant.glade")]
 public class Boxes.AddContainerAssistant : Gtk.Assistant {
 
-    //private static LXD.OperatingSystem[] all_known_operating_systems;
-    //private static HashTable<LXD.OperatingSystem, Gee.Collection<LXD.Image?>> all_known_operating_system_images;
+    private static List<unowned string> all_os_keys;
 
     static construct {
-       // all_known_operating_systems = LXD.ALL_KNOWN_OPERATING_SYSTEMS;
-        //all_known_operating_system_images = new HashTable<LXD.OperatingSystem, Gee.Collection<LXD.Image?>> (direct_hash, direct_equal);
-
-        /* TODO: Put available images in JSON file and parse from there */
-
-        /*var fedora_images = new Gee.ArrayList<LXD.Image?> ((Gee.EqualDataFunc<LXD.Image>?) direct_equal);
-        fedora_images.add (LXD.Image () { properties = LXD.Properties () { os = LXD.OperatingSystem.FEDORA, release = "30", architecture = "amd64" } });
-        fedora_images.add (LXD.Image () { properties = LXD.Properties () { os = LXD.OperatingSystem.FEDORA, release = "31", architecture = "amd64" } });
-        fedora_images.add (LXD.Image () { properties = LXD.Properties () { os = LXD.OperatingSystem.FEDORA, release = "32", architecture = "amd64" } });
-        all_known_operating_system_images.insert (LXD.OperatingSystem.FEDORA, fedora_images);
-
-        var ubuntu_images = new Gee.ArrayList<LXD.Image?> ((Gee.EqualDataFunc<LXD.Image>?) direct_equal);
-        ubuntu_images.add (LXD.Image () { properties = LXD.Properties () { os = LXD.OperatingSystem.UBUNTU, release = "bionic", architecture = "amd64" } });
-        ubuntu_images.add (LXD.Image () { properties = LXD.Properties () { os = LXD.OperatingSystem.UBUNTU, release = "eoan", architecture = "amd64" } });
-        ubuntu_images.add (LXD.Image () { properties = LXD.Properties () { os = LXD.OperatingSystem.UBUNTU, release = "focal", architecture = "amd64" } });
-        all_known_operating_system_images.insert (LXD.OperatingSystem.UBUNTU, ubuntu_images);
-        */
+        all_os_keys = Application.lxd_image_store.data.get_keys ();
+        all_os_keys.sort (strcmp);
     }
 
-    List<unowned string> all_os_keys;
-
     construct {
-        all_os_keys = Application.lxd_image_cache.data.get_keys ();
-
         all_os_keys.@foreach ((os) => {
             operating_system_combobox.append_text (_(os));
         });
@@ -79,11 +59,12 @@ public class Boxes.AddContainerAssistant : Gtk.Assistant {
         image_combobox.remove_all ();
 
         var os_key = all_os_keys.nth_data (operating_system_combobox.active);
-        var os_images = Application.lxd_image_cache.data.get (os_key);
+        var os_images = Application.lxd_image_store.data.get (os_key);
 
         if (os_images != null) {
             for(var i = 0; i < os_images.length; i++) {
-                image_combobox.append_text (_(os_images.index(i).properties.release));
+                var os_image = os_images.index(i);
+                image_combobox.append_text (_(os_image.properties.release));
             }
             image_combobox.active = 0;
         }
@@ -103,17 +84,35 @@ public class Boxes.AddContainerAssistant : Gtk.Assistant {
 
     [GtkCallback]
     private void on_apply (Gtk.Widget source) {
-        /*string[] profiles = { "default" };
+        var os_key = all_os_keys.nth_data (operating_system_combobox.active);
+        var all_os_images = Application.lxd_image_store.data.get (os_key);
+        var os_image = all_os_images.index (image_combobox.active);
+
+        var instance_source = new LXD.Instance.Source ();
+        instance_source.source_type = "image";
+        instance_source.mode = "pull";
+        instance_source.server = Application.lxd_image_store.server;
+        instance_source.alias = @"$(os_image.properties.os)/$(os_image.properties.release)";
+
+        var instance = new LXD.Instance ();
+        instance.source = instance_source;
+
+        instance.display_name = name_entry.text;
+        debug (@"instance.name: $(instance.name)");
+        instance.architecture = "x86_64";
+
+        var profiles = new Array<string> ();
+        profiles.append_val ("default");
         if (gui_enabled_checkbutton.active) {
-            profiles += "gui";
+            profiles.append_val ("gui");
         }
+        instance.profiles = (owned) profiles;
 
-        var instance = LXD.Instance () {
-            name = name_entry.text.strip (),
-            profiles = profiles
-        };*/
-
-        //Application.lxd_client.add_instance (instance);
+        try {
+            Application.lxd_client.add_instance (instance);
+        } catch (Error e) {
+            critical (e.message);
+        }
     }
 
     private void validate_current_page () {

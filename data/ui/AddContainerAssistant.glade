@@ -90,7 +90,10 @@
           <object class="GtkEntry" id="name_entry">
             <property name="visible">True</property>
             <property name="can_focus">True</property>
+            <property name="max_length">64</property>
             <property name="has_frame">False</property>
+            <property name="input_purpose">alpha</property>
+            <property name="input_hints">GTK_INPUT_HINT_UPPERCASE_WORDS | GTK_INPUT_HINT_NONE</property>
             <signal name="key-release-event" handler="on_key_release_name_entry" swapped="no"/>
           </object>
           <packing>
@@ -158,7 +161,6 @@
       </object>
       <packing>
         <property name="page_type">intro</property>
-        <property name="complete">True</property>
         <property name="has_padding">False</property>
       </packing>
     </child>
@@ -249,6 +251,12 @@
         <property name="page_type">confirm</property>
         <property name="has_padding">False</property>
       </packing>
+    </child>
+    <child>
+      <placeholder/>
+    </child>
+    <child>
+      <placeholder/>
     </child>
     <child>
       <placeholder/>

@@ -27,24 +27,12 @@ public class LXD.Image : LXD.Object {
     public string architecture { get; set; }
     public int size { get; set; }
 
-    //public Array<string> aliases { get; set; }
     public Properties properties { get; set; }
 
     public class Properties : LXD.Object {
         public string architecture { get; set; }
         public string os { get; set; }
         public string release { get; set; }
-    }
-
-
-    /* --- Json.Serializable --- */
-
-    public override Type deserialize_property_with_boxed_type (ParamSpec pspec) {
-        switch (pspec.name) {
-            case "aliases":
-                return typeof (string);
-            default:
-                return default_deserialize_property_with_boxed_type (pspec);
-        }
+        public string description { get; set; }
     }
 }

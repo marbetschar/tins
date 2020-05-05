@@ -19,21 +19,21 @@
 * Authored by: Marco Betschart <boxes@marco.betschart.name>
 */
 
-public class LXD.PublicImageCache : LXD.Object {
+public class LXD.ImageStore : LXD.Object {
 
-    public string origin { get; set; }
+    public string server { get; set; }
     public string created_at { get; set; }
     public HashTable<string,Array<LXD.Image>> data { get; set; }
 
 
     /* --- Json.Serializable --- */
 
-    public override Type deserialize_property_with_boxed_type (ParamSpec pspec) {
+    public override Type property_boxed_value_type_with_param_spec (ParamSpec pspec) {
         switch (pspec.name) {
             case "data":
                 return typeof (LXD.Image);
             default:
-                return default_deserialize_property_with_boxed_type (pspec);
+                return default_property_boxed_value_type_with_param_spec (pspec);
         }
     }
 }

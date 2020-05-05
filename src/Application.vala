@@ -23,7 +23,7 @@ public class Boxes.Application : Gtk.Application {
 
     public static GLib.Settings settings;
     public static LXD.Client lxd_client;
-    public static LXD.PublicImageCache lxd_image_cache;
+    public static LXD.ImageStore lxd_image_store;
 
     static construct {
         settings = new Settings ("com.github.marbetschar.boxes");
@@ -35,13 +35,13 @@ public class Boxes.Application : Gtk.Application {
          */
         Idle.add (() => {
             try {
-                var image_cache_file = File.new_for_uri ("resource:///com/github/marbetschar/boxes/cache/public-image-cache.json");
+                var image_store_file = File.new_for_uri ("resource:///com/github/marbetschar/boxes/lxd/image-store.json");
 
                 var parser = new Json.Parser ();
-                parser.load_from_stream (image_cache_file.read (null), null);
-                lxd_image_cache = Json.gobject_deserialize (typeof (LXD.PublicImageCache), parser.get_root ()) as LXD.PublicImageCache;
+                parser.load_from_stream (image_store_file.read (null), null);
+                lxd_image_store = Json.gobject_deserialize (typeof (LXD.ImageStore), parser.get_root ()) as LXD.ImageStore;
 
-                debug ("Loaded images for %u operating systems from cache.".printf (lxd_image_cache.data.size ()));
+                debug ("Loaded images for %u operating systems from store.".printf (lxd_image_store.data.size ()));
 
             } catch (Error e) {
                 critical (e.message);

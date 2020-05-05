@@ -19,13 +19,63 @@
 * Authored by: Marco Betschart <boxes@marco.betschart.name>
 */
 
-public class LXD.Instance : GLib.Object {
+public class LXD.Instance : LXD.Object {
 
-    public string name { get; construct set; }
-    public bool ephemeral { get; set; }
-    public bool stateful { get; set; }
-    public string status { get; set; }
-    public string[] profiles { get; set; }
+    public static Regex name_non_alpha_regex;
+    public static Regex name_multi_dash_regex;
+
+    static construct  {
+        name_non_alpha_regex = new Regex ("[^a-zA-Z0-9_]");
+        name_multi_dash_regex = new Regex ("-+");
+    }
+
+    public string display_name {
+        owned get {
+            if (this.name == null) {
+                return null;
+            }
+            return name_multi_dash_regex.replace (this.name, -1, 0, " ");
+        }
+        set {
+            var name = value;
+            if (name != null){
+                name = name_non_alpha_regex.replace (name, -1, 0, "-");
+                name = name_multi_dash_regex.replace (name, -1, 0, "-");
+            }
+            this.name = name;
+        }
+    }
+
+    /**
+     * 64 chars max, ASCII, no slash, no colon and no comma
+     */
+    public string name { get; set; }
     public string architecture { get; set; }
-    public HashTable<string, string> config { get; set; }
+    public Array<string> profiles { get; set; }
+    public bool ephemeral { get; set; }
+    public string status { get; set; }
+
+    public Source source { get; set; }
+
+    public class Source : LXD.Object {
+        [Description (nick = "type")]
+        public string source_type { get; set; }
+        public string mode { get; set; }
+        public string server { get; set; }
+        public string alias { get; set; }
+    }
+
+
+    /* --- Json.Serializable --- */
+
+    public override Type property_boxed_value_type_with_param_spec (ParamSpec pspec) {
+        switch (pspec.name) {
+            case "profiles":
+                return typeof (string);
+            case "config":
+                return typeof (string);
+            default:
+                return default_property_boxed_value_type_with_param_spec (pspec);
+        }
+    }
 }

@@ -21,24 +21,48 @@
 
 public abstract class LXD.Object : GLib.Object, Json.Serializable {
 
+    // TODO: switch to https://valadoc.org/glib-2.0/GLib.GenericArray.html
+
 	public unowned ParamSpec? find_property (string name) {
 		return ((ObjectClass) get_type ().class_ref ()).find_property (name);
 	}
 
 	public virtual Json.Node serialize_property (string property_name, Value @value, ParamSpec pspec) {
 		if (@value.type ().is_a (typeof (GLib.Array))) {
-			unowned GLib.Array<GLib.Object> array_value = @value as GLib.Array<GLib.Object>;
+		    var boxed_value_type = property_boxed_value_type_with_param_spec (pspec);
 
-			if (array_value != null){
-				var array = new Json.Array.sized (array_value.length);
+			if (boxed_value_type.is_a (typeof (GLib.Object))) {
+			    unowned GLib.Array<GLib.Object> array_value = @value as GLib.Array<GLib.Object>;
 
-				for(var i = 0; i < array_value.length; i++) {
-					array.add_element (Json.gobject_serialize (array_value.index (i)));
-				}
+			    if (array_value != null){
+				    var array = new Json.Array.sized (array_value.length);
 
-				var node = new Json.Node (Json.NodeType.ARRAY);
-				node.set_array (array);
-				return node;
+				    for(var i = 0; i < array_value.length; i++) {
+					    array.add_element (Json.gobject_serialize (array_value.index (i)));
+				    }
+
+				    var node = new Json.Node (Json.NodeType.ARRAY);
+				    node.set_array (array);
+				    return node;
+			    }
+
+			} else if (boxed_value_type.is_a (typeof (string))){
+			    unowned GLib.Array<string> array_value = @value as GLib.Array<string>;
+
+			    if (array_value != null){
+				    var array = new Json.Array.sized (array_value.length);
+
+				    for(var i = 0; i < array_value.length; i++) {
+					    array.add_string_element (array_value.index (i));
+				    }
+
+				    var node = new Json.Node (Json.NodeType.ARRAY);
+				    node.set_array (array);
+				    return node;
+			    }
+
+			} else {
+			    warning (@"GLib.Array serialization not supported for boxed type: $(boxed_value_type.name ())");
 			}
 
 		} else if (@value.type ().is_a (typeof (GLib.HashTable))) {
@@ -61,7 +85,7 @@ public abstract class LXD.Object : GLib.Object, Json.Serializable {
 					});
 				}
 
-			} else {
+			} else if (@value.type ().is_a (typeof (GLib.HashTable<string,GLib.Object>))) {
 				unowned GLib.HashTable<string,GLib.Object> hash_table = @value as HashTable<string, GLib.Object>;
 
 				if (hash_table != null) {
@@ -69,38 +93,54 @@ public abstract class LXD.Object : GLib.Object, Json.Serializable {
 						object.set_member (key, Json.gobject_serialize (object_value));
 					});
 				}
+
+			} else {
+			    warning (@"GLib.HashTable serialization not supported for boxed type: $(@value.type ().name ())");
 			}
 
 			var node = new Json.Node (Json.NodeType.OBJECT);
 			node.set_object (object);
 			return node;
-
 		}
 
 		return default_serialize_property (property_name, @value, pspec);
 	}
 
 	public virtual bool deserialize_property (string property_name, out Value @value, ParamSpec pspec, Json.Node property_node) {
-
 		if (pspec.value_type.is_a (typeof (GLib.Array))) {
 			@value = GLib.Value (pspec.value_type);
 
 			var array_value = property_node.get_array ();
-			var array = new GLib.Array<GLib.Object> ();
+			var boxed_value_type = property_boxed_value_type_with_param_spec (pspec);
 
-			if (array_value != null) {
-				var boxed_type = deserialize_property_with_boxed_type (pspec);
+			if (boxed_value_type.is_a (typeof (GLib.Object))) {
+				var array = new GLib.Array<GLib.Object> ();
 
-				array_value.foreach_element ((array_value, i, element) => {
-					array.append_val (Json.gobject_deserialize (boxed_type, element));
-				});
+				if (array_value != null) {
+					array_value.foreach_element ((array_value, i, element) => {
+						array.append_val (Json.gobject_deserialize (boxed_value_type, element));
+					});
+				}
+				@value.set_boxed (array);
+
+			} else if (boxed_value_type.is_a (typeof (string))){
+				var array = new GLib.Array<string> ();
+
+				if (array_value != null) {
+					array_value.foreach_element ((array_value, i, element) => {
+						array.append_val (element.get_string ());
+					});
+				}
+				@value.set_boxed (array);
+
+			} else {
+			    warning (@"GLib.Array deserialization not supported for boxed type: $(boxed_value_type.name ())");
 			}
-			@value.set_boxed (array);
 
 		} else if (pspec.value_type.is_a (typeof (GLib.HashTable))) {
 			@value = GLib.Value (pspec.value_type);
 
-			var boxed_type = deserialize_property_with_boxed_type (pspec);
+			var boxed_value_type = property_boxed_value_type_with_param_spec (pspec);
 			var object_value = property_node.get_object ();
 
 			if (object_value != null) {
@@ -113,19 +153,22 @@ public abstract class LXD.Object : GLib.Object, Json.Serializable {
 
 						if (array_value != null) {
 							array_value.foreach_element ((array_value, i, element) => {
-								array.append_val (Json.gobject_deserialize (boxed_type, element));
+								array.append_val (Json.gobject_deserialize (boxed_value_type, element));
 							});
 						}
 						hash_table.@set (member_name, array);
 					});
 					@value.set_boxed (hash_table);
 
-				} else {
+				} else if (pspec.value_type.is_a ((typeof (GLib.HashTable<string,GLib.Object>)))) {
 					var hash_table = new GLib.HashTable<string, GLib.Object> (str_hash, str_equal);
 					object_value.foreach_member ((object, member_name, member_node) => {
-						hash_table.@set (member_name, Json.gobject_deserialize (boxed_type, member_node));
+						hash_table.@set (member_name, Json.gobject_deserialize (boxed_value_type, member_node));
 					});
 					@value.set_boxed (hash_table);
+
+				} else {
+					warning (@"GLib.HashTable deserialization not supported for boxed value of type: $(boxed_value_type.name ())");
 				}
 			}
 
@@ -140,22 +183,22 @@ public abstract class LXD.Object : GLib.Object, Json.Serializable {
 	}
 
 	/**
-	 * GLib.Array doesn't carry its object type at runtime,
-	 * so we need to manually provide the desired Type.
+	 * GLib boxed types such as GLib.Array or GLib.HashTable
+	 * don't carry the type of their boxed values at runtime.
 	 *
-	 * Overide this method to do so.
+	 * Overide this method to provide the boxed value type for such properties.
 	 */
-	public virtual Type deserialize_property_with_boxed_type (ParamSpec pspec) {
-		return default_deserialize_property_with_boxed_type (pspec);
+	public virtual Type property_boxed_value_type_with_param_spec (ParamSpec pspec) {
+		return default_property_boxed_value_type_with_param_spec (pspec);
 	}
 
 	/**
-	 * GLib.Array doesn't carry its object type at runtime,
-	 * so we need to manually provide the desired Type.
+	 * GLib boxed types such as GLib.Array or GLib.HashTable
+	 * don't carry the type of their boxed values at runtime.
 	 *
 	 * Call this method to fall back to the default implementation.
 	 */
-	public Type default_deserialize_property_with_boxed_type (ParamSpec pspec) {
+	public Type default_property_boxed_value_type_with_param_spec (ParamSpec pspec) {
 		return pspec.value_type;
 	}
 }

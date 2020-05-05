@@ -39,11 +39,7 @@ public class Boxes.Application : GLib.Application {
             var image = all_images.index (i);
 
             if (image.architecture != "x86_64") {
-                stdout.printf ("Skipping %s %s (%s)…\n",
-                    image.properties.os,
-                    image.properties.release,
-                    image.architecture
-                );
+                stdout.printf ("Skipping %s…\n", image.properties.description);
                 continue;
             }
 
@@ -53,17 +49,17 @@ public class Boxes.Application : GLib.Application {
             data.get(image.properties.os).append_val (image);
         }
 
-        var cache = new LXD.PublicImageCache ();
-        cache.origin = lxd_client.host;
-        cache.created_at = new DateTime.now_utc ().format ("%FT%TZ");
-        cache.data = data;
+        var image_store = new LXD.ImageStore ();
+        image_store.server = lxd_client.host;
+        image_store.created_at = new DateTime.now_utc ().format ("%FT%TZ");
+        image_store.data = data;
 
-        Json.Node root = Json.gobject_serialize (cache);
+        Json.Node root = Json.gobject_serialize (image_store);
         Json.Generator generator = new Json.Generator ();
         generator.set_root (root);
 
-        var file = GLib.File.new_for_path ("public-image-cache.json");
-        stdout.printf ("Writing image metadata to %s …\n", file.get_path ());
+        var file = GLib.File.new_for_path ("image-store.json");
+        stdout.printf ("Writing image store to %s …\n", file.get_path ());
 
         if (file.query_exists ()) {
             file.@delete ();
