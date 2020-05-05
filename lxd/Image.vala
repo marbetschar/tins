@@ -21,10 +21,10 @@
 
 public class LXD.Image : LXD.Object {
 
-    //public string fingerprint { get; construct set; }
+    public string fingerprint { get; construct set; }
     //public string[] aliases { get; set; }
     public string architecture { get; set; }
-    /*public bool cached { get; set; }
-    public LXD.Properties properties { get; set; }
+    public bool cached { get; set; }
+    /*public LXD.Properties properties { get; set; }
     public LXD.Source update_source { get; set; }*/
 }

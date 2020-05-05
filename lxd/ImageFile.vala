@@ -25,6 +25,14 @@ public class LXD.ImageFile : LXD.Object {
     public string created { get; set; }
 
     public Array<LXD.Image> data { get; set; }
-    //public LXD.Image[] data { get; set; }
     public LXD.Image test { get; set; }
+
+    public override Type deserialize_property_with_boxed_type (ParamSpec pspec) {
+        switch (pspec.name) {
+            case "data":
+                return typeof (LXD.Image);
+            default:
+                return default_deserialize_property_with_boxed_type (pspec);
+        }
+    }
 }

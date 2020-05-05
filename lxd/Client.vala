@@ -84,23 +84,6 @@ public class LXD.Client {
         return images;
     }
 
-    // public Image[] get_images (string? filter = null) throws Error {
-    //     var json = json_get (@"/$version/images", (filter == null ? "" : @"filter=$filter"));
-    //     var list = json.get_array ();
-    //     int i;
-
-    //     Image[] images = {};
-    //     for (i = 0; i < list.get_length (); i++) {
-    //         images += get_image (list.get_string_element (i));
-
-    //         if (i > 5) {
-    //             break;
-    //         }
-    //     }
-
-    //     return images;
-    // }
-
     public Image get_image (string id_or_endpoint) throws Error {
         var endpoint = id_or_endpoint;
         if (!endpoint.has_prefix (@"/$version/images/")) {

@@ -54,9 +54,10 @@ public abstract class LXD.Object : GLib.Object, Json.Serializable {
 			var array = new GLib.Array<GLib.Object> ();
 
 			if (array_value != null) {
+				var boxed_type = deserialize_property_with_boxed_type (pspec);
+
 				array_value.foreach_element ((array_value, i, element) => {
-					// How to retrieve the Type from an element of a GLib.Array<ELEMENT-TYPE> ...?
-					array.append_val (Json.gobject_deserialize (typeof (LXD.Image), element));
+					array.append_val (Json.gobject_deserialize (boxed_type, element));
 				});
 			}
 			@value.set_boxed (array);
@@ -69,6 +70,14 @@ public abstract class LXD.Object : GLib.Object, Json.Serializable {
 			@value = property_node.get_value ();
 		}
 		return true;
+	}
+
+	public virtual Type deserialize_property_with_boxed_type (ParamSpec pspec) {
+		return default_deserialize_property_with_boxed_type (pspec);
+	}
+
+	public Type default_deserialize_property_with_boxed_type (ParamSpec pspec) {
+		return pspec.value_type;
 	}
 }
 
