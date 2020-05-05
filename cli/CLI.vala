@@ -28,32 +28,28 @@ public class Boxes.Application : GLib.Application {
     }
 
     protected override void activate () {
-        var images = lxd_client.get_images ();
+        var all_images = lxd_client.get_images ();
 
-        var image_file = new LXD.ImageFile ();
-        image_file.origin = lxd_client.host;
-        image_file.created = new DateTime.now_utc ().format ("%FT%TZ");
-        image_file.data = images;
+        HashTable<string,Array<LXD.Image>> data = new HashTable<string,Array<LXD.Image>> (str_hash, str_equal);
+        for(var i = 0; i < all_images.length; i++) {
+            var image = all_images.index (i);
 
-        var image = new LXD.Image ();
-        image.architecture = "test1245_x64";
-        image_file.test = image;
+            if (data.get(image.properties.os) == null) {
+                data.set(image.properties.os, new Array<LXD.Image> ());
+            }
+            data.get(image.properties.os).append_val (image);
+        }
 
-        Json.Node root = Json.gobject_serialize (image_file);
+        var cache = new LXD.PublicImageCache ();
+        cache.origin = lxd_client.host;
+        cache.created_at = new DateTime.now_utc ().format ("%FT%TZ");
+        cache.data = data;
 
-        /*
-        var json_object = root.get_object ();
-        Json.Array json_images = new Json.Array.sized (images.length ());
-        images.@foreach((image) => {
-            json_images.add_object_element (Json.gobject_serialize (image).get_object ());
-        });
-        json_object.set_array_member ("metadata", json_images);
-        */
-
+        Json.Node root = Json.gobject_serialize (cache);
         Json.Generator generator = new Json.Generator ();
         generator.set_root (root);
 
-        var file = GLib.File.new_for_path ("com.github.marbetschar.boxes.images.json");
+        var file = GLib.File.new_for_path ("com.github.marbetschar.boxes.public-image-cache.json");
         stdout.printf ("Write to %s ...\n", file.get_path ());
 
         if (file.query_exists ()) {
@@ -70,11 +66,16 @@ public class Boxes.Application : GLib.Application {
         var parser = new Json.Parser ();
         parser.load_from_stream (file_in_stream, null);
 
-        var loaded_image_file = Json.gobject_deserialize (typeof (LXD.ImageFile), parser.get_root ()) as LXD.ImageFile;
+        var loaded_image_file = Json.gobject_deserialize (typeof (LXD.PublicImageCache), parser.get_root ()) as LXD.PublicImageCache;
         debug (@"loaded_image_file:origin: $(loaded_image_file.origin)");
-        debug (@"loaded_image_file:test:architecture: $(loaded_image_file.test.architecture)");
-        debug (@"loaded_image_file:data:length: $(loaded_image_file.data.length)");
-        debug (@"loaded_image_file:data[2]:architecture: $(loaded_image_file.data.index(2).architecture)");
+
+        var data_contains_alpine = loaded_image_file.data.contains ("alpine");
+        var data_size = loaded_image_file.data.size ();
+        var data_alpine_length = loaded_image_file.data.get("alpine").length;
+
+        debug (@"loaded_image_file:data:contains:alpine: $(data_contains_alpine)");
+        debug (@"loaded_image_file:data:size: $(data_size)");
+        debug (@"loaded_image_file:data:alpine:length: $(data_alpine_length)");
     }
 
     public static int main (string[] args) {

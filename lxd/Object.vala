@@ -40,6 +40,41 @@ public abstract class LXD.Object : GLib.Object, Json.Serializable {
 				node.set_array (array);
 				return node;
 			}
+
+		} else if (@value.type ().is_a (typeof (GLib.HashTable))) {
+			var object = new Json.Object ();
+
+			if (@value.type ().is_a (typeof (GLib.HashTable<string,GLib.Array<GLib.Object>>))) {
+				unowned GLib.HashTable<string,GLib.Array<GLib.Object>> hash_table = @value as HashTable<string, GLib.Array<GLib.Object>>;
+
+				if (hash_table != null) {
+					hash_table.foreach ((key, array_value) => {
+						var array = new Json.Array.sized (array_value.length);
+
+						for(var i = 0; i < array_value.length; i++) {
+							array.add_element (Json.gobject_serialize (array_value.index (i)));
+						}
+
+						var node = new Json.Node (Json.NodeType.ARRAY);
+						node.set_array (array);
+						object.set_member (key, node);
+					});
+				}
+
+			} else {
+				unowned GLib.HashTable<string,GLib.Object> hash_table = @value as HashTable<string, GLib.Object>;
+
+				if (hash_table != null) {
+					hash_table.foreach ((key, object_value) => {
+						object.set_member (key, Json.gobject_serialize (object_value));
+					});
+				}
+			}
+
+			var node = new Json.Node (Json.NodeType.OBJECT);
+			node.set_object (object);
+			return node;
+
 		}
 
 		return default_serialize_property (property_name, @value, pspec);
@@ -61,6 +96,38 @@ public abstract class LXD.Object : GLib.Object, Json.Serializable {
 				});
 			}
 			@value.set_boxed (array);
+
+		} else if (pspec.value_type.is_a (typeof (GLib.HashTable))) {
+			@value = GLib.Value (pspec.value_type);
+
+			var boxed_type = deserialize_property_with_boxed_type (pspec);
+			var object_value = property_node.get_object ();
+
+			if (object_value != null) {
+				if (pspec.value_type.is_a ((typeof (GLib.HashTable<string,GLib.Array<GLib.Object>>)))) {
+					var hash_table = new GLib.HashTable<string, GLib.Array<GLib.Object>> (str_hash, str_equal);
+
+					object_value.foreach_member ((object, member_name, member_node) => {
+						var array_value = member_node.get_array ();
+						var array = new GLib.Array<GLib.Object> ();
+
+						if (array_value != null) {
+							array_value.foreach_element ((array_value, i, element) => {
+								array.append_val (Json.gobject_deserialize (boxed_type, element));
+							});
+						}
+						hash_table.@set (member_name, array);
+					});
+					@value.set_boxed (hash_table);
+
+				} else {
+					var hash_table = new GLib.HashTable<string, GLib.Object> (str_hash, str_equal);
+					object_value.foreach_member ((object, member_name, member_node) => {
+						hash_table.@set (member_name, Json.gobject_deserialize (boxed_type, member_node));
+					});
+					@value.set_boxed (hash_table);
+				}
+			}
 
 		} else if (pspec.value_type.is_a (typeof (GLib.Object))) {
 			@value = GLib.Value (pspec.value_type);

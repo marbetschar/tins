@@ -19,10 +19,21 @@
 * Authored by: Marco Betschart <boxes@marco.betschart.name>
 */
 
-public class LXD.Properties : GLib.Object {
+public class LXD.PublicImageCache : LXD.Object {
 
-    public string architecture { get; set; }
-    public string description { get; set; }
-    public string os { get; set; }
-    public string release { get; set; }
+    public string origin { get; set; }
+    public string created_at { get; set; }
+    public HashTable<string,Array<LXD.Image>> data { get; set; }
+
+
+    /* --- Json.Serializable --- */
+
+    public override Type deserialize_property_with_boxed_type (ParamSpec pspec) {
+        switch (pspec.name) {
+            case "data":
+                return typeof (LXD.Image);
+            default:
+                return default_deserialize_property_with_boxed_type (pspec);
+        }
+    }
 }
