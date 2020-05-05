@@ -22,8 +22,11 @@
 [GtkTemplate (ui = "/com/github/marbetschar/boxes/ui/WidgetsContainerListBoxRow.glade")]
 public class Boxes.Widgets.ContainerListBoxRow : Gtk.ListBoxRow {
 
+    public LXD.Instance instance;
+
     public signal void open_clicked ();
     public signal void configure_clicked ();
+    public signal void toggle_enabled (bool enabled);
 
     public string title {
         get { return title_label.label; }
@@ -82,6 +85,7 @@ public class Boxes.Widgets.ContainerListBoxRow : Gtk.ListBoxRow {
     construct {
         logo_box.toggle_enabled.connect ((enabled) => {
             update_request ();
+            toggle_enabled (enabled);
         });
         update_request ();
     }
@@ -99,13 +103,11 @@ public class Boxes.Widgets.ContainerListBoxRow : Gtk.ListBoxRow {
 
     [GtkCallback]
     private void on_open_button_clicked (Gtk.Widget source) {
-        debug ("open_button_clicked");
         open_clicked ();
     }
 
     [GtkCallback]
     private void on_configure_button_clicked (Gtk.Widget source) {
-        debug ("configure_button_clicked");
         configure_clicked ();
     }
 }

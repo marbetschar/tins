@@ -28,12 +28,15 @@ public class LXD.ImageStore : LXD.Object {
 
     /* --- Json.Serializable --- */
 
-    public override Type property_boxed_value_type_with_param_spec (ParamSpec pspec) {
+    public override void property_boxed_value_type_with_param_spec (ParamSpec pspec, out Type boxed_value_type, out bool boxed_in_array) {
         switch (pspec.name) {
             case "data":
-                return typeof (LXD.Image);
+                boxed_value_type = typeof (LXD.Image);
+                boxed_in_array = true;
+                break;
             default:
-                return default_property_boxed_value_type_with_param_spec (pspec);
+                default_property_boxed_value_type_with_param_spec (pspec, out boxed_value_type, out boxed_in_array);
+                break;
         }
     }
 }

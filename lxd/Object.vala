@@ -28,8 +28,11 @@ public abstract class LXD.Object : GLib.Object, Json.Serializable {
 	}
 
 	public virtual Json.Node serialize_property (string property_name, Value @value, ParamSpec pspec) {
+		Type boxed_value_type;
+	    bool boxed_in_array;
+	    property_boxed_value_type_with_param_spec (pspec, out boxed_value_type, out boxed_in_array);
+
 		if (@value.type ().is_a (typeof (GLib.Array))) {
-		    var boxed_value_type = property_boxed_value_type_with_param_spec (pspec);
 
 			if (boxed_value_type.is_a (typeof (GLib.Object))) {
 			    unowned GLib.Array<GLib.Object> array_value = @value as GLib.Array<GLib.Object>;
@@ -68,7 +71,8 @@ public abstract class LXD.Object : GLib.Object, Json.Serializable {
 		} else if (@value.type ().is_a (typeof (GLib.HashTable))) {
 			var object = new Json.Object ();
 
-			if (@value.type ().is_a (typeof (GLib.HashTable<string,GLib.Array<GLib.Object>>))) {
+			//if (@value.type ().is_a (typeof (GLib.HashTable<string,GLib.Array<GLib.Object>>))) {
+			if (boxed_in_array) {
 				unowned GLib.HashTable<string,GLib.Array<GLib.Object>> hash_table = @value as HashTable<string, GLib.Array<GLib.Object>>;
 
 				if (hash_table != null) {
@@ -107,11 +111,14 @@ public abstract class LXD.Object : GLib.Object, Json.Serializable {
 	}
 
 	public virtual bool deserialize_property (string property_name, out Value @value, ParamSpec pspec, Json.Node property_node) {
+		Type boxed_value_type;
+	    bool boxed_in_array;
+	    property_boxed_value_type_with_param_spec (pspec, out boxed_value_type, out boxed_in_array);
+
 		if (pspec.value_type.is_a (typeof (GLib.Array))) {
 			@value = GLib.Value (pspec.value_type);
 
 			var array_value = property_node.get_array ();
-			var boxed_value_type = property_boxed_value_type_with_param_spec (pspec);
 
 			if (boxed_value_type.is_a (typeof (GLib.Object))) {
 				var array = new GLib.Array<GLib.Object> ();
@@ -140,11 +147,11 @@ public abstract class LXD.Object : GLib.Object, Json.Serializable {
 		} else if (pspec.value_type.is_a (typeof (GLib.HashTable))) {
 			@value = GLib.Value (pspec.value_type);
 
-			var boxed_value_type = property_boxed_value_type_with_param_spec (pspec);
 			var object_value = property_node.get_object ();
 
 			if (object_value != null) {
-				if (pspec.value_type.is_a ((typeof (GLib.HashTable<string,GLib.Array<GLib.Object>>)))) {
+				//if (pspec.value_type.is_a ((typeof (GLib.HashTable<string,GLib.Array<GLib.Object>>)))) {
+				if (boxed_in_array) {
 					var hash_table = new GLib.HashTable<string, GLib.Array<GLib.Object>> (str_hash, str_equal);
 
 					object_value.foreach_member ((object, member_name, member_node) => {
@@ -160,7 +167,17 @@ public abstract class LXD.Object : GLib.Object, Json.Serializable {
 					});
 					@value.set_boxed (hash_table);
 
-				} else if (pspec.value_type.is_a ((typeof (GLib.HashTable<string,GLib.Object>)))) {
+				//} else if (pspec.value_type.is_a ((typeof (GLib.HashTable<string,string>)))) {
+				} else if (boxed_value_type.is_a (typeof (string))){
+					debug (@"GLib.HashTable<string,string>: $property_name");
+					var hash_table = new GLib.HashTable<string, string> (str_hash, str_equal);
+					object_value.foreach_member ((object, member_name, member_node) => {
+						hash_table.@set (member_name, member_node.get_string ());
+					});
+					@value.set_boxed (hash_table);
+
+				//} else if (pspec.value_type.is_a ((typeof (GLib.HashTable<string,GLib.Object>)))) {
+				} else if (boxed_value_type.is_a (typeof (GLib.Object))) {
 					var hash_table = new GLib.HashTable<string, GLib.Object> (str_hash, str_equal);
 					object_value.foreach_member ((object, member_name, member_node) => {
 						hash_table.@set (member_name, Json.gobject_deserialize (boxed_value_type, member_node));
@@ -188,8 +205,8 @@ public abstract class LXD.Object : GLib.Object, Json.Serializable {
 	 *
 	 * Overide this method to provide the boxed value type for such properties.
 	 */
-	public virtual Type property_boxed_value_type_with_param_spec (ParamSpec pspec) {
-		return default_property_boxed_value_type_with_param_spec (pspec);
+	public virtual void property_boxed_value_type_with_param_spec (ParamSpec pspec, out Type boxed_value_type, out bool boxed_in_array) {
+		default_property_boxed_value_type_with_param_spec (pspec, out boxed_value_type, out boxed_in_array);
 	}
 
 	/**
@@ -198,8 +215,9 @@ public abstract class LXD.Object : GLib.Object, Json.Serializable {
 	 *
 	 * Call this method to fall back to the default implementation.
 	 */
-	public Type default_property_boxed_value_type_with_param_spec (ParamSpec pspec) {
-		return pspec.value_type;
+	public void default_property_boxed_value_type_with_param_spec (ParamSpec pspec, out Type boxed_value_type, out bool boxed_in_array) {
+	    boxed_value_type = pspec.value_type;
+	    boxed_in_array = false;
 	}
 }
 

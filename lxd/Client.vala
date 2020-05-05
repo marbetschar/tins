@@ -35,14 +35,14 @@ public class LXD.Client {
         this.version = version;
     }
 
-    public LXD.Instance[] get_instances () throws Error {
+    public Array<Instance> get_instances () throws Error {
         var json = api_request ("GET", @"/$version/containers");
         var list = json.get_array ();
         int i;
 
-        Instance[] instances = {};
+        var instances = new GLib.Array<Instance> ();
         for (i = 0; i < list.get_length (); i++) {
-            instances += get_instance (list.get_string_element (i));
+            instances.append_val (get_instance (list.get_string_element (i)));
         }
 
         return instances;
@@ -90,8 +90,48 @@ public class LXD.Client {
         return Json.gobject_deserialize (typeof (LXD.Operation), node) as LXD.Operation;
     }
 
-    public Operation wait_operation (Operation operation) throws Error {
-        var node = api_request ("GET", @"/$version/operations/$(operation.id)/wait");
+    public LXD.Operation start_instance (string id_or_endpoint) throws Error {
+        var endpoint = id_or_endpoint;
+        if (!endpoint.has_prefix (@"/$version/containers/")) {
+            endpoint = @"/$version/containers/$id_or_endpoint/state";
+        }
+        var node = api_request ("PUT", endpoint, "{ \"action\": \"start\" }");
+        return Json.gobject_deserialize (typeof (LXD.Operation), node) as LXD.Operation;
+    }
+
+    public LXD.Operation stop_instance (string id_or_endpoint) throws Error {
+        var endpoint = id_or_endpoint;
+        if (!endpoint.has_prefix (@"/$version/containers/")) {
+            endpoint = @"/$version/containers/$id_or_endpoint/state";
+        }
+        var node = api_request ("PUT", endpoint, "{ \"action\": \"stop\" }");
+        return Json.gobject_deserialize (typeof (LXD.Operation), node) as LXD.Operation;
+    }
+
+    public LXD.Operation remove_instance (string id_or_endpoint) throws Error {
+        var endpoint = id_or_endpoint;
+        if (!endpoint.has_prefix (@"/$version/containers/")) {
+            endpoint = @"/$version/containers/$id_or_endpoint";
+        }
+        var node = api_request ("DELETE", endpoint, "{}");
+        return Json.gobject_deserialize (typeof (LXD.Operation), node) as LXD.Operation;
+    }
+
+    public Operation get_operation (string id_or_endpoint) throws Error {
+        var endpoint = id_or_endpoint;
+        if (!endpoint.has_prefix (@"/$version/operations/")) {
+            endpoint = @"/$version/operations/$id_or_endpoint";
+        }
+        var node = api_request ("GET", endpoint);
+        return Json.gobject_deserialize (typeof (LXD.Operation), node) as LXD.Operation;
+    }
+
+    public Operation wait_operation (string id_or_endpoint) throws Error {
+        var endpoint = id_or_endpoint;
+        if (!endpoint.has_prefix (@"/$version/operations/")) {
+            endpoint = @"/$version/operations/$id_or_endpoint/wait";
+        }
+        var node = api_request ("GET", endpoint);
         return Json.gobject_deserialize (typeof (LXD.Operation), node) as LXD.Operation;
     }
 

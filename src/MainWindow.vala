@@ -30,6 +30,8 @@ public class Boxes.MainWindow : Gtk.ApplicationWindow {
     [GtkChild]
     private Gtk.Button remove_button;
 
+    private Gtk.ListBox list_box;
+
     public MainWindow (Gtk.Application application) {
         Object (
             application: application,
@@ -43,17 +45,13 @@ public class Boxes.MainWindow : Gtk.ApplicationWindow {
         style_provider.load_from_resource ("/com/github/marbetschar/boxes/styles/Application.css");
         Gtk.StyleContext.add_provider_for_screen (Gdk.Screen.get_default (), style_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
 
-        var list_box = new Boxes.Widgets.ContainerListBox ();
+        list_box = new Boxes.Widgets.ContainerListBox ();
 
         viewport.add (list_box);
 
         list_box.row_selected.connect ((row) => {
             remove_button.sensitive = row != null;
         });
-
-        var instances = Application.lxd_client.get_instances ();
-        debug (@"instances: $(instances.length)");
-        debug (@"instance[0]: name = $(instances[0].name), status = $(instances[0].status)");
     }
 
     [GtkCallback]
@@ -69,7 +67,29 @@ public class Boxes.MainWindow : Gtk.ApplicationWindow {
 
     [GtkCallback]
     private void on_remove_button_clicked (Gtk.Widget source) {
-        debug ("on_remove_button_clicked");
+        var row = list_box.get_selected_row () as Boxes.Widgets.ContainerListBoxRow;
+        list_box.remove (row);
+
+        try {
+            var operation = Application.lxd_client.remove_instance (row.instance.name);
+
+            /**
+             * Using Idle to wait for deletion to be completed.
+             */
+            Idle.add (() => {
+                try {
+                    var result = Application.lxd_client.wait_operation (operation.id);
+
+                } catch (Error e) {
+                    critical (e.message);
+                }
+
+                return GLib.Source.REMOVE;
+            });
+
+        } catch (Error e) {
+            critical (e.message);
+        }
     }
 
     public override bool configure_event (Gdk.EventConfigure event) {

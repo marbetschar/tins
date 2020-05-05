@@ -21,53 +21,64 @@
 
 public class Boxes.Widgets.ContainerListBox : Gtk.ListBox {
 
-    private struct Container {
-        public string name;
-        public bool gui_enabled;
-        public bool enabled;
-        public OperatingSystem operating_system;
-    }
-
-    private enum OperatingSystem {
-        UBUNTU,
-        ELEMENTARY,
-        CENTOS,
-        FEDORA,
-        LINUX
-    }
-
     construct {
         selection_mode = Gtk.SelectionMode.SINGLE;
 
-        add (create_row (Container (){ name = "Ubuntu 18.04 LTS", operating_system = OperatingSystem.UBUNTU, gui_enabled = true, enabled = false }));
-        add (create_row (Container (){ name = "CentOS v7", operating_system = OperatingSystem.CENTOS, gui_enabled = false, enabled = true }));
-        add (create_row (Container (){ name = "elementary OS 6.0", operating_system = OperatingSystem.ELEMENTARY, gui_enabled = true, enabled = true }));
-        add (create_row (Container (){ name = "Fedora v32", operating_system = OperatingSystem.FEDORA, gui_enabled = true, enabled = false }));
-        add (create_row (Container (){ name = "Alpine Test", operating_system = OperatingSystem.LINUX, gui_enabled = false, enabled = true }));
+        var instances = Application.lxd_client.get_instances ();
+        for (var i = 0; i < instances.length; i++) {
+            add (create_row (instances.index (i)));
+        }
     }
 
-    private Gtk.ListBoxRow create_row (Container container) {
+    private Gtk.ListBoxRow create_row (LXD.Instance instance) {
         var row = new ContainerListBoxRow ();
-        row.title = container.name;
-        row.enabled = container.enabled;
-        row.gui_enabled = container.gui_enabled;
-        row.image_resource = resource_for_operating_system (container.operating_system);
+        row.instance = instance;
+        row.title = instance.display_name;
+        row.enabled = instance.status == "Running";
+        //row.gui_enabled = container.gui_enabled;
+        var instance_os = instance.config.get("image.os");
+        if (instance_os != null) {
+            row.image_resource = resource_for_os (instance_os);
+        }
+
+        row.toggle_enabled.connect ((enabled) => {
+            try {
+                 LXD.Operation operation;
+
+                if (enabled) {
+                    operation = Application.lxd_client.start_instance (instance.name);
+                } else {
+                    operation = Application.lxd_client.stop_instance (instance.name);
+                }
+
+                /**
+                 * Using Idle to wait for deletion to be completed.
+                 */
+                Idle.add (() => {
+                    try {
+                        var result = Application.lxd_client.wait_operation (operation.id);
+
+                    } catch (Error e) {
+                        critical (e.message);
+                    }
+
+                    return GLib.Source.REMOVE;
+                });
+
+            } catch (Error e) {
+                critical (e.message);
+            }
+        });
+
         return row;
     }
 
-    private string resource_for_operating_system (OperatingSystem operating_system) {
-        switch (operating_system) {
-            case OperatingSystem.UBUNTU:
-                return "/com/github/marbetschar/boxes/os/ubuntu.svg";
-            case OperatingSystem.ELEMENTARY:
-                return "/com/github/marbetschar/boxes/os/elementary.svg";
-            case OperatingSystem.CENTOS:
-                return "/com/github/marbetschar/boxes/os/centos.svg";
-            case OperatingSystem.FEDORA:
-                return "/com/github/marbetschar/boxes/os/fedora.svg";
-            default:
-                return "/com/github/marbetschar/boxes/os/linux.svg";
+    private string resource_for_os (string os) {
+        var file = File.new_for_uri (@"resource:///com/github/marbetschar/boxes/os/$os.svg");
+        if (file.query_exists ()) {
+            return @"/com/github/marbetschar/boxes/os/$os.svg";
         }
+        return "/com/github/marbetschar/boxes/os/linux.svg";
     }
 }
 

@@ -48,6 +48,12 @@ public class Boxes.AddContainerAssistant : Gtk.Assistant {
     [GtkChild]
     private Gtk.CheckButton gui_enabled_checkbutton;
 
+    [GtkChild]
+    private Gtk.Spinner progress_spinner;
+
+    [GtkChild]
+    private Gtk.Label progress_label;
+
     [GtkCallback]
     private bool on_key_release_name_entry (Gtk.Widget source, Gdk.EventKey event) {
         validate_current_page ();
@@ -82,6 +88,8 @@ public class Boxes.AddContainerAssistant : Gtk.Assistant {
         destroy ();
     }
 
+    private LXD.Operation operation;
+
     [GtkCallback]
     private void on_apply (Gtk.Widget source) {
         var os_key = all_os_keys.nth_data (operating_system_combobox.active);
@@ -108,32 +116,51 @@ public class Boxes.AddContainerAssistant : Gtk.Assistant {
         }
         instance.profiles = (owned) profiles;
 
-        try {
-            var operation = Application.lxd_client.add_instance (instance);
-            var result = Application.lxd_client.wait_operation (operation);
+        //next_page ();
+        //set_current_page_complete (false);
 
-            if (result.err != null && result.err.strip () != "") {
-                critical (result.err);
+        /**
+         * Using Idle to monitor progress
+         * avoids blocking the user interface
+         */
+        //Idle.add (() => {
+            try {
+                operation = Application.lxd_client.add_instance (instance);
+
+                while (operation.status_code < 200) {
+                    progress_label.label = "Loading...";
+                    Thread.usleep (1000000);
+                    operation = Application.lxd_client.get_operation (operation.id);
+                }
+
+                if (operation.err != null && operation.err.strip () != "") {
+                    critical (operation.err);
+                }
+
+            } catch (Error e) {
+                critical (e.message);
             }
+            //return GLib.Source.REMOVE;
+        //});
+    }
 
-        } catch (Error e) {
-            critical (e.message);
-        }
+    [GtkCallback]
+    private void on_prepare (Gtk.Widget page) {
+        validate_current_page ();
     }
 
     private void validate_current_page () {
+        if (name_entry.text == null || name_entry.text.strip () == "" || image_combobox.get_active_text () == null) {
+            set_current_page_complete (false);
+        } else {
+            set_current_page_complete (true);
+        }
+    }
+
+    private void set_current_page_complete (bool complete) {
         var current_index = get_current_page ();
         var current_page = get_nth_page (current_index);
 
-        if (current_index == 0) {
-            if (name_entry.text == null || name_entry.text.strip () == "" || image_combobox.get_active_text () == null) {
-                set_page_complete (current_page, false);
-            } else {
-                set_page_complete (current_page, true);
-            }
-
-        } else {
-            set_page_complete (current_page, true);
-        }
+        set_page_complete (current_page, complete);
     }
 }

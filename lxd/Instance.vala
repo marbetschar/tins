@@ -53,7 +53,9 @@ public class LXD.Instance : LXD.Object {
     public string architecture { get; set; }
     public Array<string> profiles { get; set; }
     public bool ephemeral { get; set; }
+    public bool stateful { get; set; }
     public string status { get; set; }
+    public HashTable<string,string> config { get; set; }
 
     public Source source { get; set; }
 
@@ -68,14 +70,19 @@ public class LXD.Instance : LXD.Object {
 
     /* --- Json.Serializable --- */
 
-    public override Type property_boxed_value_type_with_param_spec (ParamSpec pspec) {
+    public override void property_boxed_value_type_with_param_spec (ParamSpec pspec, out Type boxed_value_type, out bool boxed_in_array) {
         switch (pspec.name) {
             case "profiles":
-                return typeof (string);
+                boxed_value_type = typeof (string);
+                boxed_in_array = true;
+                break;
             case "config":
-                return typeof (string);
+                boxed_value_type = typeof (string);
+                boxed_in_array = false;
+                break;
             default:
-                return default_property_boxed_value_type_with_param_spec (pspec);
+                default_property_boxed_value_type_with_param_spec (pspec, out boxed_value_type, out boxed_in_array);
+                break;
         }
     }
 }
