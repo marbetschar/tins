@@ -20,12 +20,35 @@
 */
 
 public class Boxes.Application : Gtk.Application {
+
     public static GLib.Settings settings;
     public static LXD.Client lxd_client;
+    public static LXD.PublicImageCache lxd_image_cache;
 
     static construct {
         settings = new Settings ("com.github.marbetschar.boxes");
         lxd_client = new LXD.Client ();
+
+        /**
+         * Using Idle to load cached image data
+         * avoids blocking application startup
+         */
+        Idle.add (() => {
+            try {
+                var image_cache_file = File.new_for_uri ("resource:///com/github/marbetschar/boxes/cache/public-image-cache.json");
+
+                var parser = new Json.Parser ();
+                parser.load_from_stream (image_cache_file.read (null), null);
+                lxd_image_cache = Json.gobject_deserialize (typeof (LXD.PublicImageCache), parser.get_root ()) as LXD.PublicImageCache;
+
+                debug ("Loaded images for %u operating systems from cache.".printf (lxd_image_cache.data.size ()));
+
+            } catch (Error e) {
+                critical (e.message);
+            }
+
+            return GLib.Source.REMOVE;
+        });
     }
 
     public Application () {

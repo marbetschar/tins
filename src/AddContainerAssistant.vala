@@ -45,11 +45,15 @@ public class Boxes.AddContainerAssistant : Gtk.Assistant {
         */
     }
 
+    List<unowned string> all_os_keys;
+
     construct {
-        /*for(var i = 0; i < all_known_operating_systems.length; i++) {
-            operating_system_combobox.append_text (_(all_known_operating_systems[i].to_string ()));
-        }
-        operating_system_combobox.active = 0;*/
+        all_os_keys = Application.lxd_image_cache.data.get_keys ();
+
+        all_os_keys.@foreach ((os) => {
+            operating_system_combobox.append_text (_(os));
+        });
+        operating_system_combobox.active = 0;
     }
 
     [GtkChild]
@@ -72,22 +76,19 @@ public class Boxes.AddContainerAssistant : Gtk.Assistant {
 
     [GtkCallback]
     private void on_changed_operating_system (Gtk.Widget source) {
-        /*image_combobox.remove_all ();
+        image_combobox.remove_all ();
 
-        var operating_system = all_known_operating_systems[operating_system_combobox.active];
-        var operating_system_images = all_known_operating_system_images[operating_system];
+        var os_key = all_os_keys.nth_data (operating_system_combobox.active);
+        var os_images = Application.lxd_image_cache.data.get (os_key);
 
-        if (operating_system_images != null) {
-            var images = operating_system_images.to_array ();
-
-            for(var i = 0; i < images.length; i++) {
-                var image = images[i];
-                image_combobox.append_text (_(@"$(image.properties.release)"));
+        if (os_images != null) {
+            for(var i = 0; i < os_images.length; i++) {
+                image_combobox.append_text (_(os_images.index(i).properties.release));
             }
             image_combobox.active = 0;
         }
 
-        validate_current_page ();*/
+        validate_current_page ();
     }
 
     [GtkCallback]

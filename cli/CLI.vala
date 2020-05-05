@@ -28,11 +28,24 @@ public class Boxes.Application : GLib.Application {
     }
 
     protected override void activate () {
+        stdout.printf ("Downloading metadata for %u images from %s - this may take a while…\n",
+            lxd_client.count_images (),
+            lxd_client.host
+        );
         var all_images = lxd_client.get_images ();
 
         HashTable<string,Array<LXD.Image>> data = new HashTable<string,Array<LXD.Image>> (str_hash, str_equal);
         for(var i = 0; i < all_images.length; i++) {
             var image = all_images.index (i);
+
+            if (image.architecture != "x86_64") {
+                stdout.printf ("Skipping %s %s (%s)…\n",
+                    image.properties.os,
+                    image.properties.release,
+                    image.architecture
+                );
+                continue;
+            }
 
             if (data.get(image.properties.os) == null) {
                 data.set(image.properties.os, new Array<LXD.Image> ());
@@ -49,8 +62,8 @@ public class Boxes.Application : GLib.Application {
         Json.Generator generator = new Json.Generator ();
         generator.set_root (root);
 
-        var file = GLib.File.new_for_path ("com.github.marbetschar.boxes.public-image-cache.json");
-        stdout.printf ("Write to %s ...\n", file.get_path ());
+        var file = GLib.File.new_for_path ("public-image-cache.json");
+        stdout.printf ("Writing image metadata to %s …\n", file.get_path ());
 
         if (file.query_exists ()) {
             file.@delete ();
@@ -60,22 +73,6 @@ public class Boxes.Application : GLib.Application {
         generator.to_stream (file_out_stream, null);
 
         stdout.printf ("Done.\n");
-
-        var file_in_stream = file.read (null);
-
-        var parser = new Json.Parser ();
-        parser.load_from_stream (file_in_stream, null);
-
-        var loaded_image_file = Json.gobject_deserialize (typeof (LXD.PublicImageCache), parser.get_root ()) as LXD.PublicImageCache;
-        debug (@"loaded_image_file:origin: $(loaded_image_file.origin)");
-
-        var data_contains_alpine = loaded_image_file.data.contains ("alpine");
-        var data_size = loaded_image_file.data.size ();
-        var data_alpine_length = loaded_image_file.data.get("alpine").length;
-
-        debug (@"loaded_image_file:data:contains:alpine: $(data_contains_alpine)");
-        debug (@"loaded_image_file:data:size: $(data_size)");
-        debug (@"loaded_image_file:data:alpine:length: $(data_alpine_length)");
     }
 
     public static int main (string[] args) {

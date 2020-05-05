@@ -67,6 +67,13 @@ public class LXD.Client {
         return true;
     }*/
 
+    public uint count_images (string? filter = null) throws Error {
+        var json = json_get (@"/$version/images", (filter == null ? "" : @"filter=$filter"));
+        var list = json.get_array ();
+
+        return list.get_length ();
+    }
+
     public Array<Image> get_images (string? filter = null) throws Error {
         var json = json_get (@"/$version/images", (filter == null ? "" : @"filter=$filter"));
         var list = json.get_array ();
@@ -75,10 +82,6 @@ public class LXD.Client {
         var images = new GLib.Array<Image> ();
         for (i = 0; i < list.get_length (); i++) {
             images.append_val (get_image (list.get_string_element (i)));
-
-            if (i > 5) {
-                break;
-            }
         }
 
         return images;
