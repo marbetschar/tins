@@ -19,10 +19,12 @@
 * Authored by: Marco Betschart <boxes@marco.betschart.name>
 */
 
-public class LXD.ImageFile : GLib.Object {
+public class LXD.ImageFile : LXD.Object {
 
     public string origin { get; set; }
     public string created { get; set; }
 
-    public SList<LXD.Image> metadata { get; owned set; }
+    public Array<LXD.Image> data { get; set; }
+    //public LXD.Image[] data { get; set; }
+    public LXD.Image test { get; set; }
 }

@@ -33,15 +33,22 @@ public class Boxes.Application : GLib.Application {
         var image_file = new LXD.ImageFile ();
         image_file.origin = lxd_client.host;
         image_file.created = new DateTime.now_utc ().format ("%FT%TZ");
+        image_file.data = images;
+
+        var image = new LXD.Image ();
+        image.architecture = "test1245_x64";
+        image_file.test = image;
 
         Json.Node root = Json.gobject_serialize (image_file);
 
+        /*
         var json_object = root.get_object ();
         Json.Array json_images = new Json.Array.sized (images.length ());
         images.@foreach((image) => {
             json_images.add_object_element (Json.gobject_serialize (image).get_object ());
         });
         json_object.set_array_member ("metadata", json_images);
+        */
 
         Json.Generator generator = new Json.Generator ();
         generator.set_root (root);
@@ -57,6 +64,17 @@ public class Boxes.Application : GLib.Application {
         generator.to_stream (file_out_stream, null);
 
         stdout.printf ("Done.\n");
+
+        var file_in_stream = file.read (null);
+
+        var parser = new Json.Parser ();
+        parser.load_from_stream (file_in_stream, null);
+
+        var loaded_image_file = Json.gobject_deserialize (typeof (LXD.ImageFile), parser.get_root ()) as LXD.ImageFile;
+        debug (@"loaded_image_file:origin: $(loaded_image_file.origin)");
+        debug (@"loaded_image_file:test:architecture: $(loaded_image_file.test.architecture)");
+        debug (@"loaded_image_file:data:length: $(loaded_image_file.data.length)");
+        debug (@"loaded_image_file:data[2]:architecture: $(loaded_image_file.data.index(2).architecture)");
     }
 
     public static int main (string[] args) {

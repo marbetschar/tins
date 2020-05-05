@@ -19,7 +19,7 @@
 * Authored by: Marco Betschart <boxes@marco.betschart.name>
 */
 
-public class LXD.Image : GLib.Object {
+public class LXD.Image : LXD.Object {
 
     //public string fingerprint { get; construct set; }
     //public string[] aliases { get; set; }
