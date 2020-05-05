@@ -92,7 +92,7 @@ public class Boxes.AddContainerAssistant : Gtk.Assistant {
         instance_source.source_type = "image";
         instance_source.mode = "pull";
         instance_source.server = Application.lxd_image_store.server;
-        instance_source.alias = @"$(os_image.properties.os)/$(os_image.properties.release)";
+        instance_source.alias = @"$(os_image.properties.os)/$(os_image.properties.release)/$(os_image.properties.architecture)";
 
         var instance = new LXD.Instance ();
         instance.source = instance_source;
@@ -109,7 +109,13 @@ public class Boxes.AddContainerAssistant : Gtk.Assistant {
         instance.profiles = (owned) profiles;
 
         try {
-            Application.lxd_client.add_instance (instance);
+            var operation = Application.lxd_client.add_instance (instance);
+            var result = Application.lxd_client.wait_operation (operation);
+
+            if (result.err != null && result.err.strip () != "") {
+                critical (result.err);
+            }
+
         } catch (Error e) {
             critical (e.message);
         }

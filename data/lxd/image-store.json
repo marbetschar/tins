@@ -1,70 +1,333 @@
 {
   "server": "https://images.linuxcontainers.org",
-  "created-at": "2020-05-05T18:15:37Z",
+  "created-at": "2020-05-05T21:21:44Z",
   "data": {
     "alpine": [{
         "properties": {
             "os": "alpine",
-            "release": "3.10"
+            "release": "3.11",
+            "architecture": "amd64"
+        }
+    },{
+        "properties": {
+            "os": "alpine",
+            "release": "3.10",
+            "architecture": "amd64"
+        }
+    },{
+        "properties": {
+            "os": "alpine",
+            "release": "3.9",
+            "architecture": "amd64"
+        }
+    },{
+        "properties": {
+            "os": "alpine",
+            "release": "3.8",
+            "architecture": "amd64"
         }
     }],
-    "alt": [
-
-    ],
-    "archlinux": [
-
-    ],
-    "apertis": [
-
-    ],
-    "centos": [
-
-    ],
-    "debian": [
-
-    ],
-    "devuan": [
-
-    ],
-    "fedora": [
-
-    ],
-    "funtoo": [
-
-    ],
-    "gentoo": [
-
-    ],
-    "kali": [
-
-    ],
-    "mint": [
-
-    ],
-    "opensuse": [
-
-    ],
-    "openwrt": [
-
-    ],
-    "oracle": [
-
-    ],
-    "plamo": [
-
-    ],
-    "pld": [
-
-    ],
-    "sabayon": [
-
-    ],
-    "ubuntu": [
-
-    ],
-    "voidlinux": [
-
-    ]
+    "alt": [{
+        "properties": {
+            "os": "alt",
+            "release": "p9",
+            "architecture": "amd64"
+        }
+    },{
+        "properties": {
+            "os": "alt",
+            "release": "p8",
+            "architecture": "amd64"
+        }
+    }],
+    "apertis": [{
+        "properties": {
+            "os": "apertis",
+            "release": "v2020.0",
+            "architecture": "amd64"
+        }
+    },{
+        "properties": {
+            "os": "apertis",
+            "release": "v2019.2",
+            "architecture": "amd64"
+        }
+    },{
+        "properties": {
+            "os": "apertis",
+            "release": "18.12",
+            "architecture": "amd64"
+        }
+    }],
+    "archlinux": [{
+        "properties": {
+            "os": "archlinux",
+            "release": "current",
+            "architecture": "amd64"
+        }
+    }],
+    "centos": [{
+        "properties": {
+            "os": "centos",
+            "release": "8",
+            "architecture": "amd64"
+        }
+    },{
+        "properties": {
+            "os": "centos",
+            "release": "7",
+            "architecture": "amd64"
+        }
+    },{
+        "properties": {
+            "os": "centos",
+            "release": "6",
+            "architecture": "amd64"
+        }
+    }],
+    "debian": [{
+        "properties": {
+            "os": "debian",
+            "release": "bullseye",
+            "architecture": "amd64"
+        }
+    },{
+        "properties": {
+            "os": "debian",
+            "release": "buster",
+            "architecture": "amd64"
+        }
+    },{
+        "properties": {
+            "os": "debian",
+            "release": "jessie",
+            "architecture": "amd64"
+        }
+    },{
+        "properties": {
+            "os": "debian",
+            "release": "sid",
+            "architecture": "amd64"
+        }
+    },{
+        "properties": {
+            "os": "debian",
+            "release": "stretch",
+            "architecture": "amd64"
+        }
+    }],
+    "devuan": [{
+        "properties": {
+            "os": "devuan",
+            "release": "ascii",
+            "architecture": "amd64"
+        }
+    }],
+    "fedora": [{
+        "properties": {
+            "os": "fedora",
+            "release": "32",
+            "architecture": "amd64"
+        }
+    },{
+        "properties": {
+            "os": "fedora",
+            "release": "31",
+            "architecture": "amd64"
+        }
+    },{
+        "properties": {
+            "os": "fedora",
+            "release": "30",
+            "architecture": "amd64"
+        }
+    }],
+    "funtoo": [{
+        "properties": {
+            "os": "funtoo",
+            "release": "1.4",
+            "architecture": "amd64"
+        }
+    },{
+        "properties": {
+            "os": "funtoo",
+            "release": "1.3",
+            "architecture": "amd64"
+        }
+    }],
+    "gentoo": [{
+        "properties": {
+            "os": "gentoo",
+            "release": "current",
+            "architecture": "amd64"
+        }
+    }],
+    "kali": [{
+        "properties": {
+            "os": "kali",
+            "release": "current",
+            "architecture": "amd64"
+        }
+    }],
+    "mint": [{
+        "properties": {
+            "os": "mint",
+            "release": "sarah",
+            "architecture": "amd64"
+        }
+    },{
+        "properties": {
+            "os": "mint",
+            "release": "serena",
+            "architecture": "amd64"
+        }
+    },{
+        "properties": {
+            "os": "mint",
+            "release": "sonya",
+            "architecture": "amd64"
+        }
+    },{
+        "properties": {
+            "os": "mint",
+            "release": "sylvia",
+            "architecture": "amd64"
+        }
+    },{
+        "properties": {
+            "os": "mint",
+            "release": "tara",
+            "architecture": "amd64"
+        }
+    },{
+        "properties": {
+            "os": "mint",
+            "release": "tessa",
+            "architecture": "amd64"
+        }
+    },{
+        "properties": {
+            "os": "mint",
+            "release": "tina",
+            "architecture": "amd64"
+        }
+    },{
+        "properties": {
+            "os": "mint",
+            "release": "tricia",
+            "architecture": "amd64"
+        }
+    }],
+    "opensuse": [{
+        "properties": {
+            "os": "opensuse",
+            "release": "15.1",
+            "architecture": "amd64"
+        }
+    }],
+    "openwrt": [{
+        "properties": {
+            "os": "openwrt",
+            "release": "19.07",
+            "architecture": "amd64"
+        }
+    },{
+        "properties": {
+            "os": "openwrt",
+            "release": "18.06",
+            "architecture": "amd64"
+        }
+    }],
+    "oracle": [{
+        "properties": {
+            "os": "oracle",
+            "release": "8",
+            "architecture": "amd64"
+        }
+    },{
+        "properties": {
+            "os": "oracle",
+            "release": "7",
+            "architecture": "amd64"
+        }
+    },{
+        "properties": {
+            "os": "oracle",
+            "release": "6",
+            "architecture": "amd64"
+        }
+    }],
+    "plamo": [{
+        "properties": {
+            "os": "plamo",
+            "release": "7x",
+            "architecture": "amd64"
+        }
+    },{
+        "properties": {
+            "os": "plamo",
+            "release": "6x",
+            "architecture": "amd64"
+        }
+    }],
+    "pld": [{
+        "properties": {
+            "os": "pld",
+            "release": "current",
+            "architecture": "amd64"
+        }
+    }],
+    "sabayon": [{
+        "properties": {
+            "os": "sabayon",
+            "release": "current",
+            "architecture": "amd64"
+        }
+    }],
+    "ubuntu": [{
+        "properties": {
+            "os": "ubuntu",
+            "release": "bionic",
+            "architecture": "amd64"
+        }
+    },{
+        "properties": {
+            "os": "ubuntu",
+            "release": "eoan",
+            "architecture": "amd64"
+        }
+    },{
+        "properties": {
+            "os": "ubuntu",
+            "release": "focal",
+            "architecture": "amd64"
+        }
+    },{
+        "properties": {
+            "os": "ubuntu",
+            "release": "groovy",
+            "architecture": "amd64"
+        }
+    },{
+        "properties": {
+            "os": "ubuntu",
+            "release": "trusty",
+            "architecture": "amd64"
+        }
+    },{
+        "properties": {
+            "os": "ubuntu",
+            "release": "xenial",
+            "architecture": "amd64"
+        }
+    }],
+    "voidlinux": [{
+        "properties": {
+            "os": "voidlinux",
+            "release": "current",
+            "architecture": "amd64"
+        }
+    }]
   }
 }
 

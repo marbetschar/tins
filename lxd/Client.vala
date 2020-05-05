@@ -58,7 +58,7 @@ public class LXD.Client {
         return Json.gobject_deserialize (typeof (LXD.Instance), node) as LXD.Instance;
     }
 
-    public void add_instance (Instance instance) throws Error {
+    public LXD.Operation add_instance (Instance instance) throws Error {
         var json = Json.gobject_serialize (instance);
 
         /**
@@ -85,7 +85,14 @@ public class LXD.Client {
         var data = new StringBuilder ();
         generator.to_gstring (data);
 
-        api_request ("POST", @"/$version/containers", data.str);
+        var node = api_request ("POST", @"/$version/containers", data.str);
+
+        return Json.gobject_deserialize (typeof (LXD.Operation), node) as LXD.Operation;
+    }
+
+    public Operation wait_operation (Operation operation) throws Error {
+        var node = api_request ("GET", @"/$version/operations/$(operation.id)/wait");
+        return Json.gobject_deserialize (typeof (LXD.Operation), node) as LXD.Operation;
     }
 
     public uint count_images (string? filter = null) throws Error {
