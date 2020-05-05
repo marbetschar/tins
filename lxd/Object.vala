@@ -72,10 +72,22 @@ public abstract class LXD.Object : GLib.Object, Json.Serializable {
 		return true;
 	}
 
+	/**
+	 * GLib.Array doesn't carry its object type at runtime,
+	 * so we need to manually provide the desired Type.
+	 *
+	 * Overide this method to do so.
+	 */
 	public virtual Type deserialize_property_with_boxed_type (ParamSpec pspec) {
 		return default_deserialize_property_with_boxed_type (pspec);
 	}
 
+	/**
+	 * GLib.Array doesn't carry its object type at runtime,
+	 * so we need to manually provide the desired Type.
+	 *
+	 * Call this method to fall back to the default implementation.
+	 */
 	public Type default_deserialize_property_with_boxed_type (ParamSpec pspec) {
 		return pspec.value_type;
 	}
