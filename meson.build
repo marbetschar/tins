@@ -30,7 +30,6 @@ asresources = gnome.compile_resources(
 core_deps = [
     dependency ('glib-2.0'),
     dependency ('json-glib-1.0'),
-    dependency ('gee-0.8')
 ]
 ui_deps = [
     dependency ('gtk+-3.0')
@@ -49,7 +48,6 @@ executable (
     install: true
 )
 
-subdir ('cli')
 subdir ('data')
 subdir ('po')
 

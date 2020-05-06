@@ -2,13 +2,11 @@
 
 Use lightweight containers just like any virtual machine.
 
-**>>>>>> Work in Progress <<<<<<**
-
 <img src="data/screenshots/App.png?raw=true" width="512" align="right" />
 
 ## Usage
 
-...
+The usage should be pretty self explanatory. If you have any question, feel free to open an issue!
 
 ## Installation
 
@@ -18,8 +16,8 @@ Use lightweight containers just like any virtual machine.
 
 You'll need the following dependencies:
 * glib-2.0
+* json-glib-1.0
 * gtk+-3.0
-* unity
 * meson
 * valac
 
