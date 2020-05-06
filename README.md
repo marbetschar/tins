@@ -19,7 +19,9 @@ To do so, please execute the following commands in your terminal:
 
 ```
 sudo apt install lxd
-sudo lxd init            # use default values everywhere
+#
+# use default values everywhere:
+sudo lxd init
 ```
 
 ## Building
