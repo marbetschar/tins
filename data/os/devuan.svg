@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="64"
+   height="64"
+   viewBox="0 0 64 63.999995"
+   id="svg3668"
+   version="1.1"
+   inkscape:version="0.92.5 (2060ec1f9f, 2020-04-08)"
+   sodipodi:docname="Devuan Logo.svg"
+   inkscape:export-filename="/home/hellekin/src/devuan/Editors/devuan-art/graphics/logo/devuan-emblem_600dpi.png"
+   inkscape:export-xdpi="600.18597"
+   inkscape:export-ydpi="600.18597">
+  <title
+     id="title3714">Devuan Logo</title>
+  <defs
+     id="defs3670" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="5"
+     inkscape:cx="-31.274864"
+     inkscape:cy="59.237805"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0"
+     inkscape:window-width="1920"
+     inkscape:window-height="1017"
+     inkscape:window-x="0"
+     inkscape:window-y="30"
+     inkscape:window-maximized="1"
+     units="px" />
+  <metadata
+     id="metadata3673">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title>Devuan Logo</dc:title>
+        <dc:creator>
+          <cc:Agent>
+            <dc:title>hellekin</dc:title>
+          </cc:Agent>
+        </dc:creator>
+        <dc:publisher>
+          <cc:Agent>
+            <dc:title>Dyne.org Foundation</dc:title>
+          </cc:Agent>
+        </dc:publisher>
+        <dc:contributor>
+          <cc:Agent>
+            <dc:title>hellekin, golinux, Centurion_Dan</dc:title>
+          </cc:Agent>
+        </dc:contributor>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-461.83765,-512.604)">
+    <path
+       sodipodi:nodetypes="ccssscsc"
+       style="display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.02763372;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 461.83763,513.7548 c 113.104,26.99125 6.11018,48.93929 6.11018,48.93929 -2.10789,0.33683 -3.80818,1.43485 -4.83182,3.1034 -1.1499,1.87439 -1.24734,4.40702 -0.17353,6.18763 1.30664,2.16671 2.96222,2.91624 4.3901,3.23903 2.24652,0.50787 4.05984,-0.30142 4.05984,-0.30142 0,0 54.6976,-16.25468 54.28644,-32.49107 -0.20642,-8.15088 -16.77213,-21.93776 -63.84121,-28.67686 z"
+       id="path4338"
+       inkscape:connector-curvature="0" />
+  </g>
+</svg>

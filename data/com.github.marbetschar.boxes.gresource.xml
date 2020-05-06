@@ -6,11 +6,18 @@
     <file compressed="true" preprocess="xml-stripblanks">actions/download@assistant.svg</file>
     <file compressed="true" preprocess="xml-stripblanks">actions/terminal.svg</file>
     <file compressed="true" preprocess="xml-stripblanks">actions/settings.svg</file>
+    <file compressed="true" preprocess="xml-stripblanks">os/alpine.svg</file>
+    <file compressed="true" preprocess="xml-stripblanks">os/apertis.svg</file>
+    <file compressed="true" preprocess="xml-stripblanks">os/archlinux.svg</file>
     <file compressed="true" preprocess="xml-stripblanks">os/centos.svg</file>
+    <file compressed="true" preprocess="xml-stripblanks">os/debian.svg</file>
+    <file compressed="true" preprocess="xml-stripblanks">os/devuan.svg</file>
     <file compressed="true" preprocess="xml-stripblanks">os/elementary.svg</file>
     <file compressed="true" preprocess="xml-stripblanks">os/fedora.svg</file>
     <file compressed="true" preprocess="xml-stripblanks">os/linux.svg</file>
+    <file compressed="true" preprocess="xml-stripblanks">os/opensuse.svg</file>
     <file compressed="true" preprocess="xml-stripblanks">os/ubuntu.svg</file>
+    <file compressed="true" preprocess="xml-stripblanks">os/voidlinux.svg</file>
     <file compressed="true" preprocess="xml-stripblanks">ui/MainWindow.glade</file>
     <file compressed="true" preprocess="xml-stripblanks">ui/AddContainerAssistant.glade</file>
     <file compressed="true" preprocess="xml-stripblanks">ui/WidgetsContainerListBoxRow.glade</file>
