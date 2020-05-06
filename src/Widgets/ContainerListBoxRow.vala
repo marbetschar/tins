@@ -94,9 +94,11 @@ public class Boxes.Widgets.ContainerListBoxRow : Gtk.ListBoxRow {
         if (enabled) {
             description = _("Running...");
             button_stack.visible_child = open_button;
+            button_stack.sensitive = true;
 
         } else {
-            button_stack.visible_child = configure_button;
+            // button_stack.visible_child = configure_button;
+            button_stack.sensitive = false;
             description = _("Stopped.");
         }
     }
