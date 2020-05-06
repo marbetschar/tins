@@ -21,17 +21,56 @@
 
 public class Boxes.Widgets.ContainerListBox : Gtk.ListBox {
 
+    public GenericArray<LXD.Instance> instances { get; set; }
+
     construct {
+        instances = null;
         selection_mode = Gtk.SelectionMode.SINGLE;
 
-        var instances = Application.lxd_client.get_instances ();
-        for (var i = 0; i < instances.length; i++) {
-            add (create_row (instances.index (i)));
+        notify["instances"].connect (() => {
+            update_request ();
+        });
+        update_request ();
+    }
+
+    private void update_request () {
+        if (instances == null || instances.length == 0) {
+            var children = get_children ();
+
+            if (children != null) {
+                children.@foreach((row) => {
+                    remove (row);
+                });
+            }
+
+        } else {
+            var children = get_children ();
+
+            for (var i = 0; i < instances.length; i++) {
+                ContainerListBoxRow row;
+
+                if (children != null && i < children.length ()) {
+                    row = children.nth_data (i) as ContainerListBoxRow;
+                } else {
+                    row = new ContainerListBoxRow ();
+                }
+
+                update_instance_row (row, instances.get (i));
+
+                if (children == null || children.length () < (i+1)) {
+                    add (row);
+                }
+            }
+
+            if (children != null && children.length () > instances.length) {
+                for(var i = instances.length; i < children.length (); i++){
+                    remove (children.nth_data (i-1));
+                }
+            }
         }
     }
 
-    private Gtk.ListBoxRow create_row (LXD.Instance instance) {
-        var row = new ContainerListBoxRow ();
+    private void update_instance_row (ContainerListBoxRow row, LXD.Instance instance) {
         row.instance = instance;
         row.title = instance.display_name;
         row.enabled = instance.status == "Running";
@@ -69,8 +108,6 @@ public class Boxes.Widgets.ContainerListBox : Gtk.ListBox {
                 critical (e.message);
             }
         });
-
-        return row;
     }
 
     private string resource_for_os (string os) {

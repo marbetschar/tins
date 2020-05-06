@@ -34,9 +34,9 @@ public class Boxes.Application : GLib.Application {
         );
         var all_images = lxd_client.get_images ();
 
-        HashTable<string,Array<LXD.Image>> data = new HashTable<string,Array<LXD.Image>> (str_hash, str_equal);
+        HashTable<string,GenericArray<LXD.Image>> data = new HashTable<string,GenericArray<LXD.Image>> (str_hash, str_equal);
         for(var i = 0; i < all_images.length; i++) {
-            var image = all_images.index (i);
+            var image = all_images.get (i);
 
             if (image.architecture != "x86_64") {
                 stdout.printf ("Skipping %s…\n", image.properties.description);
@@ -44,9 +44,9 @@ public class Boxes.Application : GLib.Application {
             }
 
             if (data.get(image.properties.os) == null) {
-                data.set(image.properties.os, new Array<LXD.Image> ());
+                data.set(image.properties.os, new GenericArray<LXD.Image> ());
             }
-            data.get(image.properties.os).append_val (image);
+            data.get(image.properties.os).add (image);
         }
 
         var image_store = new LXD.ImageStore ();

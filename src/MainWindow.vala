@@ -30,7 +30,7 @@ public class Boxes.MainWindow : Gtk.ApplicationWindow {
     [GtkChild]
     private Gtk.Button remove_button;
 
-    private Gtk.ListBox list_box;
+    private Boxes.Widgets.ContainerListBox list_box;
 
     public MainWindow (Gtk.Application application) {
         Object (
@@ -46,11 +46,34 @@ public class Boxes.MainWindow : Gtk.ApplicationWindow {
         Gtk.StyleContext.add_provider_for_screen (Gdk.Screen.get_default (), style_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
 
         list_box = new Boxes.Widgets.ContainerListBox ();
-
+        try {
+            list_box.instances = Application.lxd_client.get_instances ();
+        } catch (Error e) {
+            critical (e.message);
+        }
         viewport.add (list_box);
 
         list_box.row_selected.connect ((row) => {
-            remove_button.sensitive = row != null;
+            if (row == null) {
+                remove_button.sensitive = false;
+            } else {
+                var instance_row = row as Boxes.Widgets.ContainerListBoxRow;
+                remove_button.sensitive = instance_row.instance.status == "Stopped";
+            }
+        });
+
+        /**
+         * Refresh all available instances
+         * in a regular interval
+         */
+        Timeout.add_seconds (3, () => {
+            try {
+                list_box.instances = Application.lxd_client.get_instances ();
+            } catch (Error e) {
+                critical (e.message);
+            }
+
+            return GLib.Source.CONTINUE;
         });
     }
 

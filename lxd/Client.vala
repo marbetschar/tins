@@ -35,14 +35,14 @@ public class LXD.Client {
         this.version = version;
     }
 
-    public Array<Instance> get_instances () throws Error {
+    public GenericArray<Instance> get_instances () throws Error {
         var json = api_request ("GET", @"/$version/containers");
         var list = json.get_array ();
         int i;
 
-        var instances = new GLib.Array<Instance> ();
+        var instances = new GLib.GenericArray<Instance> ();
         for (i = 0; i < list.get_length (); i++) {
-            instances.append_val (get_instance (list.get_string_element (i)));
+            instances.add (get_instance (list.get_string_element (i)));
         }
 
         return instances;
@@ -142,14 +142,14 @@ public class LXD.Client {
         return list.get_length ();
     }
 
-    public Array<Image> get_images (string? filter = null) throws Error {
+    public GenericArray<Image> get_images (string? filter = null) throws Error {
         var json = api_request ("GET", @"/$version/images", (filter == null ? "" : @"filter=$filter"));
         var list = json.get_array ();
         int i;
 
-        var images = new GLib.Array<Image> ();
+        var images = new GLib.GenericArray<Image> ();
         for (i = 0; i < list.get_length (); i++) {
-            images.append_val (get_image (list.get_string_element (i)));
+            images.add (get_image (list.get_string_element (i)));
         }
 
         return images;

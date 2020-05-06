@@ -23,7 +23,7 @@ public class LXD.ImageStore : LXD.Object {
 
     public string server { get; set; }
     public string created_at { get; set; }
-    public HashTable<string,Array<LXD.Image>> data { get; set; }
+    public HashTable<string,GenericArray<LXD.Image>> data { get; set; }
 
 
     /* --- Json.Serializable --- */

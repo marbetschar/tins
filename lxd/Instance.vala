@@ -51,7 +51,7 @@ public class LXD.Instance : LXD.Object {
      */
     public string name { get; set; }
     public string architecture { get; set; }
-    public Array<string> profiles { get; set; }
+    public GenericArray<string> profiles { get; set; }
     public bool ephemeral { get; set; }
     public bool stateful { get; set; }
     public string status { get; set; }

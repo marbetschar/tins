@@ -48,12 +48,6 @@ public class Boxes.AddContainerAssistant : Gtk.Assistant {
     [GtkChild]
     private Gtk.CheckButton gui_enabled_checkbutton;
 
-    [GtkChild]
-    private Gtk.Spinner progress_spinner;
-
-    [GtkChild]
-    private Gtk.Label progress_label;
-
     [GtkCallback]
     private bool on_key_release_name_entry (Gtk.Widget source, Gdk.EventKey event) {
         validate_current_page ();
@@ -69,7 +63,7 @@ public class Boxes.AddContainerAssistant : Gtk.Assistant {
 
         if (os_images != null) {
             for(var i = 0; i < os_images.length; i++) {
-                var os_image = os_images.index(i);
+                var os_image = os_images.get(i);
                 image_combobox.append_text (_(os_image.properties.release));
             }
             image_combobox.active = 0;
@@ -94,7 +88,7 @@ public class Boxes.AddContainerAssistant : Gtk.Assistant {
     private void on_apply (Gtk.Widget source) {
         var os_key = all_os_keys.nth_data (operating_system_combobox.active);
         var all_os_images = Application.lxd_image_store.data.get (os_key);
-        var os_image = all_os_images.index (image_combobox.active);
+        var os_image = all_os_images.get (image_combobox.active);
 
         var instance_source = new LXD.Instance.Source ();
         instance_source.source_type = "image";
@@ -109,39 +103,19 @@ public class Boxes.AddContainerAssistant : Gtk.Assistant {
         debug (@"instance.name: $(instance.name)");
         instance.architecture = "x86_64";
 
-        var profiles = new Array<string> ();
-        profiles.append_val ("default");
+        var profiles = new GenericArray<string> ();
+        profiles.add ("default");
         if (gui_enabled_checkbutton.active) {
-            profiles.append_val ("gui");
+            profiles.add ("gui");
         }
-        instance.profiles = (owned) profiles;
+        instance.profiles = profiles;
 
-        //next_page ();
-        //set_current_page_complete (false);
+        try {
+            Application.lxd_client.add_instance (instance);
 
-        /**
-         * Using Idle to monitor progress
-         * avoids blocking the user interface
-         */
-        //Idle.add (() => {
-            try {
-                operation = Application.lxd_client.add_instance (instance);
-
-                while (operation.status_code < 200) {
-                    progress_label.label = "Loading...";
-                    Thread.usleep (1000000);
-                    operation = Application.lxd_client.get_operation (operation.id);
-                }
-
-                if (operation.err != null && operation.err.strip () != "") {
-                    critical (operation.err);
-                }
-
-            } catch (Error e) {
-                critical (e.message);
-            }
-            //return GLib.Source.REMOVE;
-        //});
+        } catch (Error e) {
+            critical (e.message);
+        }
     }
 
     [GtkCallback]

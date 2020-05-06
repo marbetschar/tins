@@ -21,8 +21,6 @@
 
 public abstract class LXD.Object : GLib.Object, Json.Serializable {
 
-    // TODO: switch to https://valadoc.org/glib-2.0/GLib.GenericArray.html
-
 	public unowned ParamSpec? find_property (string name) {
 		return ((ObjectClass) get_type ().class_ref ()).find_property (name);
 	}
@@ -32,16 +30,16 @@ public abstract class LXD.Object : GLib.Object, Json.Serializable {
 	    bool boxed_in_array;
 	    property_boxed_value_type_with_param_spec (pspec, out boxed_value_type, out boxed_in_array);
 
-		if (@value.type ().is_a (typeof (GLib.Array))) {
+		if (@value.type ().is_a (typeof (GLib.GenericArray))) {
 
 			if (boxed_value_type.is_a (typeof (GLib.Object))) {
-			    unowned GLib.Array<GLib.Object> array_value = @value as GLib.Array<GLib.Object>;
+			    unowned GLib.GenericArray<GLib.Object> array_value = @value as GLib.GenericArray<GLib.Object>;
 
 			    if (array_value != null){
 				    var array = new Json.Array.sized (array_value.length);
 
 				    for(var i = 0; i < array_value.length; i++) {
-					    array.add_element (Json.gobject_serialize (array_value.index (i)));
+					    array.add_element (Json.gobject_serialize (array_value.get (i)));
 				    }
 
 				    var node = new Json.Node (Json.NodeType.ARRAY);
@@ -50,13 +48,13 @@ public abstract class LXD.Object : GLib.Object, Json.Serializable {
 			    }
 
 			} else if (boxed_value_type.is_a (typeof (string))){
-			    unowned GLib.Array<string> array_value = @value as GLib.Array<string>;
+			    unowned GLib.GenericArray<string> array_value = @value as GLib.GenericArray<string>;
 
 			    if (array_value != null){
 				    var array = new Json.Array.sized (array_value.length);
 
 				    for(var i = 0; i < array_value.length; i++) {
-					    array.add_string_element (array_value.index (i));
+					    array.add_string_element (array_value.get (i));
 				    }
 
 				    var node = new Json.Node (Json.NodeType.ARRAY);
@@ -65,22 +63,21 @@ public abstract class LXD.Object : GLib.Object, Json.Serializable {
 			    }
 
 			} else {
-			    warning (@"GLib.Array serialization not supported for boxed type: $(boxed_value_type.name ())");
+			    warning (@"GLib.GenericArray serialization not supported for boxed type: $(boxed_value_type.name ())");
 			}
 
 		} else if (@value.type ().is_a (typeof (GLib.HashTable))) {
 			var object = new Json.Object ();
 
-			//if (@value.type ().is_a (typeof (GLib.HashTable<string,GLib.Array<GLib.Object>>))) {
 			if (boxed_in_array) {
-				unowned GLib.HashTable<string,GLib.Array<GLib.Object>> hash_table = @value as HashTable<string, GLib.Array<GLib.Object>>;
+				unowned GLib.HashTable<string,GLib.GenericArray<GLib.Object>> hash_table = @value as HashTable<string, GLib.GenericArray<GLib.Object>>;
 
 				if (hash_table != null) {
 					hash_table.foreach ((key, array_value) => {
 						var array = new Json.Array.sized (array_value.length);
 
 						for(var i = 0; i < array_value.length; i++) {
-							array.add_element (Json.gobject_serialize (array_value.index (i)));
+							array.add_element (Json.gobject_serialize (array_value.get (i)));
 						}
 
 						var node = new Json.Node (Json.NodeType.ARRAY);
@@ -115,33 +112,33 @@ public abstract class LXD.Object : GLib.Object, Json.Serializable {
 	    bool boxed_in_array;
 	    property_boxed_value_type_with_param_spec (pspec, out boxed_value_type, out boxed_in_array);
 
-		if (pspec.value_type.is_a (typeof (GLib.Array))) {
+		if (pspec.value_type.is_a (typeof (GLib.GenericArray))) {
 			@value = GLib.Value (pspec.value_type);
 
 			var array_value = property_node.get_array ();
 
 			if (boxed_value_type.is_a (typeof (GLib.Object))) {
-				var array = new GLib.Array<GLib.Object> ();
+				var array = new GLib.GenericArray<GLib.Object> ();
 
 				if (array_value != null) {
 					array_value.foreach_element ((array_value, i, element) => {
-						array.append_val (Json.gobject_deserialize (boxed_value_type, element));
+						array.add (Json.gobject_deserialize (boxed_value_type, element));
 					});
 				}
 				@value.set_boxed (array);
 
 			} else if (boxed_value_type.is_a (typeof (string))){
-				var array = new GLib.Array<string> ();
+				var array = new GLib.GenericArray<string> ();
 
 				if (array_value != null) {
 					array_value.foreach_element ((array_value, i, element) => {
-						array.append_val (element.get_string ());
+						array.add (element.get_string ());
 					});
 				}
 				@value.set_boxed (array);
 
 			} else {
-			    warning (@"GLib.Array deserialization not supported for boxed type: $(boxed_value_type.name ())");
+			    warning (@"GLib.GenericArray deserialization not supported for boxed type: $(boxed_value_type.name ())");
 			}
 
 		} else if (pspec.value_type.is_a (typeof (GLib.HashTable))) {
@@ -150,33 +147,29 @@ public abstract class LXD.Object : GLib.Object, Json.Serializable {
 			var object_value = property_node.get_object ();
 
 			if (object_value != null) {
-				//if (pspec.value_type.is_a ((typeof (GLib.HashTable<string,GLib.Array<GLib.Object>>)))) {
 				if (boxed_in_array) {
-					var hash_table = new GLib.HashTable<string, GLib.Array<GLib.Object>> (str_hash, str_equal);
+					var hash_table = new GLib.HashTable<string, GLib.GenericArray<GLib.Object>> (str_hash, str_equal);
 
 					object_value.foreach_member ((object, member_name, member_node) => {
 						var array_value = member_node.get_array ();
-						var array = new GLib.Array<GLib.Object> ();
+						var array = new GLib.GenericArray<GLib.Object> ();
 
 						if (array_value != null) {
 							array_value.foreach_element ((array_value, i, element) => {
-								array.append_val (Json.gobject_deserialize (boxed_value_type, element));
+								array.add (Json.gobject_deserialize (boxed_value_type, element));
 							});
 						}
 						hash_table.@set (member_name, array);
 					});
 					@value.set_boxed (hash_table);
 
-				//} else if (pspec.value_type.is_a ((typeof (GLib.HashTable<string,string>)))) {
 				} else if (boxed_value_type.is_a (typeof (string))){
-					debug (@"GLib.HashTable<string,string>: $property_name");
 					var hash_table = new GLib.HashTable<string, string> (str_hash, str_equal);
 					object_value.foreach_member ((object, member_name, member_node) => {
 						hash_table.@set (member_name, member_node.get_string ());
 					});
 					@value.set_boxed (hash_table);
 
-				//} else if (pspec.value_type.is_a ((typeof (GLib.HashTable<string,GLib.Object>)))) {
 				} else if (boxed_value_type.is_a (typeof (GLib.Object))) {
 					var hash_table = new GLib.HashTable<string, GLib.Object> (str_hash, str_equal);
 					object_value.foreach_member ((object, member_name, member_node) => {
@@ -200,7 +193,7 @@ public abstract class LXD.Object : GLib.Object, Json.Serializable {
 	}
 
 	/**
-	 * GLib boxed types such as GLib.Array or GLib.HashTable
+	 * GLib boxed types such as GLib.GenericArray or GLib.HashTable
 	 * don't carry the type of their boxed values at runtime.
 	 *
 	 * Overide this method to provide the boxed value type for such properties.
@@ -210,7 +203,7 @@ public abstract class LXD.Object : GLib.Object, Json.Serializable {
 	}
 
 	/**
-	 * GLib boxed types such as GLib.Array or GLib.HashTable
+	 * GLib boxed types such as GLib.GenericArray or GLib.HashTable
 	 * don't carry the type of their boxed values at runtime.
 	 *
 	 * Call this method to fall back to the default implementation.
