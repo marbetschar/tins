@@ -24,9 +24,9 @@ public class Boxes.Widgets.ContainerListBoxRow : Gtk.ListBoxRow {
 
     public LXD.Instance instance;
 
-    public signal void open_clicked ();
-    public signal void configure_clicked ();
-    public signal void toggle_enabled (bool enabled);
+    public signal void open_clicked (LXD.Instance instance);
+    public signal void configure_clicked (LXD.Instance instance);
+    public signal void toggle_enabled (LXD.Instance instance, bool enabled);
 
     public string title {
         get { return title_label.label; }
@@ -85,7 +85,7 @@ public class Boxes.Widgets.ContainerListBoxRow : Gtk.ListBoxRow {
     construct {
         logo_box.toggle_enabled.connect ((enabled) => {
             update_request ();
-            toggle_enabled (enabled);
+            toggle_enabled (instance, enabled);
         });
         update_request ();
     }
@@ -103,12 +103,12 @@ public class Boxes.Widgets.ContainerListBoxRow : Gtk.ListBoxRow {
 
     [GtkCallback]
     private void on_open_button_clicked (Gtk.Widget source) {
-        open_clicked ();
+        open_clicked (instance);
     }
 
     [GtkCallback]
     private void on_configure_button_clicked (Gtk.Widget source) {
-        configure_clicked ();
+        configure_clicked (instance);
     }
 }
 

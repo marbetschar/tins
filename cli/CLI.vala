@@ -28,47 +28,51 @@ public class Boxes.Application : GLib.Application {
     }
 
     protected override void activate () {
-        stdout.printf ("Downloading metadata for %u images from %s - this may take a while…\n",
-            lxd_client.count_images (),
-            lxd_client.host
-        );
-        var all_images = lxd_client.get_images ();
+        try {
+            stdout.printf ("Downloading metadata for %u images from %s - this may take a while…\n",
+                lxd_client.count_images (),
+                lxd_client.host
+            );
+            var all_images = lxd_client.get_images ();
 
-        HashTable<string,GenericArray<LXD.Image>> data = new HashTable<string,GenericArray<LXD.Image>> (str_hash, str_equal);
-        for(var i = 0; i < all_images.length; i++) {
-            var image = all_images.get (i);
+            HashTable<string,GenericArray<LXD.Image>> data = new HashTable<string,GenericArray<LXD.Image>> (str_hash, str_equal);
+            for(var i = 0; i < all_images.length; i++) {
+                var image = all_images.get (i);
 
-            if (image.architecture != "x86_64") {
-                stdout.printf ("Skipping %s…\n", image.properties.description);
-                continue;
+                if (image.architecture != "x86_64") {
+                    stdout.printf ("Skipping %s…\n", image.properties.description);
+                    continue;
+                }
+
+                if (data.get(image.properties.os) == null) {
+                    data.set(image.properties.os, new GenericArray<LXD.Image> ());
+                }
+                data.get(image.properties.os).add (image);
             }
 
-            if (data.get(image.properties.os) == null) {
-                data.set(image.properties.os, new GenericArray<LXD.Image> ());
+            var image_store = new LXD.ImageStore ();
+            image_store.server = lxd_client.host;
+            image_store.created_at = new DateTime.now_utc ().format ("%FT%TZ");
+            image_store.data = data;
+
+            Json.Node root = Json.gobject_serialize (image_store);
+            Json.Generator generator = new Json.Generator ();
+            generator.set_root (root);
+
+            var file = GLib.File.new_for_path ("image-store.json");
+            stdout.printf ("Writing image store to %s …\n", file.get_path ());
+
+            if (file.query_exists ()) {
+                file.@delete ();
             }
-            data.get(image.properties.os).add (image);
+
+            var file_out_stream = file.create (FileCreateFlags.REPLACE_DESTINATION);
+            generator.to_stream (file_out_stream, null);
+
+            stdout.printf ("Done.\n");
+        } catch (Error e) {
+            critical (e.message);
         }
-
-        var image_store = new LXD.ImageStore ();
-        image_store.server = lxd_client.host;
-        image_store.created_at = new DateTime.now_utc ().format ("%FT%TZ");
-        image_store.data = data;
-
-        Json.Node root = Json.gobject_serialize (image_store);
-        Json.Generator generator = new Json.Generator ();
-        generator.set_root (root);
-
-        var file = GLib.File.new_for_path ("image-store.json");
-        stdout.printf ("Writing image store to %s …\n", file.get_path ());
-
-        if (file.query_exists ()) {
-            file.@delete ();
-        }
-
-        var file_out_stream = file.create (FileCreateFlags.REPLACE_DESTINATION);
-        generator.to_stream (file_out_stream, null);
-
-        stdout.printf ("Done.\n");
     }
 
     public static int main (string[] args) {

@@ -101,7 +101,7 @@ public class Boxes.MainWindow : Gtk.ApplicationWindow {
              */
             Idle.add (() => {
                 try {
-                    var result = Application.lxd_client.wait_operation (operation.id);
+                    Application.lxd_client.wait_operation (operation.id);
 
                 } catch (Error e) {
                     critical (e.message);

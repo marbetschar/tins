@@ -25,22 +25,37 @@ public class LXD.Instance : LXD.Object {
     public static Regex name_multi_dash_regex;
 
     static construct  {
-        name_non_alpha_regex = new Regex ("[^a-zA-Z0-9_]");
-        name_multi_dash_regex = new Regex ("-+");
+        try {
+            name_non_alpha_regex = new Regex ("[^a-zA-Z0-9_]");
+            name_multi_dash_regex = new Regex ("-+");
+        } catch (Error e) {
+            critical (e.message);
+        }
     }
 
-    public string display_name {
+    public string? display_name {
         owned get {
             if (this.name == null) {
                 return null;
             }
-            return name_multi_dash_regex.replace (this.name, -1, 0, " ");
+            var name = this.name;
+
+            try {
+                name = name_multi_dash_regex.replace (name, -1, 0, " ");
+            } catch (Error e) {
+                warning (e.message);
+            }
+            return name;
         }
         set {
             var name = value;
             if (name != null){
-                name = name_non_alpha_regex.replace (name, -1, 0, "-");
-                name = name_multi_dash_regex.replace (name, -1, 0, "-");
+                try {
+                    name = name_non_alpha_regex.replace (name, -1, 0, "-");
+                    name = name_multi_dash_regex.replace (name, -1, 0, "-");
+                } catch (Error e) {
+                    warning (e.message);
+                }
             }
             this.name = name;
         }

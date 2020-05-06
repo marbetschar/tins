@@ -86,7 +86,7 @@ public abstract class LXD.Object : GLib.Object, Json.Serializable {
 					});
 				}
 
-			} else if (@value.type ().is_a (typeof (GLib.HashTable<string,GLib.Object>))) {
+			} else {
 				unowned GLib.HashTable<string,GLib.Object> hash_table = @value as HashTable<string, GLib.Object>;
 
 				if (hash_table != null) {
@@ -95,8 +95,8 @@ public abstract class LXD.Object : GLib.Object, Json.Serializable {
 					});
 				}
 
-			} else {
-			    warning (@"GLib.HashTable serialization not supported for boxed type: $(@value.type ().name ())");
+			//} else {
+			//    warning (@"GLib.HashTable serialization not supported for boxed type: $(@value.type ().name ())");
 			}
 
 			var node = new Json.Node (Json.NodeType.OBJECT);

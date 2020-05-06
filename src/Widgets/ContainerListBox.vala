@@ -52,7 +52,7 @@ public class Boxes.Widgets.ContainerListBox : Gtk.ListBox {
                 if (children != null && i < children.length ()) {
                     row = children.nth_data (i) as ContainerListBoxRow;
                 } else {
-                    row = new ContainerListBoxRow ();
+                    row = construct_instance_row ();
                 }
 
                 update_instance_row (row, instances.get (i));
@@ -70,32 +70,36 @@ public class Boxes.Widgets.ContainerListBox : Gtk.ListBox {
         }
     }
 
-    private void update_instance_row (ContainerListBoxRow row, LXD.Instance instance) {
-        row.instance = instance;
-        row.title = instance.display_name;
-        row.enabled = instance.status == "Running";
-        //row.gui_enabled = container.gui_enabled;
-        var instance_os = instance.config.get("image.os");
-        if (instance_os != null) {
-            row.image_resource = resource_for_os (instance_os);
-        }
+    private ContainerListBoxRow construct_instance_row () {
+        var row = new ContainerListBoxRow ();
 
-        row.toggle_enabled.connect ((enabled) => {
+        row.toggle_enabled.connect ((instance, enabled) => {
+            var selected_row = get_selected_row ();
+            if (selected_row != null) {
+                unselect_row (selected_row);
+            }
+
             try {
                  LXD.Operation operation;
 
                 if (enabled) {
                     operation = Application.lxd_client.start_instance (instance.name);
+                    instance.status = "Running";
                 } else {
                     operation = Application.lxd_client.stop_instance (instance.name);
+                    instance.status = "Stopped";
+                }
+
+                if (selected_row != null) {
+                    select_row (selected_row);
                 }
 
                 /**
-                 * Using Idle to wait for deletion to be completed.
+                 * Using Idle to wait for status change to be completed.
                  */
                 Idle.add (() => {
                     try {
-                        var result = Application.lxd_client.wait_operation (operation.id);
+                        Application.lxd_client.wait_operation (operation.id);
 
                     } catch (Error e) {
                         critical (e.message);
@@ -108,6 +112,27 @@ public class Boxes.Widgets.ContainerListBox : Gtk.ListBox {
                 critical (e.message);
             }
         });
+
+        row.open_clicked.connect ((instance) => {
+            try {
+                Process.spawn_command_line_async (@"io.elementary.terminal --execute=\"lxc exec $(instance.name) -- /bin/bash\"");
+            } catch (Error e) {
+                critical (e.message);
+            }
+        });
+
+        return row;
+    }
+
+    private void update_instance_row (ContainerListBoxRow row, LXD.Instance instance) {
+        row.instance = instance;
+        row.title = instance.display_name;
+        row.enabled = instance.status == "Running";
+        //row.gui_enabled = container.gui_enabled;
+        var instance_os = instance.config.get("image.os");
+        if (instance_os != null) {
+            row.image_resource = resource_for_os (instance_os);
+        }
     }
 
     private string resource_for_os (string os) {

@@ -82,8 +82,6 @@ public class Boxes.AddContainerAssistant : Gtk.Assistant {
         destroy ();
     }
 
-    private LXD.Operation operation;
-
     [GtkCallback]
     private void on_apply (Gtk.Widget source) {
         var os_key = all_os_keys.nth_data (operating_system_combobox.active);
