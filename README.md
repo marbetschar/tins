@@ -2,7 +2,7 @@
 
 Use lightweight containers just like any virtual machine.
 
-<img src="data/screenshots/App.png?raw=true" width="512" align="right" />
+<img src="data/screenshots/App.png?raw=true" width="448" align="right" />
 
 ## Usage
 
