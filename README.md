@@ -10,7 +10,7 @@ The usage should be pretty self explanatory. If you have any question, feel free
 
 ## Installation
 
-...
+Boxes will be available in elementary AppCenter soon!
 
 ## Building
 
