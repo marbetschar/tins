@@ -6,11 +6,21 @@ Use lightweight containers just like any virtual machine.
 
 ## Usage
 
-The usage should be pretty self explanatory. If you have any question, feel free to open an issue!
+In case you want to learn more about LXD, there is a pretty good documenation on (linuxcontainers.org)[https://linuxcontainers.org/lxd].
+
+Even though the usage of Boxes should be pretty self explanatory, feel free to open an issue if you have any questions.
 
 ## Installation
 
 Boxes will be available in elementary AppCenter soon!
+
+**PLEASE NOTE:** Until (issue #7)[https://github.com/marbetschar/boxes/issues/7] is fixed, Boxes expects LXD to be installed via apt and initialized on the host system.
+To do so, please execute the following commands in your terminal:
+
+```
+sudo apt install lxd
+sudo lxd init            # use default values for everything
+```
 
 ## Building
 
