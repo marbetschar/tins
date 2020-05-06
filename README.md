@@ -1,6 +1,6 @@
 # Boxes
 
-Use lightweight containers just like any virtual machine.
+Containers just like Virtual Machines
 
 <img src="data/screenshots/App.png?raw=true" width="448" align="right" />
 
