@@ -115,7 +115,16 @@ public class Boxes.Widgets.ContainerListBox : Gtk.ListBox {
 
         row.open_clicked.connect ((instance) => {
             try {
-                Process.spawn_command_line_async (@"io.elementary.terminal --execute=\"lxc exec $(instance.name) -- /bin/bash\"");
+                var app_info = AppInfo.create_from_commandline (
+                    @"io.elementary.terminal --execute=\"lxc exec $(instance.name) -- /bin/bash\"",
+                    null,
+                    AppInfoCreateFlags.NONE
+                );
+
+                if (app_info != null) {
+                    app_info.launch (null, Gdk.Screen.get_default ().get_display ().get_app_launch_context ());
+                }
+
             } catch (Error e) {
                 critical (e.message);
             }
