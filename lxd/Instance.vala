@@ -70,7 +70,9 @@ public class LXD.Instance : LXD.Object {
     public bool ephemeral { get; set; }
     public bool stateful { get; set; }
     public string status { get; set; }
+
     public HashTable<string,string> config { get; set; }
+    public HashTable<string,string> devices { get; set; }
 
     public Source source { get; set; }
 
@@ -92,6 +94,10 @@ public class LXD.Instance : LXD.Object {
                 boxed_in_array = true;
                 break;
             case "config":
+                boxed_value_type = typeof (string);
+                boxed_in_array = false;
+                break;
+            case "devices":
                 boxed_value_type = typeof (string);
                 boxed_in_array = false;
                 break;

@@ -6,6 +6,8 @@
     <file compressed="true" preprocess="xml-stripblanks">actions/download@assistant.svg</file>
     <file compressed="true" preprocess="xml-stripblanks">actions/terminal.svg</file>
     <file compressed="true" preprocess="xml-stripblanks">actions/settings.svg</file>
+    <file compressed="true" preprocess="xml-stripblanks">actions/warning@assistant.svg</file>
+    <file compressed="true" preprocess="xml-stripblanks">actions/working@assistant.svg</file>
     <file compressed="true" preprocess="xml-stripblanks">os/alpine.svg</file>
     <file compressed="true" preprocess="xml-stripblanks">os/apertis.svg</file>
     <file compressed="true" preprocess="xml-stripblanks">os/archlinux.svg</file>

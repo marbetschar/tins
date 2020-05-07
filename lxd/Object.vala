@@ -122,7 +122,11 @@ public abstract class LXD.Object : GLib.Object, Json.Serializable {
 
 				if (array_value != null) {
 					array_value.foreach_element ((array_value, i, element) => {
-						array.add (Json.gobject_deserialize (boxed_value_type, element));
+						if (element.is_null ()) {
+							array.add (null);
+						} else {
+							array.add (Json.gobject_deserialize (boxed_value_type, element));
+						}
 					});
 				}
 				@value.set_boxed (array);
@@ -156,7 +160,11 @@ public abstract class LXD.Object : GLib.Object, Json.Serializable {
 
 						if (array_value != null) {
 							array_value.foreach_element ((array_value, i, element) => {
-								array.add (Json.gobject_deserialize (boxed_value_type, element));
+								if (element.is_null ()) {
+									array.add (null);
+								} else {
+									array.add (Json.gobject_deserialize (boxed_value_type, element));
+								}
 							});
 						}
 						hash_table.@set (member_name, array);
@@ -173,7 +181,11 @@ public abstract class LXD.Object : GLib.Object, Json.Serializable {
 				} else if (boxed_value_type.is_a (typeof (GLib.Object))) {
 					var hash_table = new GLib.HashTable<string, GLib.Object> (str_hash, str_equal);
 					object_value.foreach_member ((object, member_name, member_node) => {
-						hash_table.@set (member_name, Json.gobject_deserialize (boxed_value_type, member_node));
+						if (member_node.is_null ()) {
+							hash_table.@set (member_name, null);
+						} else {
+							hash_table.@set (member_name, Json.gobject_deserialize (boxed_value_type, member_node));
+						}
 					});
 					@value.set_boxed (hash_table);
 
@@ -184,7 +196,11 @@ public abstract class LXD.Object : GLib.Object, Json.Serializable {
 
 		} else if (pspec.value_type.is_a (typeof (GLib.Object))) {
 			@value = GLib.Value (pspec.value_type);
-			@value.set_object (Json.gobject_deserialize (pspec.value_type, property_node));
+			if (property_node.is_null ()) {
+				@value.set_object (null);
+			} else {
+				@value.set_object (Json.gobject_deserialize (pspec.value_type, property_node));
+			}
 
 		} else {
 			@value = property_node.get_value ();

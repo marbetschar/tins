@@ -48,6 +48,24 @@ public class Tins.AddContainerAssistant : Gtk.Assistant {
     [GtkChild]
     private Gtk.CheckButton gui_enabled_checkbutton;
 
+    [GtkChild]
+    private Gtk.Spinner progress_spinner;
+
+    [GtkChild]
+    private Gtk.Label progress_label;
+
+    [GtkChild]
+    private Gtk.Stack progress_image_stack;
+
+    [GtkChild]
+    private Gtk.Image progress_warning_image;
+
+    [GtkChild]
+    private Gtk.Stack progress_info_stack;
+
+    [GtkChild]
+    private Gtk.Label progress_warning_label;
+
     [GtkCallback]
     private bool on_key_release_name_entry (Gtk.Widget source, Gdk.EventKey event) {
         validate_current_page ();
@@ -84,6 +102,8 @@ public class Tins.AddContainerAssistant : Gtk.Assistant {
 
     [GtkCallback]
     private void on_apply (Gtk.Widget source) {
+        set_current_page_complete (false);
+
         var os_key = all_os_keys.nth_data (operating_system_combobox.active);
         var all_os_images = Application.lxd_image_store.data.get (os_key);
         var os_image = all_os_images.get (image_combobox.active);
@@ -98,7 +118,6 @@ public class Tins.AddContainerAssistant : Gtk.Assistant {
         instance.source = instance_source;
 
         instance.display_name = name_entry.text;
-        debug (@"instance.name: $(instance.name)");
         instance.architecture = "x86_64";
 
         var profiles = new GenericArray<string> ();
@@ -109,11 +128,76 @@ public class Tins.AddContainerAssistant : Gtk.Assistant {
         instance.profiles = profiles;
 
         try {
-            Application.lxd_client.add_instance (instance);
+            var operation = Application.lxd_client.add_instance (instance);
+            progress_label.label = @"$(operation.description)…";
+
+            Timeout.add_seconds (1, () => {
+                try {
+                    operation = Application.lxd_client.get_operation (operation.id);
+
+                    if (operation.status_code < 200) {
+                        if (operation.metadata != null && operation.metadata.download_progress != null) {
+                            progress_label.label = _("Downloading…") + " " + operation.metadata.download_progress;
+                        } else {
+                            progress_label.label = @"$(operation.description)…";
+                        }
+
+                    } else {
+                         if (operation.status_code < 300) {
+
+                            try {
+                                var start_operation = Application.lxd_client.start_instance (instance.name);
+
+                                Timeout.add_seconds (3, () => {
+                                    try {
+                                        start_operation = Application.lxd_client.get_operation (start_operation.id);
+
+                                        if (start_operation.status_code < 200) {
+                                            progress_label.label = @"$(start_operation.description)…";
+
+                                        } else {
+                                            if (start_operation.status_code < 300) {
+                                                close ();
+                                            } else {
+                                                on_operation_error (start_operation);
+                                            }
+                                            return Source.REMOVE;
+                                        }
+
+                                    } catch (Error e) {
+                                        critical (e.message);
+                                    }
+
+                                    return Source.CONTINUE;
+                                });
+
+                            } catch (Error e) {
+                                warning (e.message);
+                                close ();
+                            }
+
+                        } else {
+                            on_operation_error (operation);
+                        }
+                        return Source.REMOVE;
+                    }
+
+                } catch (Error e) {
+                    critical (e.message);
+                }
+
+                return Source.CONTINUE;
+            });
 
         } catch (Error e) {
             critical (e.message);
         }
+    }
+
+    private void on_operation_error (LXD.Operation operation) {
+        progress_image_stack.visible_child = progress_warning_image;
+        progress_info_stack.visible_child = progress_warning_label;
+        progress_warning_label.label = @"$(operation.err) ($(operation.status_code)).";
     }
 
     [GtkCallback]
