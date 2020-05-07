@@ -6,9 +6,9 @@ Containers just like Virtual Machines
 
 ## Usage
 
-Even though the usage of Tins should be pretty straight forward, feel free to open an issue if you have any questions.
+Even though the usage of Tins should be straight forward, feel free to open an issue if you have any questions.
 
-In case you want to learn more about LXD, there is a pretty good documenation on [linuxcontainers.org](https://linuxcontainers.org/lxd).
+In case you want to learn more about LXD, there is a pretty good documentation on [linuxcontainers.org](https://linuxcontainers.org/lxd).
 
 ## Installation
 
