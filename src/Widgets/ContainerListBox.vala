@@ -16,10 +16,10 @@
 * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 * Boston, MA 02110-1301 USA
 *
-* Authored by: Marco Betschart <boxes@marco.betschart.name>
+* Authored by: Marco Betschart <elementary-tins@marco.betschart.name>
 */
 
-public class Boxes.Widgets.ContainerListBox : Gtk.ListBox {
+public class Tins.Widgets.ContainerListBox : Gtk.ListBox {
 
     public GenericArray<LXD.Instance> instances { get; set; }
 
@@ -145,11 +145,11 @@ public class Boxes.Widgets.ContainerListBox : Gtk.ListBox {
     }
 
     private string resource_for_os (string os) {
-        var file = File.new_for_uri (@"resource:///com/github/marbetschar/boxes/os/$os.svg");
+        var file = File.new_for_uri (@"resource:///com/github/marbetschar/tins/os/$os.svg");
         if (file.query_exists ()) {
-            return @"/com/github/marbetschar/boxes/os/$os.svg";
+            return @"/com/github/marbetschar/tins/os/$os.svg";
         }
-        return "/com/github/marbetschar/boxes/os/linux.svg";
+        return "/com/github/marbetschar/tins/os/linux.svg";
     }
 }
 

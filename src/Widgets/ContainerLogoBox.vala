@@ -16,11 +16,11 @@
 * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 * Boston, MA 02110-1301 USA
 *
-* Authored by: Marco Betschart <boxes@marco.betschart.name>
+* Authored by: Marco Betschart <elementary-tins@marco.betschart.name>
 */
 
-[GtkTemplate (ui = "/com/github/marbetschar/boxes/ui/WidgetsContainerLogoBox.glade")]
-public class Boxes.Widgets.ContainerLogoBox : Gtk.Overlay {
+[GtkTemplate (ui = "/com/github/marbetschar/tins/ui/WidgetsContainerLogoBox.glade")]
+public class Tins.Widgets.ContainerLogoBox : Gtk.Overlay {
 
     public signal void toggle_enabled (bool enabled);
 

@@ -16,10 +16,11 @@
 * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 * Boston, MA 02110-1301 USA
 *
+* Authored by: Marco Betschart <elementary-tins@marco.betschart.name>
 */
 
-[GtkTemplate (ui = "/com/github/marbetschar/boxes/ui/MainWindow.glade")]
-public class Boxes.MainWindow : Gtk.ApplicationWindow {
+[GtkTemplate (ui = "/com/github/marbetschar/tins/ui/MainWindow.glade")]
+public class Tins.MainWindow : Gtk.ApplicationWindow {
 
     private uint configure_id;
     private AddContainerAssistant add_container_assistant;
@@ -30,22 +31,22 @@ public class Boxes.MainWindow : Gtk.ApplicationWindow {
     [GtkChild]
     private Gtk.Button remove_button;
 
-    private Boxes.Widgets.ContainerListBox list_box;
+    private Widgets.ContainerListBox list_box;
 
     public MainWindow (Gtk.Application application) {
         Object (
             application: application,
-            icon_name: "com.github.marbetschar.boxes",
-            title: _("Boxes")
+            icon_name: "com.github.marbetschar.tins",
+            title: _("Tins")
         );
     }
 
     construct {
         var style_provider = new Gtk.CssProvider ();
-        style_provider.load_from_resource ("/com/github/marbetschar/boxes/styles/Application.css");
+        style_provider.load_from_resource ("/com/github/marbetschar/tins/styles/Application.css");
         Gtk.StyleContext.add_provider_for_screen (Gdk.Screen.get_default (), style_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
 
-        list_box = new Boxes.Widgets.ContainerListBox ();
+        list_box = new Widgets.ContainerListBox ();
         try {
             list_box.instances = Application.lxd_client.get_instances ();
         } catch (Error e) {
@@ -57,7 +58,7 @@ public class Boxes.MainWindow : Gtk.ApplicationWindow {
             if (row == null) {
                 remove_button.sensitive = false;
             } else {
-                var instance_row = row as Boxes.Widgets.ContainerListBoxRow;
+                var instance_row = row as Widgets.ContainerListBoxRow;
                 remove_button.sensitive = instance_row.instance.status == "Stopped";
             }
         });
@@ -90,7 +91,7 @@ public class Boxes.MainWindow : Gtk.ApplicationWindow {
 
     [GtkCallback]
     private void on_remove_button_clicked (Gtk.Widget source) {
-        var row = list_box.get_selected_row () as Boxes.Widgets.ContainerListBoxRow;
+        var row = list_box.get_selected_row () as Widgets.ContainerListBoxRow;
         list_box.remove (row);
 
         try {
@@ -125,11 +126,11 @@ public class Boxes.MainWindow : Gtk.ApplicationWindow {
 
             Gdk.Rectangle rect;
             get_allocation (out rect);
-            Boxes.Application.settings.set ("window-size", "(ii)", rect.width, rect.height);
+            Application.settings.set ("window-size", "(ii)", rect.width, rect.height);
 
             int root_x, root_y;
             get_position (out root_x, out root_y);
-            Boxes.Application.settings.set ("window-position", "(ii)", root_x, root_y);
+            Application.settings.set ("window-position", "(ii)", root_x, root_y);
 
             return false;
         });

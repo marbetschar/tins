@@ -16,17 +16,17 @@
 * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 * Boston, MA 02110-1301 USA
 *
-* Authored by: Marco Betschart <boxes@marco.betschart.name>
+* Authored by: Marco Betschart <elementary-tins@marco.betschart.name>
 */
 
-public class Boxes.Application : Gtk.Application {
+public class Tins.Application : Gtk.Application {
 
     public static GLib.Settings settings;
     public static LXD.Client lxd_client;
     public static LXD.ImageStore lxd_image_store;
 
     static construct {
-        settings = new Settings ("com.github.marbetschar.boxes");
+        settings = new Settings ("com.github.marbetschar.tins");
         lxd_client = new LXD.Client ();
 
         /**
@@ -35,7 +35,7 @@ public class Boxes.Application : Gtk.Application {
          */
         Idle.add (() => {
             try {
-                var image_store_file = File.new_for_uri ("resource:///com/github/marbetschar/boxes/lxd/image-store.json");
+                var image_store_file = File.new_for_uri ("resource:///com/github/marbetschar/tins/lxd/image-store.json");
 
                 var parser = new Json.Parser ();
                 parser.load_from_stream (image_store_file.read (null), null);
@@ -53,7 +53,7 @@ public class Boxes.Application : Gtk.Application {
 
     public Application () {
         Object (
-            application_id: "com.github.marbetschar.boxes",
+            application_id: "com.github.marbetschar.tins",
             flags: ApplicationFlags.FLAGS_NONE
         );
     }

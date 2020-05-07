@@ -1,4 +1,4 @@
-# Boxes
+# Tins
 
 Containers just like Virtual Machines
 
@@ -6,15 +6,15 @@ Containers just like Virtual Machines
 
 ## Usage
 
-In case you want to learn more about LXD, there is a pretty good documenation on [linuxcontainers.org](https://linuxcontainers.org/lxd).
+Even though the usage of Tins should be pretty straight forward, feel free to open an issue if you have any questions.
 
-Even though the usage of Boxes should be pretty self explanatory, feel free to open an issue if you have any questions.
+In case you want to learn more about LXD, there is a pretty good documenation on [linuxcontainers.org](https://linuxcontainers.org/lxd).
 
 ## Installation
 
-Boxes will be available in elementary AppCenter soon!
+Tins will be available in elementary AppCenter soon!
 
-**PLEASE NOTE:** Until [issue #7](https://github.com/marbetschar/boxes/issues/7) is fixed, Boxes expects LXD to be installed via apt and initialized on the host system.
+**PLEASE NOTE:** Until [issue #7](https://github.com/marbetschar/tins/issues/7) is fixed, Tins expects LXD to be installed via apt and initialized on the host system.
 To do so, please execute the following commands in your terminal:
 
 ```

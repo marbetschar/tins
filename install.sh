@@ -9,5 +9,5 @@ sudo ninja install
 sudo chown -R $USER:$USER .
 
 export G_MESSAGES_DEBUG=all
-com.github.marbetschar.boxes
+com.github.marbetschar.tins
 

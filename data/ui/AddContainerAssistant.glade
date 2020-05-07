@@ -2,7 +2,7 @@
 <!-- Generated with glade 3.22.1 -->
 <interface>
   <requires lib="gtk+" version="3.20"/>
-  <template class="BoxesAddContainerAssistant" parent="GtkAssistant">
+  <template class="TinsAddContainerAssistant" parent="GtkAssistant">
     <property name="can_focus">False</property>
     <property name="halign">start</property>
     <property name="valign">start</property>
@@ -27,7 +27,7 @@
           <object class="GtkImage">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="resource">/com/github/marbetschar/boxes/actions/download@assistant.svg</property>
+            <property name="resource">/com/github/marbetschar/tins/actions/download@assistant.svg</property>
             <property name="icon_size">0</property>
           </object>
           <packing>
@@ -61,7 +61,7 @@
             <property name="halign">start</property>
             <property name="valign">center</property>
             <property name="margin_bottom">12</property>
-            <property name="label" translatable="yes">Please choose a descriptive name for the new container and select the type of operating system you intend to install on it. The name you choose will be used throughout Boxes to identify this machine.</property>
+            <property name="label" translatable="yes">Please choose a descriptive name for the new container and select the type of operating system you intend to install on it. The name you choose will be used throughout Tins to identify this machine.</property>
             <property name="wrap">True</property>
             <property name="max_width_chars">50</property>
           </object>
@@ -180,7 +180,7 @@
           <object class="GtkImage">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="resource">/com/github/marbetschar/boxes/actions/desktop@assistant.svg</property>
+            <property name="resource">/com/github/marbetschar/tins/actions/desktop@assistant.svg</property>
             <property name="icon_size">0</property>
           </object>
           <packing>

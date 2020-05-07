@@ -16,11 +16,11 @@
 * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 * Boston, MA 02110-1301 USA
 *
-* Authored by: Marco Betschart <boxes@marco.betschart.name>
+* Authored by: Marco Betschart <elementary-tins@marco.betschart.name>
 */
 
-[GtkTemplate (ui = "/com/github/marbetschar/boxes/ui/AddContainerAssistant.glade")]
-public class Boxes.AddContainerAssistant : Gtk.Assistant {
+[GtkTemplate (ui = "/com/github/marbetschar/tins/ui/AddContainerAssistant.glade")]
+public class Tins.AddContainerAssistant : Gtk.Assistant {
 
     private static List<unowned string> all_os_keys;
 

@@ -1,6 +1,6 @@
 # Project name, programming language and version
 project (
-    'com.github.marbetschar.boxes',
+    'com.github.marbetschar.tins',
     'vala', 'c',
     version: '0.0.1'
 )

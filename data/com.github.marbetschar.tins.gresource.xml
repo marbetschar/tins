@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <gresources>
-  <gresource prefix="/com/github/marbetschar/boxes">
+  <gresource prefix="/com/github/marbetschar/tins">
     <file compressed="true" preprocess="xml-stripblanks">actions/desktop.svg</file>
     <file compressed="true" preprocess="xml-stripblanks">actions/desktop@assistant.svg</file>
     <file compressed="true" preprocess="xml-stripblanks">actions/download@assistant.svg</file>

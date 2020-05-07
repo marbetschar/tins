@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Copyright 2020 Marco Betschart <boxes@marco.betschart.name> -->
+<!-- Copyright 2020 Marco Betschart <elementary-tins@marco.betschart.name> -->
 <component type="desktop">
-  <id>com.github.marbetschar.boxes</id>
+  <id>com.github.marbetschar.tins</id>
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>GPL-3.0+</project_license>
-  <name>Boxes</name>
+  <name>Tins</name>
   <summary>Containers just like Virtual Machines</summary>
   <description>
     <p>
@@ -19,8 +19,8 @@
         <li>Open container shell</li>
     </ul>
     <p>
-        <strong>PLEASE NOTE:</strong> Until <a href="https://github.com/marbetschar/boxes/issues/7">issue #7</a>
-        is fixed, Boxes expects LXD to be installed via apt and initialized on the host system.
+        <strong>PLEASE NOTE:</strong> Until <a href="https://github.com/marbetschar/tins/issues/7">issue #7</a>
+        is fixed, Tins expects LXD to be installed via apt and initialized on the host system.
         To do so, please execute the following commands in your terminal:
     </p>
     <pre>
@@ -36,7 +36,7 @@ sudo lxd init
     <value key="x-appcenter-suggested-price">29</value>
   </custom>
   <provides>
-    <binary>com.github.marbetschar.boxes</binary>
+    <binary>com.github.marbetschar.tins</binary>
   </provides>
   <releases>
     <release version="1.0.0" date="2020-05-06">
@@ -46,13 +46,13 @@ sudo lxd init
     </release>
   </releases>
   <developer_name>Marco Betschart</developer_name>
-  <url type="homepage">https://github.com/marbetschar/boxes</url>
-  <url type="bugtracker">https://github.com/marbetschar/boxes/issues</url>
-  <url type="help">https://github.com/marbetschar/boxes/issues</url>
-  <update_contact>elementary-boxes@marco.betschart.name</update_contact>
+  <url type="homepage">https://github.com/marbetschar/tins</url>
+  <url type="bugtracker">https://github.com/marbetschar/tins/issues</url>
+  <url type="help">https://github.com/marbetschar/tins/issues</url>
+  <update_contact>elementary-tins@marco.betschart.name</update_contact>
   <screenshots>
     <screenshot type="default">
-      <image>https://raw.githubusercontent.com/marbetschar/boxes/master/data/screenshots/App.png</image>
+      <image>https://raw.githubusercontent.com/marbetschar/tins/master/data/screenshots/App.png</image>
     </screenshot>
   </screenshots>
   <content_rating type="oars-1.1">
