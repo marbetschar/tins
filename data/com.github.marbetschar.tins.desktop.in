@@ -7,4 +7,4 @@ Exec=com.github.marbetschar.tins %U
 Icon=com.github.marbetschar.tins
 Terminal=false
 Categories=System;Development;
-Keywords=Develop;LXD;LXC;Linux;Containers;Virtual Machines;VM
+Keywords=Develop;LXD;LXC;Linux;Containers;Boxes;Virtual Machines;VM
