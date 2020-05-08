@@ -109,14 +109,14 @@ public class Tins.Widgets.ContainerListBoxRow : Gtk.ListBoxRow {
         }
 
         if (enabled) {
-            description = version + _("Running...");
+            description = version + _("running...");
             button_stack.visible_child = open_button;
             button_stack.sensitive = true;
 
         } else {
             // button_stack.visible_child = configure_button;
             button_stack.sensitive = false;
-            description = version + _("Stopped.");
+            description = version + _("stopped.");
         }
     }
 
