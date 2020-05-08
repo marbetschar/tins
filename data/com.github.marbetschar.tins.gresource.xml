@@ -4,6 +4,7 @@
     <file compressed="true" preprocess="xml-stripblanks">actions/desktop.svg</file>
     <file compressed="true" preprocess="xml-stripblanks">actions/desktop@assistant.svg</file>
     <file compressed="true" preprocess="xml-stripblanks">actions/download@assistant.svg</file>
+    <file compressed="true" preprocess="xml-stripblanks">actions/linux@assistant.svg</file>
     <file compressed="true" preprocess="xml-stripblanks">actions/terminal.svg</file>
     <file compressed="true" preprocess="xml-stripblanks">actions/settings.svg</file>
     <file compressed="true" preprocess="xml-stripblanks">actions/warning@assistant.svg</file>

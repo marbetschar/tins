@@ -27,7 +27,7 @@
           <object class="GtkImage">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="resource">/com/github/marbetschar/tins/actions/download@assistant.svg</property>
+            <property name="resource">/com/github/marbetschar/tins/actions/linux@assistant.svg</property>
             <property name="icon_size">0</property>
           </object>
           <packing>
@@ -305,7 +305,7 @@
               <object class="GtkImage">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="resource">/com/github/marbetschar/tins/actions/working@assistant.svg</property>
+                <property name="resource">/com/github/marbetschar/tins/actions/download@assistant.svg</property>
                 <property name="icon_size">0</property>
               </object>
             </child>
@@ -402,6 +402,9 @@
         <property name="page_type">summary</property>
         <property name="has_padding">False</property>
       </packing>
+    </child>
+    <child>
+      <placeholder/>
     </child>
     <child>
       <placeholder/>
