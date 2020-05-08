@@ -87,19 +87,36 @@ public class Tins.Widgets.ContainerListBoxRow : Gtk.ListBoxRow {
             update_request ();
             toggle_enabled (instance, enabled);
         });
+        notify["instance"].connect (update_request);
         update_request ();
     }
 
     private void update_request () {
+        var version = "";
+
+        if (instance != null) {
+            if (instance.config.get("image.os") != null && instance.config.get("image.os").strip () != "") {
+                version += instance.config.get("image.os") ;
+            }
+
+            if (instance.config.get("image.release") != null && instance.config.get("image.release").strip () != "") {
+                version += (version.strip () == "" ? "" : " ") + instance.config.get("image.release");
+            }
+
+            if (version.strip () != "") {
+                version += ", ";
+            }
+        }
+
         if (enabled) {
-            description = _("Running...");
+            description = version + _("Running...");
             button_stack.visible_child = open_button;
             button_stack.sensitive = true;
 
         } else {
             // button_stack.visible_child = configure_button;
             button_stack.sensitive = false;
-            description = _("Stopped.");
+            description = version + _("Stopped.");
         }
     }
 
