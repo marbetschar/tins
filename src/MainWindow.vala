@@ -91,28 +91,62 @@ public class Tins.MainWindow : Gtk.ApplicationWindow {
 
     [GtkCallback]
     private void on_remove_button_clicked (Gtk.Widget source) {
-        var row = list_box.get_selected_row () as Widgets.ContainerListBoxRow;
-        list_box.remove (row);
+        var selected_row = list_box.get_selected_row () as Widgets.ContainerListBoxRow;
 
-        try {
-            var operation = Application.lxd_client.remove_instance (row.instance.name);
+        if (selected_row != null) {
+            var confirm_dialog = new Granite.MessageDialog.with_image_from_icon_name (
+                _(@"Really Delete \"$(selected_row.instance.display_name)\"…?"),
+                _("If you delete the container all of its data will be lost."),
+                "user-trash-full",
+                Gtk.ButtonsType.CANCEL
+            );
 
-            /**
-             * Using Idle to wait for deletion to be completed.
-             */
-            Idle.add (() => {
-                try {
-                    Application.lxd_client.wait_operation (operation.id);
+            var delete_button = (Gtk.Button) confirm_dialog.add_button (_("Delete"), Gtk.ResponseType.APPLY);
+            delete_button.get_style_context ().add_class (Gtk.STYLE_CLASS_DESTRUCTIVE_ACTION);
 
-                } catch (Error e) {
-                    critical (e.message);
+            confirm_dialog.response.connect ((response_id) => {
+                if (response_id == Gtk.ResponseType.APPLY) {
+                    list_box.remove (selected_row);
+
+                    try {
+                        var operation = Application.lxd_client.remove_instance (selected_row.instance.name);
+
+                        /**
+                         * Using Idle to wait for deletion to be completed.
+                         */
+                        Idle.add (() => {
+                            try {
+                                Application.lxd_client.wait_operation (operation.id);
+
+                            } catch (Error e) {
+                                var error_dialog = new Granite.MessageDialog.with_image_from_icon_name (
+                                    _("Error"),
+                                    _(e.message),
+                                    "dialog-error",
+                                    Gtk.ButtonsType.CLOSE
+                                );
+                                error_dialog.run ();
+                                error_dialog.destroy ();
+                            }
+
+                            return GLib.Source.REMOVE;
+                        });
+
+                    } catch (Error e) {
+                        var error_dialog = new Granite.MessageDialog.with_image_from_icon_name (
+                            _("Error"),
+                            _(e.message),
+                            "dialog-error",
+                            Gtk.ButtonsType.CLOSE
+                        );
+                        error_dialog.run ();
+                        error_dialog.destroy ();
+                    }
                 }
 
-                return GLib.Source.REMOVE;
             });
-
-        } catch (Error e) {
-            critical (e.message);
+            confirm_dialog.run ();
+            confirm_dialog.destroy ();
         }
     }
 

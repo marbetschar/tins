@@ -58,13 +58,13 @@ public class Tins.AddContainerAssistant : Gtk.Assistant {
     private Gtk.Stack progress_image_stack;
 
     [GtkChild]
-    private Gtk.Image progress_warning_image;
+    private Gtk.Image progress_error_image;
 
     [GtkChild]
     private Gtk.Stack progress_info_stack;
 
     [GtkChild]
-    private Gtk.Label progress_warning_label;
+    private Gtk.Label progress_error_label;
 
     [GtkCallback]
     private bool on_key_release_name_entry (Gtk.Widget source, Gdk.EventKey event) {
@@ -172,7 +172,14 @@ public class Tins.AddContainerAssistant : Gtk.Assistant {
                                 });
 
                             } catch (Error e) {
-                                warning (e.message);
+                                var error_dialog = new Granite.MessageDialog.with_image_from_icon_name (
+                                    _("Error"),
+                                    _(e.message),
+                                    "dialog-error",
+                                    Gtk.ButtonsType.CLOSE
+                                );
+                                error_dialog.run ();
+                                error_dialog.destroy ();
                                 close ();
                             }
 
@@ -183,21 +190,35 @@ public class Tins.AddContainerAssistant : Gtk.Assistant {
                     }
 
                 } catch (Error e) {
-                    critical (e.message);
+                    var error_dialog = new Granite.MessageDialog.with_image_from_icon_name (
+                        _("Error"),
+                        _(e.message),
+                        "dialog-error",
+                        Gtk.ButtonsType.CLOSE
+                    );
+                    error_dialog.run ();
+                    error_dialog.destroy ();
                 }
 
                 return Source.CONTINUE;
             });
 
         } catch (Error e) {
-            critical (e.message);
+            var error_dialog = new Granite.MessageDialog.with_image_from_icon_name (
+                _("Error"),
+                _(e.message),
+                "dialog-error",
+                Gtk.ButtonsType.CLOSE
+            );
+            error_dialog.run ();
+            error_dialog.destroy ();
         }
     }
 
     private void on_operation_error (LXD.Operation operation) {
-        progress_image_stack.visible_child = progress_warning_image;
-        progress_info_stack.visible_child = progress_warning_label;
-        progress_warning_label.label = @"$(operation.err) ($(operation.status_code)).";
+        progress_image_stack.visible_child = progress_error_image;
+        progress_info_stack.visible_child = progress_error_label;
+        progress_error_label.label = @"$(operation.err) ($(operation.status_code)).";
     }
 
     [GtkCallback]

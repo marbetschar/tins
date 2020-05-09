@@ -32,7 +32,8 @@ core_deps = [
     dependency ('json-glib-1.0'),
 ]
 ui_deps = [
-    dependency ('gtk+-3.0')
+    dependency ('gtk+-3.0'),
+    dependency ('granite')
 ]
 
 subdir ('lxd')
