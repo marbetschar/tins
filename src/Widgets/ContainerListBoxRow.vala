@@ -22,11 +22,11 @@
 [GtkTemplate (ui = "/com/github/marbetschar/tins/ui/WidgetsContainerListBoxRow.glade")]
 public class Tins.Widgets.ContainerListBoxRow : Gtk.ListBoxRow {
 
-    public LXD.Instance instance;
+    public LXD.Instance instance { get; set; }
 
     public signal void open_clicked (LXD.Instance instance);
     public signal void configure_clicked (LXD.Instance instance);
-    public signal void toggle_enabled (LXD.Instance instance, bool enabled);
+    public signal void toggle_enable (LXD.Instance instance, bool did_enable);
 
     public bool gui_enabled {
         get { return open_button_stack.visible_child == open_button_desktop_image; }
@@ -63,22 +63,20 @@ public class Tins.Widgets.ContainerListBoxRow : Gtk.ListBoxRow {
     private Gtk.Image open_button_desktop_image;
 
     construct {
-        logo_box.toggle_enabled.connect ((enabled) => {
-            update_request ();
-            toggle_enabled (instance, enabled);
+        logo_box.toggle_state.connect ((new_state) => {
+            toggle_enable (instance, new_state == ContainerLogoBox.ENABLED);
         });
         notify["instance"].connect (update_request);
         update_request ();
     }
 
     private void update_request () {
-        var version = "";
-
         if (instance != null) {
             title_label.label = instance.display_name;
-            logo_box.enabled = instance.status == "Running";
 
+            var version = "";
             var instance_os = instance.config.get("image.os");
+
             if (instance_os != null) {
                 logo_box.image_resource = resource_for_os (instance_os);
 
@@ -95,21 +93,31 @@ public class Tins.Widgets.ContainerListBoxRow : Gtk.ListBoxRow {
                 version += ", ";
             }
 
+            switch (instance.status.up ()) {
+                case "RUNNING":
+                    logo_box.state = ContainerLogoBox.State.ENABLED;
+                    description_label.label = version + _("running…");
+                    button_stack.visible_child = open_button;
+                    button_stack.sensitive = true;
+                    break;
+
+                case "STOPPED":
+                    logo_box.state = ContainerLogoBox.State.DISABLED;
+                    // button_stack.visible_child = configure_button;
+                    button_stack.sensitive = false;
+                    description_label.label = version + _("stopped.");
+                    break;
+
+                default:
+                    break;
+            }
+
         } else {
             title_label.label = _("Unknown");
-            logo_box.enabled = false;
+            logo_box.state = ContainerLogoBox.State.ENABLED;
             logo_box.image_resource = resource_for_os ("unknown");
-        }
-
-        if (logo_box.enabled) {
-            description_label.label = version + _("running…");
-            button_stack.visible_child = open_button;
-            button_stack.sensitive = true;
-
-        } else {
-            // button_stack.visible_child = configure_button;
             button_stack.sensitive = false;
-            description_label.label = version + _("stopped.");
+            description_label.label = _("unknown");
         }
     }
 

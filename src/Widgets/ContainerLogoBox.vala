@@ -22,32 +22,46 @@
 [GtkTemplate (ui = "/com/github/marbetschar/tins/ui/WidgetsContainerLogoBox.glade")]
 public class Tins.Widgets.ContainerLogoBox : Gtk.Overlay {
 
-    public signal void toggle_enabled (bool enabled);
+    public signal void toggle_state (State new_state);
 
-    public string image_resource {
-        owned get { return logo_image.resource; }
-        set { logo_image.resource = value; }
+    public enum State {
+        WORKING,
+        ENABLED,
+        DISABLED
     }
 
-    public bool enabled {
-        get { return state_stack.visible_child == state_enabled; }
+    private State instance_state;
+
+    public State state {
         set {
-            if (value == enabled) {
+            if (value == instance_state) {
                 return;
             }
             var logo_image_style_context = logo_image.get_style_context ();
 
-            if (value) {
-                state_stack.visible_child = state_enabled;
-                logo_image_style_context.remove_class (Gtk.STYLE_CLASS_DIM_LABEL);
+            switch(value) {
+                case State.WORKING:
+                    state_stack.visible_child = state_working;
+                    break;
 
-            } else {
-                state_stack.visible_child = state_disabled;
-                logo_image_style_context.add_class (Gtk.STYLE_CLASS_DIM_LABEL);
+                case State.ENABLED:
+                    instance_state = State.ENABLED;
+                    state_stack.visible_child = state_enabled;
+                    logo_image_style_context.remove_class (Gtk.STYLE_CLASS_DIM_LABEL);
+                    break;
+
+                case State.DISABLED:
+                    instance_state = State.DISABLED;
+                    state_stack.visible_child = state_disabled;
+                    logo_image_style_context.add_class (Gtk.STYLE_CLASS_DIM_LABEL);
+                    break;
             }
-
-            toggle_enabled (value);
         }
+    }
+
+    public string image_resource {
+        owned get { return logo_image.resource; }
+        set { logo_image.resource = value; }
     }
 
     [GtkChild]
@@ -62,9 +76,14 @@ public class Tins.Widgets.ContainerLogoBox : Gtk.Overlay {
     [GtkChild]
     private Gtk.Image state_disabled;
 
+    [GtkChild]
+    private Gtk.Image state_working;
+
     [GtkCallback]
     private bool on_button_release_event (Gtk.Widget source, Gdk.EventButton event) {
-        enabled = !enabled;
+        state = State.WORKING;
+        toggle_state (instance_state == State.ENABLED ? State.DISABLED : State.ENABLED);
+
         return Gdk.EVENT_PROPAGATE;
     }
 }

@@ -40,22 +40,31 @@
             <property name="icon_name">system-shutdown</property>
             <property name="icon_size">3</property>
           </object>
+        </child>
+        <child>
+          <object class="GtkImage" id="state_working">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="halign">start</property>
+            <property name="valign">end</property>
+            <property name="icon_name">system-run</property>
+            <property name="icon_size">3</property>
+          </object>
           <packing>
-            <property name="name">page0</property>
-            <property name="title" translatable="yes">page0</property>
+            <property name="position">1</property>
           </packing>
         </child>
         <child>
           <object class="GtkImage" id="state_disabled">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
+            <property name="halign">start</property>
+            <property name="valign">end</property>
             <property name="icon_name">media-playback-start</property>
             <property name="icon_size">3</property>
           </object>
           <packing>
-            <property name="name">page1</property>
-            <property name="title" translatable="yes">page1</property>
-            <property name="position">1</property>
+            <property name="position">2</property>
           </packing>
         </child>
       </object>

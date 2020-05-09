@@ -73,47 +73,22 @@ public class Tins.Widgets.ContainerListBox : Gtk.ListBox {
     private ContainerListBoxRow construct_instance_row () {
         var row = new ContainerListBoxRow ();
 
-        row.toggle_enabled.connect ((instance, enabled) => {
+        row.toggle_enable.connect ((instance, did_enable) => {
             var selected_row = get_selected_row ();
             if (selected_row != null) {
                 unselect_row (selected_row);
             }
 
             try {
-                 LXD.Operation operation;
-
-                if (enabled) {
-                    operation = Application.lxd_client.start_instance (instance.name);
-                    instance.status = "Running";
+                if (did_enable) {
+                    Application.lxd_client.start_instance (instance.name);
                 } else {
-                    operation = Application.lxd_client.stop_instance (instance.name);
-                    instance.status = "Stopped";
+                    Application.lxd_client.stop_instance (instance.name);
                 }
 
                 if (selected_row != null) {
                     select_row (selected_row);
                 }
-
-                /**
-                 * Using Idle to wait for status change to be completed.
-                 */
-                Idle.add (() => {
-                    try {
-                        Application.lxd_client.wait_operation (operation.id);
-
-                    } catch (Error e) {
-                        var error_dialog = new Granite.MessageDialog.with_image_from_icon_name (
-                            _("Error"),
-                            _(e.message),
-                            "dialog-error",
-                            Gtk.ButtonsType.CLOSE
-                        );
-                        error_dialog.run ();
-                        error_dialog.destroy ();
-                    }
-
-                    return GLib.Source.REMOVE;
-                });
 
             } catch (Error e) {
                 var error_dialog = new Granite.MessageDialog.with_image_from_icon_name (
