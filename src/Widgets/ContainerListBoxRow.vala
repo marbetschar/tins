@@ -28,26 +28,6 @@ public class Tins.Widgets.ContainerListBoxRow : Gtk.ListBoxRow {
     public signal void configure_clicked (LXD.Instance instance);
     public signal void toggle_enabled (LXD.Instance instance, bool enabled);
 
-    public string title {
-        get { return title_label.label; }
-        set { title_label.label = value; }
-    }
-
-    public string description {
-        get { return description_label.label; }
-        set { description_label.label = value; }
-    }
-
-    public string image_resource {
-        owned get { return logo_box.image_resource; }
-        set { logo_box.image_resource = value; }
-    }
-
-    public bool enabled {
-        get { return logo_box.enabled; }
-        set { logo_box.enabled = value; }
-    }
-
     public bool gui_enabled {
         get { return open_button_stack.visible_child == open_button_desktop_image; }
         set {
@@ -95,8 +75,16 @@ public class Tins.Widgets.ContainerListBoxRow : Gtk.ListBoxRow {
         var version = "";
 
         if (instance != null) {
-            if (instance.config.get("image.os") != null && instance.config.get("image.os").strip () != "") {
-                version += instance.config.get("image.os") ;
+            title_label.label = instance.display_name;
+            logo_box.enabled = instance.status == "Running";
+
+            var instance_os = instance.config.get("image.os");
+            if (instance_os != null) {
+                logo_box.image_resource = resource_for_os (instance_os);
+
+                if (instance_os.strip () != "") {
+                    version += instance_os;
+                }
             }
 
             if (instance.config.get("image.release") != null && instance.config.get("image.release").strip () != "") {
@@ -106,18 +94,31 @@ public class Tins.Widgets.ContainerListBoxRow : Gtk.ListBoxRow {
             if (version.strip () != "") {
                 version += ", ";
             }
+
+        } else {
+            title_label.label = _("Unknown");
+            logo_box.enabled = false;
+            logo_box.image_resource = resource_for_os ("unknown");
         }
 
-        if (enabled) {
-            description = version + _("running…");
+        if (logo_box.enabled) {
+            description_label.label = version + _("running…");
             button_stack.visible_child = open_button;
             button_stack.sensitive = true;
 
         } else {
             // button_stack.visible_child = configure_button;
             button_stack.sensitive = false;
-            description = version + _("stopped.");
+            description_label.label = version + _("stopped.");
         }
+    }
+
+    private string resource_for_os (string os) {
+        var file = File.new_for_uri (@"resource:///com/github/marbetschar/tins/os/$os.svg");
+        if (file.query_exists ()) {
+            return @"/com/github/marbetschar/tins/os/$os.svg";
+        }
+        return "/com/github/marbetschar/tins/os/linux.svg";
     }
 
     [GtkCallback]

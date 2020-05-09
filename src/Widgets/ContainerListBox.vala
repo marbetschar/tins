@@ -55,7 +55,7 @@ public class Tins.Widgets.ContainerListBox : Gtk.ListBox {
                     row = construct_instance_row ();
                 }
 
-                update_instance_row (row, instances.get (i));
+                row.instance = instances.get (i);
 
                 if (children == null || children.length () < (i+1)) {
                     add (row);
@@ -102,14 +102,28 @@ public class Tins.Widgets.ContainerListBox : Gtk.ListBox {
                         Application.lxd_client.wait_operation (operation.id);
 
                     } catch (Error e) {
-                        critical (e.message);
+                        var error_dialog = new Granite.MessageDialog.with_image_from_icon_name (
+                            _("Error"),
+                            _(e.message),
+                            "dialog-error",
+                            Gtk.ButtonsType.CLOSE
+                        );
+                        error_dialog.run ();
+                        error_dialog.destroy ();
                     }
 
                     return GLib.Source.REMOVE;
                 });
 
             } catch (Error e) {
-                critical (e.message);
+                var error_dialog = new Granite.MessageDialog.with_image_from_icon_name (
+                    _("Error"),
+                    _(e.message),
+                    "dialog-error",
+                    Gtk.ButtonsType.CLOSE
+                );
+                error_dialog.run ();
+                error_dialog.destroy ();
             }
         });
 
@@ -126,30 +140,18 @@ public class Tins.Widgets.ContainerListBox : Gtk.ListBox {
                 }
 
             } catch (Error e) {
-                critical (e.message);
+                var error_dialog = new Granite.MessageDialog.with_image_from_icon_name (
+                    _("Error"),
+                    _(e.message),
+                    "dialog-error",
+                    Gtk.ButtonsType.CLOSE
+                );
+                error_dialog.run ();
+                error_dialog.destroy ();
             }
         });
 
         return row;
-    }
-
-    private void update_instance_row (ContainerListBoxRow row, LXD.Instance instance) {
-        row.instance = instance;
-        row.title = instance.display_name;
-        row.enabled = instance.status == "Running";
-        //row.gui_enabled = container.gui_enabled;
-        var instance_os = instance.config.get("image.os");
-        if (instance_os != null) {
-            row.image_resource = resource_for_os (instance_os);
-        }
-    }
-
-    private string resource_for_os (string os) {
-        var file = File.new_for_uri (@"resource:///com/github/marbetschar/tins/os/$os.svg");
-        if (file.query_exists ()) {
-            return @"/com/github/marbetschar/tins/os/$os.svg";
-        }
-        return "/com/github/marbetschar/tins/os/linux.svg";
     }
 }
 
