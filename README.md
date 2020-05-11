@@ -2,7 +2,7 @@
 
 Containers just like Virtual Machines
 
-> **Tins:** a tinplate container - often used to package breath mints.
+> **Tins:** tinplate containers - often used to package breath mints.
 > In some cultures, these boxes are referred to as "tins".
 
 <img src="data/screenshots/App.png?raw=true" width="448" align="right" />
