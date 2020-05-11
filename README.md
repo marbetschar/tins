@@ -32,6 +32,7 @@ You'll need the following dependencies:
 * json-glib-1.0
 * gtk+-3.0
 * granite
+* posix
 * meson
 * valac
 
