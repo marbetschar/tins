@@ -26,6 +26,8 @@
     <file compressed="true" preprocess="xml-stripblanks">ui/WidgetsContainerLogoBox.glade</file>
     <file compressed="true">styles/Application.css</file>
     <file compressed="true">lxd/image-store.json</file>
+    <file compressed="true">lxd/profile-x11.json</file>
+    <file>lxd/profile-x11.yml</file>
   </gresource>
 </gresources>
 

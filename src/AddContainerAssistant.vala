@@ -49,9 +49,6 @@ public class Tins.AddContainerAssistant : Gtk.Assistant {
     private Gtk.CheckButton gui_enabled_checkbutton;
 
     [GtkChild]
-    private Gtk.Spinner progress_spinner;
-
-    [GtkChild]
     private Gtk.Label progress_label;
 
     [GtkChild]

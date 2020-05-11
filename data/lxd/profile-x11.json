@@ -1,0 +1,25 @@
+{
+  "name": "tins-x11",
+  "description": "Enable Graphics Support",
+  "config": {
+    "environment.DISPLAY": ":0",
+    "raw.idmap": "both $UID $UID",
+    "user.user-data": "resource:///com/github/marbetschar/tins/lxd/profile-x11.yml"
+  },
+  "devices": {
+    "PASocket": {
+        "path": "/tmp/.pulse-native",
+        "source": "/run/user/$UID/pulse/native",
+        "device_type": "disk"
+    },
+    "X0": {
+      "path": "/tmp/.X11-unix/X0",
+      "source": "/tmp/.X11-unix/X0",
+      "device_type": "disk"
+    },
+    "graphics": {
+      "device_type": "gpu"
+    }
+  }
+}
+

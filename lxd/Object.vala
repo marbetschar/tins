@@ -16,7 +16,7 @@
 * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 * Boston, MA 02110-1301 USA
 *
-* Authored by: Marco Betschart <boxes@marco.betschart.name>
+* Authored by: Marco Betschart <elementary-tins@marco.betschart.name>
 */
 
 public abstract class LXD.Object : GLib.Object, Json.Serializable {
@@ -86,8 +86,17 @@ public abstract class LXD.Object : GLib.Object, Json.Serializable {
 					});
 				}
 
-			} else {
-				unowned GLib.HashTable<string,GLib.Object> hash_table = @value as HashTable<string, GLib.Object>;
+			} else if (boxed_value_type.is_a (typeof (string))) {
+				unowned GLib.HashTable<string, string> hash_table = @value as HashTable<string, string>;
+
+				if (hash_table != null) {
+					hash_table.foreach ((key, val) => {
+						object.set_string_member (key, val);
+					});
+				}
+
+			} else if (boxed_value_type.is_a (typeof (GLib.Object))) {
+				unowned GLib.HashTable<string, GLib.Object> hash_table = @value as HashTable<string, GLib.Object>;
 
 				if (hash_table != null) {
 					hash_table.foreach ((key, object_value) => {
@@ -95,8 +104,8 @@ public abstract class LXD.Object : GLib.Object, Json.Serializable {
 					});
 				}
 
-			//} else {
-			//    warning (@"GLib.HashTable serialization not supported for boxed type: $(@value.type ().name ())");
+			} else {
+			   warning (@"GLib.HashTable serialization not supported for boxed type: $(@value.type ().name ())");
 			}
 
 			var node = new Json.Node (Json.NodeType.OBJECT);
@@ -122,9 +131,7 @@ public abstract class LXD.Object : GLib.Object, Json.Serializable {
 
 				if (array_value != null) {
 					array_value.foreach_element ((array_value, i, element) => {
-						if (element.is_null ()) {
-							array.add (null);
-						} else {
+						if (!element.is_null ()) {
 							array.add (Json.gobject_deserialize (boxed_value_type, element));
 						}
 					});
@@ -160,9 +167,7 @@ public abstract class LXD.Object : GLib.Object, Json.Serializable {
 
 						if (array_value != null) {
 							array_value.foreach_element ((array_value, i, element) => {
-								if (element.is_null ()) {
-									array.add (null);
-								} else {
+								if (!element.is_null ()) {
 									array.add (Json.gobject_deserialize (boxed_value_type, element));
 								}
 							});
@@ -171,7 +176,7 @@ public abstract class LXD.Object : GLib.Object, Json.Serializable {
 					});
 					@value.set_boxed (hash_table);
 
-				} else if (boxed_value_type.is_a (typeof (string))){
+				} else if (boxed_value_type.is_a (typeof (string))) {
 					var hash_table = new GLib.HashTable<string, string> (str_hash, str_equal);
 					object_value.foreach_member ((object, member_name, member_node) => {
 						hash_table.@set (member_name, member_node.get_string ());
@@ -181,9 +186,7 @@ public abstract class LXD.Object : GLib.Object, Json.Serializable {
 				} else if (boxed_value_type.is_a (typeof (GLib.Object))) {
 					var hash_table = new GLib.HashTable<string, GLib.Object> (str_hash, str_equal);
 					object_value.foreach_member ((object, member_name, member_node) => {
-						if (member_node.is_null ()) {
-							hash_table.@set (member_name, null);
-						} else {
+						if (!member_node.is_null ()) {
 							hash_table.@set (member_name, Json.gobject_deserialize (boxed_value_type, member_node));
 						}
 					});
@@ -196,9 +199,7 @@ public abstract class LXD.Object : GLib.Object, Json.Serializable {
 
 		} else if (pspec.value_type.is_a (typeof (GLib.Object))) {
 			@value = GLib.Value (pspec.value_type);
-			if (property_node.is_null ()) {
-				@value.set_object (null);
-			} else {
+			if (!property_node.is_null ()) {
 				@value.set_object (Json.gobject_deserialize (pspec.value_type, property_node));
 			}
 

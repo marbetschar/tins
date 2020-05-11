@@ -16,12 +16,12 @@
 * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 * Boston, MA 02110-1301 USA
 *
-* Authored by: Marco Betschart <boxes@marco.betschart.name>
+* Authored by: Marco Betschart <elementary-tins@marco.betschart.name>
 */
 
 errordomain LXDClientError {
     CURL,
-    API,
+    SERVER,
     RESPONSE
 }
 
@@ -165,6 +165,82 @@ public class LXD.Client {
         return Json.gobject_deserialize (typeof (LXD.Image), node) as LXD.Image;
     }
 
+    public LXD.Profile get_profile (string id_or_endpoint) throws Error {
+        var endpoint = id_or_endpoint;
+        if (!endpoint.has_prefix (@"/$version/profiles/")) {
+            endpoint = @"/$version/profiles/$id_or_endpoint";
+        }
+        var node = api_request ("GET", endpoint);
+
+        return Json.gobject_deserialize (typeof (LXD.Profile), node) as LXD.Profile;
+    }
+
+    public void add_profile(LXD.Profile profile) throws Error {
+        var json = Json.gobject_serialize (profile);
+
+        /**
+         * rename: "device-type" => "type"
+         */
+        if (json.get_object ().has_member ("devices")) {
+            var devices = json.get_object ().get_object_member ("devices");
+
+            devices.foreach_member ((object, member_name, member_node) => {
+                var device = member_node.get_object ();
+
+                if (device != null && device.has_member ("device-type")) {
+                    device.set_string_member ("type", device.get_string_member ("device-type"));
+                    device.remove_member ("device-type");
+                }
+            });
+        }
+
+        var generator = new Json.Generator ();
+        generator.root = json;
+
+        var data = new StringBuilder ();
+        generator.to_gstring (data);
+
+        api_request ("POST", @"/$version/profiles", data.str);
+    }
+
+    public LXD.Operation update_profile (Profile profile) throws Error {
+        var endpoint = @"/$version/profiles/$(profile.name)";
+        var json = Json.gobject_serialize (profile);
+
+        /**
+         * remove: "name"
+         */
+        if (json.get_object ().has_member ("name")) {
+            json.get_object ().remove_member ("name");
+        }
+
+        /**
+         * rename: "device-type" => "type"
+         */
+        if (json.get_object ().has_member ("devices")) {
+            var devices = json.get_object ().get_object_member ("devices");
+
+            devices.foreach_member ((object, member_name, member_node) => {
+                var device = member_node.get_object ();
+
+                if (device != null && device.has_member ("device-type")) {
+                    device.set_string_member ("type", device.get_string_member ("device-type"));
+                    device.remove_member ("device-type");
+                }
+            });
+        }
+
+        var generator = new Json.Generator ();
+        generator.root = json;
+
+        var data = new StringBuilder ();
+        generator.to_gstring (data);
+
+        var node = api_request ("PATCH", endpoint, data.str);
+
+        return Json.gobject_deserialize (typeof (LXD.Operation), node) as LXD.Operation;
+    }
+
     private Json.Node api_request (string method, string endpoint, string? data = null) throws Error {
         int exit_code;
         string stdout;
@@ -192,7 +268,7 @@ public class LXD.Client {
             }
 
             if (error_code != 0) {
-                throw new LXDClientError.API ("Error %lld: %s".printf (error_code, result.get_string_member ("error")));
+                throw new LXDClientError.SERVER ("Error %lld: %s".printf (error_code, result.get_string_member ("error")));
             }
 
             if (result.has_member("metadata")) {
@@ -209,7 +285,19 @@ public class LXD.Client {
             args += @" --header \"Content-Type: application/json\"";
         }
         if (data != null) {
-            args += @" --data \'$data\'";
+            try {
+                FileIOStream streams;
+                File data_file = File.new_tmp ("lxd-XXXXXX.json", out streams);
+
+                DataOutputStream out_stream = new DataOutputStream (streams.output_stream);
+                out_stream.put_string (data);
+
+                args += " --data @" + data_file.get_path ();
+
+            } catch (Error e) {
+                warning (e.message);
+                args += @" --data \'$data\'";
+            }
         }
         if (host == "lxd") {
             args += " --unix-socket /var/lib/lxd/unix.socket";

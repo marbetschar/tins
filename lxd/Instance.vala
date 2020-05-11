@@ -16,7 +16,7 @@
 * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 * Boston, MA 02110-1301 USA
 *
-* Authored by: Marco Betschart <boxes@marco.betschart.name>
+* Authored by: Marco Betschart <elementary-tins@marco.betschart.name>
 */
 
 public class LXD.Instance : LXD.Object {
@@ -72,7 +72,7 @@ public class LXD.Instance : LXD.Object {
     public string status { get; set; }
 
     public HashTable<string,string> config { get; set; }
-    public HashTable<string,string> devices { get; set; }
+    public HashTable<string,LXD.Device> devices { get; set; }
 
     public Source source { get; set; }
 
@@ -98,7 +98,7 @@ public class LXD.Instance : LXD.Object {
                 boxed_in_array = false;
                 break;
             case "devices":
-                boxed_value_type = typeof (string);
+                boxed_value_type = typeof (LXD.Device);
                 boxed_in_array = false;
                 break;
             default:

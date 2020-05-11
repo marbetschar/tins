@@ -19,20 +19,9 @@
 * Authored by: Marco Betschart <elementary-tins@marco.betschart.name>
 */
 
-public class LXD.Image : LXD.Object {
-
-    public string fingerprint { get; construct set; }
-
-    public string filename { get; set; }
-    public string architecture { get; set; }
-    public int size { get; set; }
-
-    public Properties properties { get; set; }
-
-    public class Properties : LXD.Object {
-        public string architecture { get; set; }
-        public string os { get; set; }
-        public string release { get; set; }
-        public string description { get; set; }
-    }
+public class LXD.Device : LXD.Object {
+    public string path { get; set; }
+    public string source { get; set; }
+    [Description (nick = "type")]
+    public string device_type { get; set; }
 }

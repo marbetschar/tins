@@ -34,17 +34,33 @@ public class Tins.Application : Gtk.Application {
          * avoids blocking application startup
          */
         Idle.add (() => {
+            var json_parser = new Json.Parser ();
+
+            // Parse Template Image File
             try {
                 var image_store_file = File.new_for_uri ("resource:///com/github/marbetschar/tins/lxd/image-store.json");
 
-                var parser = new Json.Parser ();
-                parser.load_from_stream (image_store_file.read (null), null);
-                lxd_image_store = Json.gobject_deserialize (typeof (LXD.ImageStore), parser.get_root ()) as LXD.ImageStore;
+                json_parser.load_from_stream (image_store_file.read (null), null);
+                lxd_image_store = Json.gobject_deserialize (typeof (LXD.ImageStore), json_parser.get_root ()) as LXD.ImageStore;
 
                 debug ("Loaded images for %u operating systems from store.".printf (lxd_image_store.data.size ()));
 
             } catch (Error e) {
                 critical (e.message);
+            }
+
+            // Update GUI Profile
+            try {
+                var x11_profile = LXD.Profile.new_from_template_uri ("resource:///com/github/marbetschar/tins/lxd/profile-x11.json");
+
+                try {
+                    lxd_client.update_profile (x11_profile);
+                } catch (Error e) {
+                    lxd_client.add_profile (x11_profile);
+                }
+
+            } catch (Error e) {
+                warning (e.message);
             }
 
             return GLib.Source.REMOVE;

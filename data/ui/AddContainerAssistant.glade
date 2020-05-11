@@ -338,7 +338,7 @@
                 <property name="valign">start</property>
                 <property name="orientation">vertical</property>
                 <child>
-                  <object class="GtkSpinner" id="progress_spinner">
+                  <object class="GtkSpinner">
                     <property name="width_request">18</property>
                     <property name="height_request">18</property>
                     <property name="visible">True</property>

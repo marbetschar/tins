@@ -30,6 +30,7 @@ asresources = gnome.compile_resources(
 core_deps = [
     dependency ('glib-2.0'),
     dependency ('json-glib-1.0'),
+    meson.get_compiler('vala').find_library('posix'),
 ]
 ui_deps = [
     dependency ('gtk+-3.0'),
