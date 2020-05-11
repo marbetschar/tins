@@ -45,6 +45,11 @@ public class Tins.Widgets.ContainerListBox : Gtk.ListBox {
 
         } else {
             var children = get_children ();
+            var selected_row = get_selected_row ();
+
+            if (selected_row != null) {
+                unselect_row (selected_row);
+            }
 
             for (var i = 0; i < instances.length; i++) {
                 ContainerListBoxRow row;
@@ -67,6 +72,10 @@ public class Tins.Widgets.ContainerListBox : Gtk.ListBox {
                     remove (children.nth_data (i-1));
                 }
             }
+
+            if (selected_row != null) {
+                select_row (selected_row);
+            }
         }
     }
 
@@ -74,20 +83,11 @@ public class Tins.Widgets.ContainerListBox : Gtk.ListBox {
         var row = new ContainerListBoxRow ();
 
         row.toggle_enable.connect ((instance, did_enable) => {
-            var selected_row = get_selected_row ();
-            if (selected_row != null) {
-                unselect_row (selected_row);
-            }
-
             try {
                 if (did_enable) {
                     Application.lxd_client.start_instance (instance.name);
                 } else {
                     Application.lxd_client.stop_instance (instance.name);
-                }
-
-                if (selected_row != null) {
-                    select_row (selected_row);
                 }
 
             } catch (Error e) {
