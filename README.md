@@ -1,4 +1,4 @@
-# Tins
+# <img src="data/icons/128/com.github.marbetschar.tins.svg?raw=true" width="42" height="42" align="left" /> Tins
 
 Containers just like Virtual Machines
 
