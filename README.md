@@ -17,12 +17,10 @@ In case you want to learn more about LXD, there is a pretty good documentation o
 
 Tins will be available in elementary AppCenter soon!
 
-**PLEASE NOTE:** Until [issue #7](https://github.com/marbetschar/tins/issues/7) is fixed, Tins expects LXD to be installed via apt and initialized on the host system.
-To do so, please execute the following commands in your terminal:
+**PLEASE NOTE:** Until [issue #7](https://github.com/marbetschar/tins/issues/7) is fixed, Tins expects LXD to be initialized on the host system.
+To do so, please execute the following command in your terminal:
 
 ```
-sudo apt install lxd
-
 # use default values everywhere:
 sudo lxd init
 ```

@@ -24,12 +24,10 @@
     </ul>
     <p>
         <strong>PLEASE NOTE:</strong> Until <a href="https://github.com/marbetschar/tins/issues/7">issue #7</a>
-        is fixed, Tins expects LXD to be installed via apt and initialized on the host system.
-        To do so, please execute the following commands in your terminal:
+        is fixed, Tins expects LXD to be initialized on the host system.
+        To do so, please execute the following command in your terminal:
     </p>
     <pre>
-sudo apt install lxd
-
 # use default values everywhere:
 sudo lxd init
     </pre>
