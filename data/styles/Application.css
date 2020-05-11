@@ -19,14 +19,14 @@
 * Authored by: Marco Betschart <boxes@marco.betschart.name>
 */
 
-@define-color colorAccent #a56de2;
+@define-color colorAccent #28bca3; /* Mint 500 */
 
 list row {
-    border-bottom: 1px solid #d4d4d4;
+    border-bottom: 1px solid #d4d4d4; /* Silver 300 */
 }
 
 list row:selected {
-    background-color: #fafafa;
+    background-color: #fafafa; /* Silver 100 */
 }
 
 list row label {
@@ -45,8 +45,8 @@ list row button:active {
 /* Add Container Assistant Dialog */
 
 entry {
-    border: 1px solid #d4d4d4;
-    background-color: alpha (#d4d4d4, 0.2);
+    border: 1px solid #d4d4d4; /* Silver 300 */
+    background-color: alpha (#d4d4d4, 0.2); /* Silver 300 */
 }
 
 entry:focus {
