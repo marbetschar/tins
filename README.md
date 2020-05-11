@@ -1,8 +1,6 @@
-# Tins
+# Tins - Containers just like Virtual Machines
 
-Containers just like Virtual Machines
-
-> **Tin Box:** a tinplate container - often used to package breath mints.
+> a tinplate container - often used to package breath mints.
 > In some cultures, these boxes are referred to as "tins".
 
 <img src="data/screenshots/App.png?raw=true" width="448" align="right" />
