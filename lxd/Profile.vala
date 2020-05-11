@@ -85,7 +85,7 @@ public class LXD.Profile : LXD.Object {
 
                         if (val != null) {
                             profile.config.set(key, val.replace (
-                                "$UID", "1001" //passwd.pw_uid
+                                "$UID", "%zu".printf (passwd.pw_uid)
                             ).replace (
                                 "$USER", passwd.pw_name
                             ));
@@ -97,7 +97,7 @@ public class LXD.Profile : LXD.Object {
                     profile.devices.foreach ((name, device) => {
                         if (device.path != null) {
                             device.path = device.path.replace (
-                                "$UID", "1001" //passwd.pw_uid
+                                "$UID", "%zu".printf (passwd.pw_uid)
                             ).replace (
                                 "$USER", passwd.pw_name
                             );
@@ -105,7 +105,7 @@ public class LXD.Profile : LXD.Object {
 
                         if (device.source != null) {
                             device.source = device.source.replace (
-                                "$UID", "1001" //passwd.pw_uid
+                                "$UID", "%zu".printf (passwd.pw_uid)
                             ).replace (
                                 "$USER", passwd.pw_name
                             );
@@ -113,7 +113,7 @@ public class LXD.Profile : LXD.Object {
 
                         if (device.device_type != null) {
                             device.device_type = device.device_type.replace (
-                                "$UID", "1001" //passwd.pw_uid
+                                "$UID", "%zu".printf (passwd.pw_uid)
                             ).replace (
                                 "$USER", passwd.pw_name
                             );
