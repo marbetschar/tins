@@ -120,7 +120,7 @@ public class Tins.AddContainerAssistant : Gtk.Assistant {
         var profiles = new GenericArray<string> ();
         profiles.add ("default");
         if (gui_enabled_checkbutton.active) {
-            profiles.add ("gui");
+            profiles.add ("tins-x11");
         }
         instance.profiles = profiles;
 

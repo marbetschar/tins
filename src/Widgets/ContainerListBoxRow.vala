@@ -28,13 +28,6 @@ public class Tins.Widgets.ContainerListBoxRow : Gtk.ListBoxRow {
     public signal void configure_clicked (LXD.Instance instance);
     public signal void toggle_enable (LXD.Instance instance, bool did_enable);
 
-    public bool gui_enabled {
-        get { return open_button_stack.visible_child == open_button_desktop_image; }
-        set {
-            open_button_stack.visible_child = value ? open_button_desktop_image : open_button_terminal_image;
-        }
-    }
-
     [GtkChild]
     private ContainerLogoBox logo_box;
 
@@ -112,12 +105,19 @@ public class Tins.Widgets.ContainerListBoxRow : Gtk.ListBoxRow {
                     break;
             }
 
+            if (instance.profiles != null && instance.profiles.find_with_equal_func ("tins-x11", str_equal)) {
+                open_button_stack.visible_child = open_button_desktop_image;
+            } else {
+                open_button_stack.visible_child = open_button_terminal_image;
+            }
+
         } else {
             title_label.label = _("Unknown");
             logo_box.state = ContainerLogoBox.State.ENABLED;
             logo_box.image_resource = resource_for_os ("unknown");
             button_stack.sensitive = false;
             description_label.label = _("unknown");
+            open_button_stack.visible_child = open_button_terminal_image;
         }
     }
 
