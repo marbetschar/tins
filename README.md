@@ -22,7 +22,7 @@ To do so, please execute the following command in your terminal:
 
 ```
 # use default values everywhere:
-sudo lxd init
+lxd init
 ```
 
 ## Building

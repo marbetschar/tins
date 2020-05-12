@@ -29,7 +29,7 @@
     </p>
     <pre>
 # use default values everywhere:
-sudo lxd init
+lxd init
     </pre>
   </description>
   <custom>
