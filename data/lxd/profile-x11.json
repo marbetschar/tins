@@ -1,6 +1,6 @@
 {
   "name": "tins-x11",
-  "description": "Enable Graphics Support",
+  "description": "Desktop Support",
   "config": {
     "environment.DISPLAY": ":0",
     "raw.idmap": "both $UID $UID",

@@ -46,7 +46,7 @@ public class Tins.AddContainerAssistant : Gtk.Assistant {
     private Gtk.ComboBoxText image_combobox;
 
     [GtkChild]
-    private Gtk.CheckButton gui_enabled_checkbutton;
+    private Gtk.CheckButton desktop_enabled_checkbutton;
 
     [GtkChild]
     private Gtk.Label progress_label;
@@ -119,7 +119,7 @@ public class Tins.AddContainerAssistant : Gtk.Assistant {
 
         var profiles = new GenericArray<string> ();
         profiles.add ("default");
-        if (gui_enabled_checkbutton.active) {
+        if (desktop_enabled_checkbutton.active) {
             profiles.add ("tins-x11");
         }
         instance.profiles = profiles;

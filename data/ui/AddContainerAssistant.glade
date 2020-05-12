@@ -194,7 +194,7 @@
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <property name="halign">start</property>
-            <property name="label" translatable="yes">Graphics Support</property>
+            <property name="label" translatable="yes">Desktop Support</property>
             <property name="ellipsize">end</property>
             <property name="single_line_mode">True</property>
             <attributes>
@@ -214,7 +214,7 @@
             <property name="halign">start</property>
             <property name="valign">center</property>
             <property name="margin_bottom">24</property>
-            <property name="label" translatable="yes">Enabling support for graphics allows you to execute apps with a Graphical User Interface (GUI) such as web browsers or desktop environments. You can change this in the container configuration at any time.</property>
+            <property name="label" translatable="yes">Enabling desktop support allows you to execute a graphical desktop environment from a container. You can change this in the container configuration at any time.</property>
             <property name="wrap">True</property>
             <property name="max_width_chars">50</property>
           </object>
@@ -225,8 +225,8 @@
           </packing>
         </child>
         <child>
-          <object class="GtkCheckButton" id="gui_enabled_checkbutton">
-            <property name="label" translatable="yes">Enable graphics support</property>
+          <object class="GtkCheckButton" id="desktop_enabled_checkbutton">
+            <property name="label" translatable="yes">Enable Desktop Support</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="receives_default">False</property>
@@ -403,6 +403,9 @@
         <property name="page_type">summary</property>
         <property name="has_padding">False</property>
       </packing>
+    </child>
+    <child>
+      <placeholder/>
     </child>
     <child>
       <placeholder/>
