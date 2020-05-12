@@ -78,6 +78,8 @@ public class LXD.Profile : LXD.Object {
 
             unowned Posix.Passwd passwd = Posix.getpwuid (Posix.getuid ());
             if (passwd != null) {
+                var pw_uid = "%zu".printf (passwd.pw_uid);
+
                 if (profile.config != null) {
                     var keys = profile.config.get_keys ();
                     keys.foreach ((key) => {
@@ -85,7 +87,7 @@ public class LXD.Profile : LXD.Object {
 
                         if (val != null) {
                             profile.config.set(key, val.replace (
-                                "$UID", "%zu".printf (passwd.pw_uid)
+                                "$UID", pw_uid
                             ).replace (
                                 "$USER", passwd.pw_name
                             ));
@@ -97,7 +99,7 @@ public class LXD.Profile : LXD.Object {
                     profile.devices.foreach ((name, device) => {
                         if (device.path != null) {
                             device.path = device.path.replace (
-                                "$UID", "%zu".printf (passwd.pw_uid)
+                                "$UID", pw_uid
                             ).replace (
                                 "$USER", passwd.pw_name
                             );
@@ -105,7 +107,7 @@ public class LXD.Profile : LXD.Object {
 
                         if (device.source != null) {
                             device.source = device.source.replace (
-                                "$UID", "%zu".printf (passwd.pw_uid)
+                                "$UID", pw_uid
                             ).replace (
                                 "$USER", passwd.pw_name
                             );
@@ -113,7 +115,7 @@ public class LXD.Profile : LXD.Object {
 
                         if (device.device_type != null) {
                             device.device_type = device.device_type.replace (
-                                "$UID", "%zu".printf (passwd.pw_uid)
+                                "$UID", pw_uid
                             ).replace (
                                 "$USER", passwd.pw_name
                             );
