@@ -2,20 +2,23 @@
   "name": "tins-x11",
   "description": "Desktop Support",
   "config": {
-    "environment.DISPLAY": ":1",
+    "environment.DISPLAY": ":0",
+    "environment.PULSE_SERVER": "unix:/home/$USER/pulse-native",
     "raw.idmap": "both $UID $UID",
     "user.user-data": "resource:///com/github/marbetschar/tins/lxd/profile-x11.yml"
   },
   "devices": {
-    "PASocket": {
-        "path": "/tmp/.pulse-native",
-        "source": "/run/user/$UID/pulse/native",
-        "device_type": "disk"
+    "PASocket1": {
+        "bind": "container",
+        "connect": "unix:/run/user/$UID/pulse/native",
+        "listen": "unix:/home/$USER/pulse-native",
+        "device_type": "proxy"
     },
     "X0": {
-      "path": "/tmp/.X11-unix/X0",
-      "source": "/tmp/.X11-unix/X0",
-      "device_type": "disk"
+      "bind": "container",
+      "connect": "unix:@/tmp/.X11-unix/X1",
+      "listen": "unix:@/tmp/.X11-unix/X0",
+      "device_type": "proxy"
     },
     "graphics": {
       "device_type": "gpu"

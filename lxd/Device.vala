@@ -22,6 +22,9 @@
 public class LXD.Device : LXD.Object {
     public string path { get; set; }
     public string source { get; set; }
+    public string bind { get; set; }
+    public string connect { get; set; }
+    public string listen { get; set; }
     [Description (nick = "type")]
     public string device_type { get; set; }
 }

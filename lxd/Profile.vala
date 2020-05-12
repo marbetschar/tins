@@ -113,6 +113,30 @@ public class LXD.Profile : LXD.Object {
                             );
                         }
 
+                        if (device.bind != null) {
+                            device.bind = device.bind.replace (
+                                "$UID", pw_uid
+                            ).replace (
+                                "$USER", passwd.pw_name
+                            );
+                        }
+
+                        if (device.connect != null) {
+                            device.connect = device.connect.replace (
+                                "$UID", pw_uid
+                            ).replace (
+                                "$USER", passwd.pw_name
+                            );
+                        }
+
+                        if (device.listen != null) {
+                            device.listen = device.listen.replace (
+                                "$UID", pw_uid
+                            ).replace (
+                                "$USER", passwd.pw_name
+                            );
+                        }
+
                         if (device.device_type != null) {
                             device.device_type = device.device_type.replace (
                                 "$UID", pw_uid
