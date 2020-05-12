@@ -54,7 +54,7 @@ public class Tins.Application : Gtk.Application {
                 var x11_profile = LXD.Profile.new_from_template_uri ("resource:///com/github/marbetschar/tins/lxd/profile-x11.json");
 
                 try {
-                    lxd_client.update_profile (x11_profile);
+                    lxd_client.replace_profile (x11_profile);
                 } catch (Error e) {
                     lxd_client.add_profile (x11_profile);
                 }

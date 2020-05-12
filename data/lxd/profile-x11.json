@@ -2,7 +2,7 @@
   "name": "tins-x11",
   "description": "Desktop Support",
   "config": {
-    "environment.DISPLAY": ":0",
+    "environment.DISPLAY": ":6",
     "raw.idmap": "both $UID $UID",
     "user.user-data": "resource:///com/github/marbetschar/tins/lxd/profile-x11.yml"
   },

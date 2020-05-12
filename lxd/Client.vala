@@ -203,7 +203,7 @@ public class LXD.Client {
         api_request ("POST", @"/$version/profiles", data.str);
     }
 
-    public LXD.Operation update_profile (Profile profile) throws Error {
+    public LXD.Operation replace_profile (Profile profile) throws Error {
         var endpoint = @"/$version/profiles/$(profile.name)";
         var json = Json.gobject_serialize (profile);
 
@@ -236,7 +236,7 @@ public class LXD.Client {
         var data = new StringBuilder ();
         generator.to_gstring (data);
 
-        var node = api_request ("PATCH", endpoint, data.str);
+        var node = api_request ("PUT", endpoint, data.str);
 
         return Json.gobject_deserialize (typeof (LXD.Operation), node) as LXD.Operation;
     }
