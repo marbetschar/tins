@@ -8,7 +8,9 @@
   <summary>Containers just like Virtual Machines</summary>
   <description>
     <p>
-        Use all benefits of virtual machines - but in lightweight containers.
+        Tins uses LXD to easily create and manage Containers providing a Desktop Environment (Graphical User Interface).
+        The usability is similar to VirtualBox, but without the downsides of traditional Virtual Machines:
+        Unprivileged, lightweight Linux Containers provide good isolation along with superior performance.
     </p>
     <blockquote>
         <strong>Tins:</strong> tinplate containers - often used to package breath mints.
