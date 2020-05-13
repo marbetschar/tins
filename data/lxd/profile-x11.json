@@ -3,7 +3,7 @@
   "description": "Desktop Support",
   "//": "Forwarding X11 apps works if the following command is executed on the host",
   "//": "before the container is started, and the user id matches:",
-  "//": "Xephyr :73 resizeable -screen 1024x768 -reset -terminate",
+  "//": "Xephyr :73 -resizeable -screen 1024x768 -reset -terminate",
   "config": {
     "environment.DISPLAY": ":0",
     "environment.PULSE_SERVER": "unix:/home/$USER/pulse-native",
