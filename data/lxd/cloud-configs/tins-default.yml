@@ -1,0 +1,14 @@
+#cloud-config
+groups:
+  - sudo
+  - wheel
+users:
+  - name: $USER
+    groups: [sudo,wheel]
+    sudo: ALL=(ALL) NOPASSWD:ALL
+package_update: true
+packages:
+  - sudo
+runcmd:
+  - groupmod --gid $GID $USER
+  - usermod --gid $GID --uid $UID $USER

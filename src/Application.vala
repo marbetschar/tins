@@ -49,19 +49,26 @@ public class Tins.Application : Gtk.Application {
                 critical (e.message);
             }
 
-            // Update X11 Profile
-            try {
-                var x11_profile = LXD.Profile.new_from_template_uri ("resource:///com/github/marbetschar/tins/lxd/profile-x11.json");
+            // Update Profiles
+            string[] profile_names = {
+                "tins-default",
+                "tins-x11"
+            };
 
+            foreach (var profile_name in profile_names) {
                 try {
-                    lxd_client.replace_profile (x11_profile);
-                } catch (Error e) {
-                    warning (e.message);
-                    lxd_client.add_profile (x11_profile);
-                }
+                    var profile = LXD.Profile.new_from_template_uri (@"resource:///com/github/marbetschar/tins/lxd/profiles/$profile_name.json");
 
-            } catch (Error e) {
-                warning (e.message);
+                    try {
+                        lxd_client.replace_profile (profile);
+                    } catch (Error e) {
+                        warning (e.message);
+                        lxd_client.add_profile (profile);
+                    }
+
+                } catch (Error e) {
+                    critical (e.message);
+                }
             }
 
             return GLib.Source.REMOVE;

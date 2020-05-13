@@ -1,0 +1,20 @@
+#cloud-config
+groups:
+  - sudo
+  - wheel
+users:
+  - name: $USER
+    groups: [sudo,wheel]
+    sudo: ALL=(ALL) NOPASSWD:ALL
+package_update: true
+packages:
+  - sudo
+runcmd:
+  - groupmod --gid $GID $USER
+  - usermod --gid $GID --uid $UID $USER
+runcmd:
+  - 'sed -i "s/; enable-shm = yes/enable-shm = no/g" /etc/pulse/client.conf'
+packages:
+  - x11-apps
+  - mesa-utils
+  - pulseaudio

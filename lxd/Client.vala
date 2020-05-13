@@ -90,6 +90,51 @@ public class LXD.Client {
         return Json.gobject_deserialize (typeof (LXD.Operation), node) as LXD.Operation;
     }
 
+    public void update_instance (LXD.Instance instance) throws Error {
+        var endpoint = @"/$version/containers/$(instance.name)";
+        var json = Json.gobject_serialize (instance);
+
+        /**
+         * remove: "display_name"
+         */
+        if (json.get_object ().has_member ("display-name")) {
+            json.get_object ().remove_member ("display-name");
+        }
+
+        /**
+         * remove: "name"
+         */
+        if (json.get_object ().has_member ("name")) {
+            json.get_object ().remove_member ("name");
+        }
+
+        /**
+         * rename: "expanded-config" => "expanded_config"
+         */
+        if (json.get_object ().has_member ("expanded-config")) {
+            json.get_object ().set_object_member ("expanded_config", json.get_object ().get_object_member ("expanded-config"));
+            json.get_object ().remove_member ("expanded-config");
+        }
+
+        /**
+         * rename: "expanded-devices" => "expanded_devices"
+         */
+        if (json.get_object ().has_member ("expanded-devices")) {
+            json.get_object ().set_object_member ("expanded_devices", json.get_object ().get_object_member ("expanded-devices"));
+            json.get_object ().remove_member ("expanded-devices");
+        }
+
+        var generator = new Json.Generator ();
+        generator.root = json;
+
+        var data = new StringBuilder ();
+        generator.to_gstring (data);
+
+        debug (@">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>: $(data.str)");
+
+        api_request ("PATCH", endpoint, data.str);
+    }
+
     public LXD.Operation start_instance (string id_or_endpoint) throws Error {
         var endpoint = id_or_endpoint;
         if (!endpoint.has_prefix (@"/$version/containers/")) {
@@ -213,9 +258,10 @@ public class LXD.Client {
         int exit_code;
         string stdout;
         string stderr;
+        File data_file;
 
         Process.spawn_command_line_sync (
-            curl_command_line (method, endpoint, data),
+            curl_command_line (method, endpoint, data, out data_file),
             out stdout,
             out stderr,
             out exit_code
@@ -240,6 +286,13 @@ public class LXD.Client {
             }
 
             if (result.has_member("metadata")) {
+                if (data_file != null) {
+                    try {
+                        data_file.delete ();
+                    } catch (Error e) {
+                        warning (e.message);
+                    }
+                }
                 return result.get_member ("metadata");
             }
             throw new LXDClientError.RESPONSE (stdout);
@@ -247,7 +300,7 @@ public class LXD.Client {
         throw new LXDClientError.CURL(stderr);
     }
 
-    private string curl_command_line (string method, string endpoint, string? data = null) {
+    private string curl_command_line (string method, string endpoint, string? data = null, out File? data_file) {
         var args = "--silent --show-error --location --request " + method;
         if (method == "POST") {
             args += @" --header \"Content-Type: application/json\"";
@@ -255,7 +308,7 @@ public class LXD.Client {
         if (data != null) {
             try {
                 FileIOStream streams;
-                File data_file = File.new_tmp ("lxd-XXXXXX.json", out streams);
+                data_file = File.new_tmp ("lxd-XXXXXX.json", out streams);
 
                 DataOutputStream out_stream = new DataOutputStream (streams.output_stream);
                 out_stream.put_string (data);
@@ -265,13 +318,20 @@ public class LXD.Client {
             } catch (Error e) {
                 warning (e.message);
                 args += @" --data \'$data\'";
+                data_file = null;
             }
+        } else {
+            data_file = null;
         }
         if (host == "lxd") {
             args += " --unix-socket /var/lib/lxd/unix.socket";
         }
         var command_line = @"curl $args \"$host$endpoint\"";
-        debug (@"lxd-client: $command_line");
+        if (data == null) {
+            debug (@"lxd-client: $command_line");
+        } else {
+            debug (@"lxd-client: $command_line -- data: $data");
+        }
         return command_line;
     }
 

@@ -1,7 +1,0 @@
-#cloud-config
-runcmd:
-  - 'sed -i "s/; enable-shm = yes/enable-shm = no/g" /etc/pulse/client.conf'
-packages:
-  - x11-apps
-  - mesa-utils
-  - pulseaudio

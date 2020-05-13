@@ -1,0 +1,9 @@
+{
+  "name": "tins-default",
+  "description": "Basic configuration for containers managed by Tins",
+  "config": {
+    "boot.autostart": "false",
+    "user.user-data": "resource:///com/github/marbetschar/tins/lxd/cloud-configs/tins-default.yml"
+  }
+}
+

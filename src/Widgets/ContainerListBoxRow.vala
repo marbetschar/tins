@@ -122,10 +122,15 @@ public class Tins.Widgets.ContainerListBoxRow : Gtk.ListBoxRow {
     }
 
     private string resource_for_os (string os) {
-        var file = File.new_for_uri (@"resource:///com/github/marbetschar/tins/os/$os.svg");
-        if (file.query_exists ()) {
-            return @"/com/github/marbetschar/tins/os/$os.svg";
+        if (os != null) {
+            var os_down = os.down ();
+
+            var file = File.new_for_uri (@"resource:///com/github/marbetschar/tins/os/$(os_down).svg");
+            if (file.query_exists ()) {
+                return @"/com/github/marbetschar/tins/os/$(os_down).svg";
+            }
         }
+
         return "/com/github/marbetschar/tins/os/linux.svg";
     }
 

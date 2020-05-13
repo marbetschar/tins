@@ -1,0 +1,12 @@
+{
+  "//": "Forwarding X11 apps works if the following command is executed on the host",
+  "//": "before the container is started, and the user id matches:",
+  "//": "Xephyr :$DISPLAY -resizeable -glamor -title 'Tins -- $INSTANCE' -screen 1024x768 -br -terminate -noreset +extension GLX +extension RANDR +extension RENDER",
+  "devices": {
+    "X0": {
+      "path": "/tmp/.X11-unix/X0",
+      "source": "/tmp/.X11-unix/X$DISPLAY",
+      "type": "disk"
+    }
+  }
+}

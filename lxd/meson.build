@@ -4,6 +4,7 @@ lxd_sources = files (
     'Image.vala',
     'ImageStore.vala',
     'Instance.vala',
+    'LXD.vala',
     'Object.vala',
     'Operation.vala',
     'Profile.vala'

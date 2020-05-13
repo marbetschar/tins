@@ -72,7 +72,10 @@ public class LXD.Instance : LXD.Object {
     public string status { get; set; }
 
     public HashTable<string,string> config { get; set; }
+    //public HashTable<string,string> expanded_config { get; set; }
+
     public HashTable<string,HashTable<string,string>> devices { get; set; }
+    //public HashTable<string,HashTable<string,string>> expanded_devices { get; set; }
 
     public Source source { get; set; }
 
@@ -94,10 +97,12 @@ public class LXD.Instance : LXD.Object {
                 boxed_in_array = true;
                 break;
             case "config":
+            //case "expanded-config":
                 boxed_value_type = typeof (string);
                 boxed_in_array = false;
                 break;
             case "devices":
+            //case "expanded-devices":
                 boxed_value_type = typeof (HashTable);
                 boxed_in_array = false;
                 break;
@@ -105,5 +110,60 @@ public class LXD.Instance : LXD.Object {
                 default_property_boxed_value_type_with_param_spec (pspec, out boxed_value_type, out boxed_in_array);
                 break;
         }
+    }
+
+    public static LXD.Instance new_from_template_uri (string uri, HashTable<string, string> template_vars = new HashTable<string, string> (str_hash, str_equal)) throws Error {
+        var file = File.new_for_uri (uri);
+
+        var json_parser = new Json.Parser ();
+        json_parser.load_from_stream (file.read (null), null);
+
+        var instance = Json.gobject_deserialize (typeof (LXD.Instance), json_parser.get_root ()) as LXD.Instance;
+
+        if (instance != null) {
+            if (instance.config.get("user.user-data") != null) {
+                try {
+                    var user_data = LXD.read_file_from_uri (instance.config.get("user.user-data"));
+                    if (user_data != null) {
+                        instance.config.set("user.user-data", user_data);
+                    }
+
+                } catch (Error e) {
+                    warning (e.message);
+                }
+            }
+
+            if (instance.config != null) {
+                LXD.apply_vars_to_hash_table (instance.config, template_vars);
+            }
+
+            // if (instance.expanded_config != null) {
+            //     LXD.apply_vars_to_hash_table (instance.config, template_vars);
+            // }
+
+            if (instance.devices != null) {
+                var device_names = instance.devices.get_keys ();
+                device_names.foreach ((device_name) => {
+                    var device = instance.devices.get (device_name);
+
+                    if (device != null) {
+                        LXD.apply_vars_to_hash_table (device, template_vars);
+                    }
+                });
+            }
+
+            // if (instance.expanded_devices != null) {
+            //     var device_names = instance.devices.get_keys ();
+            //     device_names.foreach ((device_name) => {
+            //         var device = instance.devices.get (device_name);
+
+            //         if (device != null) {
+            //             LXD.apply_vars_to_hash_table (device, template_vars);
+            //         }
+            //     });
+            // }
+        }
+
+        return instance;
     }
 }

@@ -26,8 +26,11 @@
     <file compressed="true" preprocess="xml-stripblanks">ui/WidgetsContainerLogoBox.glade</file>
     <file compressed="true">styles/Application.css</file>
     <file compressed="true">lxd/image-store.json</file>
-    <file compressed="true">lxd/profile-x11.json</file>
-    <file>lxd/profile-x11.yml</file>
+    <file compressed="true">lxd/profiles/tins-default.json</file>
+    <file compressed="true">lxd/profiles/tins-x11.json</file>
+    <file compressed="true">lxd/instances/tins-x11.json</file>
+    <file>lxd/cloud-configs/tins-default.yml</file>
+    <file>lxd/cloud-configs/tins-x11.yml</file>
   </gresource>
 </gresources>
 

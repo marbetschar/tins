@@ -109,7 +109,7 @@ public class Tins.AddContainerAssistant : Gtk.Assistant {
         instance_source.source_type = "image";
         instance_source.mode = "pull";
         instance_source.server = Application.lxd_image_store.server;
-        instance_source.alias = @"$(os_image.properties.os)/$(os_image.properties.release)/$(os_image.properties.architecture)";
+        instance_source.alias = @"$(os_image.properties.os)/$(os_image.properties.release)/$(os_image.properties.architecture)/$(os_image.properties.variant)";
 
         var instance = new LXD.Instance ();
         instance.source = instance_source;
@@ -119,6 +119,7 @@ public class Tins.AddContainerAssistant : Gtk.Assistant {
 
         var profiles = new GenericArray<string> ();
         profiles.add ("default");
+        profiles.add ("tins-default");
         if (desktop_enabled_checkbutton.active) {
             profiles.add ("tins-x11");
         }

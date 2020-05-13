@@ -45,7 +45,7 @@ public class LXD.Profile : LXD.Object {
         }
     }
 
-    public static LXD.Profile new_from_template_uri (string uri) throws Error {
+    public static LXD.Profile new_from_template_uri (string uri, HashTable<string, string> template_vars = new HashTable<string, string> (str_hash, str_equal)) throws Error {
         var file = File.new_for_uri (uri);
 
         var json_parser = new Json.Parser ();
@@ -56,18 +56,8 @@ public class LXD.Profile : LXD.Object {
         if (profile != null) {
             if (profile.config.get("user.user-data") != null) {
                 try {
-                    var user_data_file = File.new_for_uri (profile.config.get("user.user-data"));
-
-                    if (user_data_file.query_exists ()) {
-                        var in_stream = new DataInputStream (user_data_file.read ());
-                        var builder = new StringBuilder ();
-
-                        string line;
-                        while ((line = in_stream.read_line ()) != null) {
-                            builder.append(line + "\n");
-                        }
-                        var user_data = builder.str;
-
+                    var user_data = LXD.read_file_from_uri (profile.config.get("user.user-data"));
+                    if (user_data != null) {
                         profile.config.set("user.user-data", user_data);
                     }
 
@@ -76,47 +66,21 @@ public class LXD.Profile : LXD.Object {
                 }
             }
 
-            unowned Posix.Passwd passwd = Posix.getpwuid (Posix.getuid ());
-            if (passwd != null) {
-                var pw_uid = "%zu".printf (passwd.pw_uid);
+            if (profile.config != null) {
+                LXD.apply_vars_to_hash_table (profile.config, template_vars);
+            }
 
-                if (profile.config != null) {
-                    var keys = profile.config.get_keys ();
-                    keys.foreach ((key) => {
-                        var val = profile.config.get (key);
+            if (profile.devices != null) {
+                var device_names = profile.devices.get_keys ();
+                device_names.foreach ((device_name) => {
+                    var device = profile.devices.get (device_name);
 
-                        if (val != null) {
-                            profile.config.set(key, val.replace (
-                                "$UID", pw_uid
-                            ).replace (
-                                "$USER", passwd.pw_name
-                            ));
-                        }
-                    });
-                }
-
-                if (profile.devices != null) {
-                    var device_names = profile.devices.get_keys ();
-                    device_names.foreach ((device_name) => {
-                        var device = profile.devices.get (device_name);
-
+                    if (device != null) {
                         if (device != null) {
-                            var device_keys = device.get_keys ();
-
-                            device_keys.foreach ((device_key) => {
-                                var device_val = device.get (device_key);
-
-                                if (device_val != null) {
-                                    device.set(device_key, device_val.replace (
-                                        "$UID", pw_uid
-                                    ).replace (
-                                        "$USER", passwd.pw_name
-                                    ));
-                                }
-                            });
+                            LXD.apply_vars_to_hash_table (device, template_vars);
                         }
-                    });
-                }
+                    }
+                });
             }
         }
 

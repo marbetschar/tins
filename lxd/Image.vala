@@ -31,8 +31,9 @@ public class LXD.Image : LXD.Object {
 
     public class Properties : LXD.Object {
         public string architecture { get; set; }
+        public string description { get; set; }
         public string os { get; set; }
         public string release { get; set; }
-        public string description { get; set; }
+        public string variant { get; set; }
     }
 }

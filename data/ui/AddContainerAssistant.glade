@@ -214,7 +214,7 @@
             <property name="halign">start</property>
             <property name="valign">center</property>
             <property name="margin_bottom">24</property>
-            <property name="label" translatable="yes">Enabling desktop support allows you to execute a graphical desktop environment from a container. You can change this in the container configuration at any time.</property>
+            <property name="label" translatable="yes">Enabling desktop support allows you to execute a graphical desktop environment from a container. It is NOT possible to change this later.</property>
             <property name="wrap">True</property>
             <property name="max_width_chars">50</property>
           </object>
@@ -403,6 +403,9 @@
         <property name="page_type">summary</property>
         <property name="has_padding">False</property>
       </packing>
+    </child>
+    <child>
+      <placeholder/>
     </child>
     <child>
       <placeholder/>
