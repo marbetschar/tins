@@ -7,6 +7,10 @@ Containers just like Virtual Machines
 
 <img src="data/screenshots/App.png?raw=true" width="448" align="right" />
 
+Tins is a graphical frontend for LXD to easily create and manage Containers with a graphical Desktop Environment.
+The usability is similar to VirtualBox, but without the downsides of traditional Virtual Machines:
+Unprivileged LXC containers provide good isolation along with superior performance.
+
 ## Usage
 
 Even though the usage of Tins should be straight forward, feel free to open an issue if you have any questions.
