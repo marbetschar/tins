@@ -25,7 +25,7 @@ public class LXD.Profile : LXD.Object {
     public string description { get; set; }
 
     public HashTable<string,string> config { get; set; }
-    public HashTable<string,LXD.Device> devices { get; set; }
+    public HashTable<string,HashTable<string,string>> devices { get; set; }
 
     /* --- Json.Serializable --- */
 
@@ -36,7 +36,7 @@ public class LXD.Profile : LXD.Object {
                 boxed_in_array = false;
                 break;
             case "devices":
-                boxed_value_type = typeof (LXD.Device);
+                boxed_value_type = typeof (HashTable);
                 boxed_in_array = false;
                 break;
             default:
@@ -96,53 +96,24 @@ public class LXD.Profile : LXD.Object {
                 }
 
                 if (profile.devices != null) {
-                    profile.devices.foreach ((name, device) => {
-                        if (device.path != null) {
-                            device.path = device.path.replace (
-                                "$UID", pw_uid
-                            ).replace (
-                                "$USER", passwd.pw_name
-                            );
-                        }
+                    var device_names = profile.devices.get_keys ();
+                    device_names.foreach ((device_name) => {
+                        var device = profile.devices.get (device_name);
 
-                        if (device.source != null) {
-                            device.source = device.source.replace (
-                                "$UID", pw_uid
-                            ).replace (
-                                "$USER", passwd.pw_name
-                            );
-                        }
+                        if (device != null) {
+                            var device_keys = device.get_keys ();
 
-                        if (device.bind != null) {
-                            device.bind = device.bind.replace (
-                                "$UID", pw_uid
-                            ).replace (
-                                "$USER", passwd.pw_name
-                            );
-                        }
+                            device_keys.foreach ((device_key) => {
+                                var device_val = device.get (device_key);
 
-                        if (device.connect != null) {
-                            device.connect = device.connect.replace (
-                                "$UID", pw_uid
-                            ).replace (
-                                "$USER", passwd.pw_name
-                            );
-                        }
-
-                        if (device.listen != null) {
-                            device.listen = device.listen.replace (
-                                "$UID", pw_uid
-                            ).replace (
-                                "$USER", passwd.pw_name
-                            );
-                        }
-
-                        if (device.device_type != null) {
-                            device.device_type = device.device_type.replace (
-                                "$UID", pw_uid
-                            ).replace (
-                                "$USER", passwd.pw_name
-                            );
+                                if (device_val != null) {
+                                    device.set(device_key, device_val.replace (
+                                        "$UID", pw_uid
+                                    ).replace (
+                                        "$USER", passwd.pw_name
+                                    ));
+                                }
+                            });
                         }
                     });
                 }

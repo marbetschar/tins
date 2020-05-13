@@ -72,7 +72,7 @@ public class LXD.Instance : LXD.Object {
     public string status { get; set; }
 
     public HashTable<string,string> config { get; set; }
-    public HashTable<string,LXD.Device> devices { get; set; }
+    public HashTable<string,HashTable<string,string>> devices { get; set; }
 
     public Source source { get; set; }
 
@@ -98,7 +98,7 @@ public class LXD.Instance : LXD.Object {
                 boxed_in_array = false;
                 break;
             case "devices":
-                boxed_value_type = typeof (LXD.Device);
+                boxed_value_type = typeof (HashTable);
                 boxed_in_array = false;
                 break;
             default:

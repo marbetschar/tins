@@ -56,6 +56,7 @@ public class Tins.Application : Gtk.Application {
                 try {
                     lxd_client.replace_profile (x11_profile);
                 } catch (Error e) {
+                    warning (e.message);
                     lxd_client.add_profile (x11_profile);
                 }
 

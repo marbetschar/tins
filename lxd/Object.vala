@@ -95,6 +95,25 @@ public abstract class LXD.Object : GLib.Object, Json.Serializable {
 					});
 				}
 
+			} else if (boxed_value_type.is_a (typeof (GLib.HashTable))) {
+				unowned GLib.HashTable<string, HashTable<string,string>> hash_table = @value as HashTable<string, HashTable<string,string>>;
+
+				if (hash_table != null) {
+					hash_table.foreach ((key, val) => {
+						if (val != null) {
+							var member_object = new Json.Object ();
+
+							val.foreach ((member_key, member_val) => {
+								if (val != null) {
+									member_object.set_string_member (member_key, member_val);
+								}
+							});
+
+							object.set_object_member (key, (owned) member_object);
+						}
+					});
+				}
+
 			} else if (boxed_value_type.is_a (typeof (GLib.Object))) {
 				unowned GLib.HashTable<string, GLib.Object> hash_table = @value as HashTable<string, GLib.Object>;
 
@@ -180,6 +199,23 @@ public abstract class LXD.Object : GLib.Object, Json.Serializable {
 					var hash_table = new GLib.HashTable<string, string> (str_hash, str_equal);
 					object_value.foreach_member ((object, member_name, member_node) => {
 						hash_table.@set (member_name, member_node.get_string ());
+					});
+					@value.set_boxed (hash_table);
+
+				} else if (boxed_value_type.is_a (typeof (GLib.HashTable))) {
+				    var hash_table = new GLib.HashTable<string, HashTable<string,string>> (str_hash, str_equal);
+					object_value.foreach_member ((object, member_name, member_node) => {
+					    var member_object = member_node.get_object ();
+
+					    if (member_object != null) {
+					        var member_table = new GLib.HashTable<string, string> (str_hash, str_equal);
+
+					        member_object.foreach_member ((member_object, child_member_name, child_member_node) => {
+					           member_table.@set (child_member_name, child_member_node.get_string ());
+					        });
+
+					        hash_table.@set (member_name, member_table);
+					    }
 					});
 					@value.set_boxed (hash_table);
 

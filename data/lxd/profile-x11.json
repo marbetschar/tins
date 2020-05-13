@@ -12,16 +12,16 @@
         "bind": "container",
         "connect": "unix:/run/user/$UID/pulse/native",
         "listen": "unix:/home/$USER/pulse-native",
-        "device_type": "proxy"
+        "type": "proxy"
     },
     "X0": {
       "bind": "container",
       "connect": "unix:@/tmp/.X11-unix/X1",
       "listen": "unix:@/tmp/.X11-unix/X0",
-      "device_type": "proxy"
+      "type": "proxy"
     },
     "graphics": {
-      "device_type": "gpu"
+      "type": "gpu"
     }
   }
 }

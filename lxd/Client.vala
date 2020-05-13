@@ -178,22 +178,6 @@ public class LXD.Client {
     public void add_profile(LXD.Profile profile) throws Error {
         var json = Json.gobject_serialize (profile);
 
-        /**
-         * rename: "device-type" => "type"
-         */
-        if (json.get_object ().has_member ("devices")) {
-            var devices = json.get_object ().get_object_member ("devices");
-
-            devices.foreach_member ((object, member_name, member_node) => {
-                var device = member_node.get_object ();
-
-                if (device != null && device.has_member ("device-type")) {
-                    device.set_string_member ("type", device.get_string_member ("device-type"));
-                    device.remove_member ("device-type");
-                }
-            });
-        }
-
         var generator = new Json.Generator ();
         generator.root = json;
 
@@ -212,22 +196,6 @@ public class LXD.Client {
          */
         if (json.get_object ().has_member ("name")) {
             json.get_object ().remove_member ("name");
-        }
-
-        /**
-         * rename: "device-type" => "type"
-         */
-        if (json.get_object ().has_member ("devices")) {
-            var devices = json.get_object ().get_object_member ("devices");
-
-            devices.foreach_member ((object, member_name, member_node) => {
-                var device = member_node.get_object ();
-
-                if (device != null && device.has_member ("device-type")) {
-                    device.set_string_member ("type", device.get_string_member ("device-type"));
-                    device.remove_member ("device-type");
-                }
-            });
         }
 
         var generator = new Json.Generator ();
