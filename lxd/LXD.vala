@@ -113,4 +113,15 @@ namespace LXD {
         }
         return null;
     }
+
+    public int count_files_in_path (string path) throws Error {
+        Dir dir = Dir.open (path);
+        string? name = null;
+
+        int i = 0;
+        while ((name = dir.read_name ()) != null) {
+            i++;
+        }
+        return i;
+    }
 }

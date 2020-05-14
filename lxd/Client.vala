@@ -130,8 +130,6 @@ public class LXD.Client {
         var data = new StringBuilder ();
         generator.to_gstring (data);
 
-        debug (@">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>: $(data.str)");
-
         api_request ("PATCH", endpoint, data.str);
     }
 
@@ -300,7 +298,7 @@ public class LXD.Client {
         throw new LXDClientError.CURL(stderr);
     }
 
-    private string curl_command_line (string method, string endpoint, string? data = null, out File? data_file) {
+    private string curl_command_line (string method, string endpoint, string? data = null, out File? data_file = null) {
         var args = "--silent --show-error --location --request " + method;
         if (method == "POST") {
             args += @" --header \"Content-Type: application/json\"";

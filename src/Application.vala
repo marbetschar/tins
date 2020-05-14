@@ -52,7 +52,9 @@ public class Tins.Application : Gtk.Application {
             // Update Profiles
             string[] profile_names = {
                 "tins-default",
-                "tins-x11"
+                "tins-x11",
+                "tins-x11-ubuntu-gnome",
+                "tins-x11-ubuntu-kde"
             };
 
             foreach (var profile_name in profile_names) {

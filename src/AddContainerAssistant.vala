@@ -92,6 +92,9 @@ public class Tins.AddContainerAssistant : Gtk.Assistant {
 
     [GtkCallback]
     private void on_changed_image (Gtk.Widget source) {
+        if (desktop_combobox == null) {
+            critical (">>>>>>>>>>>>> desktop_combobox is null!!!!!");
+        }
         desktop_combobox.remove_all ();
         desktop_combobox.append_text (_("other"));
 
@@ -99,7 +102,7 @@ public class Tins.AddContainerAssistant : Gtk.Assistant {
         var os_images = Application.lxd_image_store.data.get (os_key);
 
         if (os_images != null) {
-            var os_image = os_images.get (image_combobox.active);
+            var os_image = os_images.get (image_combobox.active < 0 ? 0 : image_combobox.active);
 
             if (os_image.desktops != null) {
                 for(var i = 0; i < os_image.desktops.length; i++) {
@@ -154,6 +157,22 @@ public class Tins.AddContainerAssistant : Gtk.Assistant {
         profiles.add ("tins-default");
         if (desktop_enabled_checkbutton.active) {
             profiles.add ("tins-x11");
+
+            if (os_image.desktops != null && desktop_combobox.active != 0) {
+                var desktop_name = os_image.desktops.get(desktop_combobox.active - 1);
+                var desktop_profile_name = @"tins-x11-$(os_image.properties.os)-$(desktop_name)";
+
+                try {
+                    var desktop_profile = Application.lxd_client.get_profile (desktop_profile_name);
+
+                    if (desktop_profile != null) {
+                        profiles.add (desktop_profile_name);
+                    }
+
+                } catch (Error e) {
+                    warning (e.message);
+                }
+            }
         }
         instance.profiles = profiles;
 

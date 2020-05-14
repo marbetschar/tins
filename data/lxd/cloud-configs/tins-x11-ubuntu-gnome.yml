@@ -11,7 +11,7 @@ packages:
   - x11-apps
   - mesa-utils
   - pulseaudio
-  - kubuntu-desktop
+  - ubuntu-desktop
   - lightdm
   - lightdm-gtk-greeter
 runcmd:

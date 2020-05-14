@@ -6,7 +6,6 @@ users:
   - name: $USER
     groups: [sudo,wheel]
     sudo: ALL=(ALL) NOPASSWD:ALL
-package_update: true
 packages:
   - sudo
   - x11-apps
@@ -15,4 +14,5 @@ packages:
 runcmd:
   - groupmod --gid $GID $USER
   - usermod --gid $GID --uid $UID $USER
-  - 'sed -i "s/; enable-shm = yes/enable-shm = no/g" /etc/pulse/client.conf'
+  - echo '$USER:$USER' | chpasswd
+  - sed -i "s/; enable-shm = yes/enable-shm = no/g" /etc/pulse/client.conf
