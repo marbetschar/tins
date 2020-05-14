@@ -92,9 +92,6 @@ public class Tins.AddContainerAssistant : Gtk.Assistant {
 
     [GtkCallback]
     private void on_changed_image (Gtk.Widget source) {
-        if (desktop_combobox == null) {
-            critical (">>>>>>>>>>>>> desktop_combobox is null!!!!!");
-        }
         desktop_combobox.remove_all ();
         desktop_combobox.append_text (_("other"));
 
@@ -177,97 +174,72 @@ public class Tins.AddContainerAssistant : Gtk.Assistant {
         instance.profiles = profiles;
 
         try {
-            var operation = Application.lxd_client.add_instance (instance);
-            progress_label.label = @"$(operation.description)…";
-
-            Timeout.add_seconds (1, () => {
+            var add_operation = Application.lxd_client.add_instance (instance);
+            wait_operation.begin (add_operation, (obj, res) => {
                 try {
-                    operation = Application.lxd_client.get_operation (operation.id);
+                    add_operation = wait_operation.end (res);
 
-                    if (operation.status_code < 200) {
-                        if (operation.metadata != null && operation.metadata.download_progress != null) {
-                            progress_label.label = _("Downloading…") + " " + operation.metadata.download_progress;
-                        } else {
-                            progress_label.label = @"$(operation.description)…";
+                    if (add_operation.status_code < 300) {
+                        try {
+                            var start_operation = Application.lxd_client.start_instance (instance.name);
+                            wait_operation.begin (start_operation, (obj, res) => {
+                                try {
+                                    start_operation = wait_operation.end (res);
+
+                                    if (start_operation.status_code < 300) {
+                                        try {
+                                            var exec = new LXD.InstanceExec ();
+                                            exec.command = new GenericArray<string> ();
+                                            exec.command.add ("cloud-init");
+                                            exec.command.add ("status");
+                                            exec.command.add ("--wait");
+
+                                            var init_operation = Application.lxd_client.exec_instance (instance.name, exec);
+                                            wait_operation.begin (init_operation, (obj, res) => {
+                                                try {
+                                                    init_operation = wait_operation.end (res);
+
+                                                    if (init_operation.status_code < 300) {
+                                                        close ();
+
+                                                    } else {
+                                                        on_operation_error (init_operation);
+                                                    }
+
+                                                } catch (Error e) {
+                                                    on_error (e);
+                                                }
+                                            });
+
+                                        } catch (Error e) {
+                                            on_error (e);
+                                        }
+
+                                    } else {
+                                        on_operation_error (start_operation);
+                                    }
+
+                                } catch (Error e) {
+                                    on_error (e);
+                                }
+                            });
+
+                        } catch (Error e) {
+                            on_error (e);
                         }
 
                     } else {
-                         if (operation.status_code < 300) {
-
-                            try {
-                                var start_operation = Application.lxd_client.start_instance (instance.name);
-
-                                Timeout.add_seconds (3, () => {
-                                    try {
-                                        start_operation = Application.lxd_client.get_operation (start_operation.id);
-
-                                        if (start_operation.status_code < 200) {
-                                            progress_label.label = @"$(start_operation.description)…";
-
-                                        } else {
-                                            if (start_operation.status_code < 300) {
-                                                close ();
-                                            } else {
-                                                on_operation_error (start_operation);
-                                            }
-                                            return Source.REMOVE;
-                                        }
-
-                                    } catch (Error e) {
-                                        critical (e.message);
-                                    }
-
-                                    return Source.CONTINUE;
-                                });
-
-                            } catch (Error e) {
-                                var error_dialog = new Granite.MessageDialog.with_image_from_icon_name (
-                                    _("Error"),
-                                    _(e.message),
-                                    "dialog-error",
-                                    Gtk.ButtonsType.CLOSE
-                                );
-                                error_dialog.run ();
-                                error_dialog.destroy ();
-                                close ();
-                            }
-
-                        } else {
-                            on_operation_error (operation);
-                        }
-                        return Source.REMOVE;
+                        on_operation_error (add_operation);
                     }
 
                 } catch (Error e) {
-                    var error_dialog = new Granite.MessageDialog.with_image_from_icon_name (
-                        _("Error"),
-                        _(e.message),
-                        "dialog-error",
-                        Gtk.ButtonsType.CLOSE
-                    );
-                    error_dialog.run ();
-                    error_dialog.destroy ();
+                    on_error (e);
                 }
-
-                return Source.CONTINUE;
             });
 
         } catch (Error e) {
-            var error_dialog = new Granite.MessageDialog.with_image_from_icon_name (
-                _("Error"),
-                _(e.message),
-                "dialog-error",
-                Gtk.ButtonsType.CLOSE
-            );
-            error_dialog.run ();
-            error_dialog.destroy ();
+            on_error (e);
         }
-    }
-
-    private void on_operation_error (LXD.Operation operation) {
-        progress_image_stack.visible_child = progress_error_image;
-        progress_info_stack.visible_child = progress_error_label;
-        progress_error_label.label = @"$(operation.err) ($(operation.status_code)).";
     }
 
     [GtkCallback]
@@ -288,5 +260,55 @@ public class Tins.AddContainerAssistant : Gtk.Assistant {
         var current_page = get_nth_page (current_index);
 
         set_page_complete (current_page, complete);
+    }
+
+    private async LXD.Operation wait_operation (LXD.Operation operation) throws Error {
+        SourceFunc callback = wait_operation.callback;
+        LXD.Operation[] output = { operation };
+
+        ThreadFunc<bool> wait = () => {
+            var wait_operation = output[0];
+
+            while (wait_operation != null && wait_operation.status_code < 200) {
+                if (wait_operation.metadata != null && wait_operation.metadata.download_progress != null) {
+                    progress_label.label = _("Downloading…") + " " + wait_operation.metadata.download_progress;
+                } else {
+                    progress_label.label = @"$(wait_operation.description)…";
+                }
+                Thread.usleep (1000000);
+
+                try {
+                    wait_operation = Application.lxd_client.get_operation (wait_operation.id);
+                } catch (Error e) {
+                    wait_operation = null;
+                }
+            }
+
+            output[0] = wait_operation;
+            Idle.add((owned) callback);
+            return true;
+        };
+        new Thread<bool>("wait-operation", wait);
+
+        yield;
+        return output[0];
+    }
+
+    private void on_error (Error e) {
+        var error_dialog = new Granite.MessageDialog.with_image_from_icon_name (
+            _("Error"),
+            _(e.message),
+            "dialog-error",
+            Gtk.ButtonsType.CLOSE
+        );
+        error_dialog.run ();
+        error_dialog.destroy ();
+        close ();
+    }
+
+    private void on_operation_error (LXD.Operation operation) {
+        progress_image_stack.visible_child = progress_error_image;
+        progress_info_stack.visible_child = progress_error_label;
+        progress_error_label.label = @"$(operation.err) ($(operation.status_code)).";
     }
 }

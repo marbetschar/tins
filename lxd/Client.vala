@@ -160,6 +160,21 @@ public class LXD.Client {
         return Json.gobject_deserialize (typeof (LXD.Operation), node) as LXD.Operation;
     }
 
+    public LXD.Operation exec_instance (string id, LXD.InstanceExec instance_exec) throws Error {
+        var endpoint = @"/$version/containers/$id/exec";
+        var json = Json.gobject_serialize (instance_exec);
+
+        var generator = new Json.Generator ();
+        generator.root = json;
+
+        var data = new StringBuilder ();
+        generator.to_gstring (data);
+
+        var node = api_request ("POST", endpoint, data.str);
+
+        return Json.gobject_deserialize (typeof (LXD.Operation), node) as LXD.Operation;
+    }
+
     public Operation get_operation (string id_or_endpoint) throws Error {
         var endpoint = id_or_endpoint;
         if (!endpoint.has_prefix (@"/$version/operations/")) {
