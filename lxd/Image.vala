@@ -28,6 +28,7 @@ public class LXD.Image : LXD.Object {
     public int size { get; set; }
 
     public Properties properties { get; set; }
+    public GenericArray<string> desktops { get; set; }
 
     public class Properties : LXD.Object {
         public string architecture { get; set; }
@@ -35,5 +36,19 @@ public class LXD.Image : LXD.Object {
         public string os { get; set; }
         public string release { get; set; }
         public string variant { get; set; }
+    }
+
+    /* --- Json.Serializable --- */
+
+    public override void property_boxed_value_type_with_param_spec (ParamSpec pspec, out Type boxed_value_type, out bool boxed_in_array) {
+        switch (pspec.name) {
+            case "desktops":
+                boxed_value_type = typeof (string);
+                boxed_in_array = true;
+                break;
+            default:
+                default_property_boxed_value_type_with_param_spec (pspec, out boxed_value_type, out boxed_in_array);
+                break;
+        }
     }
 }

@@ -147,6 +147,7 @@
           <object class="GtkComboBoxText" id="image_combobox">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
+            <signal name="changed" handler="on_changed_image" swapped="no"/>
             <style>
               <class name="flat"/>
             </style>
@@ -225,18 +226,49 @@
           </packing>
         </child>
         <child>
-          <object class="GtkCheckButton" id="desktop_enabled_checkbutton">
-            <property name="label" translatable="yes">Enable Desktop Support</property>
+          <object class="GtkBox">
             <property name="visible">True</property>
-            <property name="can_focus">True</property>
-            <property name="receives_default">False</property>
-            <property name="halign">start</property>
-            <property name="valign">start</property>
+            <property name="can_focus">False</property>
             <property name="margin_left">24</property>
-            <property name="draw_indicator">True</property>
-            <style>
-              <class name="flat"/>
-            </style>
+            <property name="orientation">vertical</property>
+            <child>
+              <object class="GtkCheckButton" id="desktop_enabled_checkbutton">
+                <property name="label" translatable="yes">Enable Desktop Support</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">False</property>
+                <property name="halign">start</property>
+                <property name="valign">start</property>
+                <property name="margin_bottom">8</property>
+                <property name="relief">none</property>
+                <property name="draw_indicator">True</property>
+                <signal name="toggled" handler="on_toggled_desktop_enable" swapped="no"/>
+                <style>
+                  <class name="flat"/>
+                </style>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkComboBoxText" id="desktop_combobox">
+                <property name="visible">True</property>
+                <property name="sensitive">False</property>
+                <property name="can_focus">False</property>
+                <property name="margin_left">18</property>
+                <style>
+                  <class name="flat"/>
+                </style>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">1</property>
+              </packing>
+            </child>
           </object>
           <packing>
             <property name="left_attach">1</property>
@@ -403,6 +435,12 @@
         <property name="page_type">summary</property>
         <property name="has_padding">False</property>
       </packing>
+    </child>
+    <child>
+      <placeholder/>
+    </child>
+    <child>
+      <placeholder/>
     </child>
     <child>
       <placeholder/>

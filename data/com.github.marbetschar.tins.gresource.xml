@@ -31,6 +31,7 @@
     <file compressed="true">lxd/instances/tins-x11.json</file>
     <file>lxd/cloud-configs/tins-default.yml</file>
     <file>lxd/cloud-configs/tins-x11.yml</file>
+    <file>lxd/cloud-configs/tins-x11-ubuntu-kde.yml</file>
   </gresource>
 </gresources>
 

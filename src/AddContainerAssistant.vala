@@ -49,6 +49,9 @@ public class Tins.AddContainerAssistant : Gtk.Assistant {
     private Gtk.CheckButton desktop_enabled_checkbutton;
 
     [GtkChild]
+    private Gtk.ComboBoxText desktop_combobox;
+
+    [GtkChild]
     private Gtk.Label progress_label;
 
     [GtkChild]
@@ -85,6 +88,35 @@ public class Tins.AddContainerAssistant : Gtk.Assistant {
         }
 
         validate_current_page ();
+    }
+
+    [GtkCallback]
+    private void on_changed_image (Gtk.Widget source) {
+        desktop_combobox.remove_all ();
+        desktop_combobox.append_text (_("other"));
+
+        var os_key = all_os_keys.nth_data (operating_system_combobox.active);
+        var os_images = Application.lxd_image_store.data.get (os_key);
+
+        if (os_images != null) {
+            var os_image = os_images.get (image_combobox.active);
+
+            if (os_image.desktops != null) {
+                for(var i = 0; i < os_image.desktops.length; i++) {
+                    var desktop = os_image.desktops.get(i);
+                    desktop_combobox.append_text (_(desktop));
+                }
+            }
+        }
+        desktop_combobox.active = 0;
+
+        validate_current_page ();
+    }
+
+    [GtkCallback]
+    private void on_toggled_desktop_enable (Gtk.Widget source) {
+        var toggle_button = source as Gtk.ToggleButton;
+        desktop_combobox.sensitive = toggle_button.active;
     }
 
     [GtkCallback]

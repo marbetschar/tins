@@ -12,7 +12,17 @@ packages:
   - x11-apps
   - mesa-utils
   - pulseaudio
+  - kubuntu-desktop
+  - lightdm
+  - lightdm-gtk-greeter
 runcmd:
   - groupmod --gid $GID $USER
   - usermod --gid $GID --uid $UID $USER
   - 'sed -i "s/; enable-shm = yes/enable-shm = no/g" /etc/pulse/client.conf'
+write_files:
+  - content: |
+      [Seat:*]
+      type=xremote
+      xserver-display-number=0
+      greeter-session=lightdm-gtk-greeter
+    path: /etc/lightdm/lightdm.conf.d/10-tins-x11.conf
