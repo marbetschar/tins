@@ -22,6 +22,10 @@
 public class LXD.InstanceExec : LXD.Object {
 
     public GenericArray<string> command { get; set; }
+    public int user { get; set; }
+    public int group { get; set; }
+    public bool interactive { get; set; default = false; }
+    public bool record_output { get; set; default = false; }
 
     /* --- Json.Serializable --- */
 

@@ -52,7 +52,13 @@ public class Tins.AddContainerAssistant : Gtk.Assistant {
     private Gtk.ComboBoxText desktop_combobox;
 
     [GtkChild]
-    private Gtk.Label progress_label;
+    private Gtk.Label progress_title_label;
+
+    [GtkChild]
+    private Gtk.Label progress_description_label;
+
+    [GtkChild]
+    private Gtk.Label progress_state_label;
 
     [GtkChild]
     private Gtk.Stack progress_image_stack;
@@ -189,6 +195,16 @@ public class Tins.AddContainerAssistant : Gtk.Assistant {
                                     if (start_operation.status_code < 300) {
                                         try {
                                             var exec = new LXD.InstanceExec ();
+
+                                            // run as root
+                                            exec.user = 0;
+                                            exec.group = 0;
+
+                                            // wait until done
+                                            exec.interactive = false;
+                                            exec.record_output = true;
+
+                                            // execute command
                                             exec.command = new GenericArray<string> ();
                                             exec.command.add ("cloud-init");
                                             exec.command.add ("status");
@@ -200,7 +216,12 @@ public class Tins.AddContainerAssistant : Gtk.Assistant {
                                                     init_operation = wait_operation.end (res);
 
                                                     if (init_operation.status_code < 300) {
-                                                        close ();
+
+                                                        if (init_operation.metadata != null && init_operation.metadata.return != null && init_operation.metadata.return != "0") {
+                                                            set_error_message (_(@"Initial configuration using cloud-init failed. Execute the following command for more details:\n\n\tlxc exec $(instance.name) -- cat /var/log/cloud-init-output.log"));
+                                                        } else {
+                                                            close ();
+                                                        }
 
                                                     } else {
                                                         on_operation_error (init_operation);
@@ -268,19 +289,21 @@ public class Tins.AddContainerAssistant : Gtk.Assistant {
 
         ThreadFunc<bool> wait = () => {
             var wait_operation = output[0];
+            var error_count = 0;
 
-            while (wait_operation != null && wait_operation.status_code < 200) {
+            while (wait_operation != null && wait_operation.status_code < 200 && error_count < 5) {
                 if (wait_operation.metadata != null && wait_operation.metadata.download_progress != null) {
-                    progress_label.label = _("Downloading…") + " " + wait_operation.metadata.download_progress;
+                    progress_state_label.label = _("Downloading…") + " " + wait_operation.metadata.download_progress;
                 } else {
-                    progress_label.label = @"$(wait_operation.description)…";
+                    progress_state_label.label = @"$(wait_operation.description)…";
                 }
                 Thread.usleep (1000000);
 
                 try {
                     wait_operation = Application.lxd_client.get_operation (wait_operation.id);
                 } catch (Error e) {
-                    wait_operation = null;
+                    warning (e.message);
+                    error_count++;
                 }
             }
 
@@ -295,20 +318,19 @@ public class Tins.AddContainerAssistant : Gtk.Assistant {
     }
 
     private void on_error (Error e) {
-        var error_dialog = new Granite.MessageDialog.with_image_from_icon_name (
-            _("Error"),
-            _(e.message),
-            "dialog-error",
-            Gtk.ButtonsType.CLOSE
-        );
-        error_dialog.run ();
-        error_dialog.destroy ();
-        close ();
+        set_error_message (e.message);
     }
 
     private void on_operation_error (LXD.Operation operation) {
+        set_error_message (@"$(operation.err) ($(operation.status_code)).");
+    }
+
+    private void set_error_message (string error_message) {
+        progress_title_label.label = _("Error Creating Container");
+        progress_description_label.label = _("There was an error setting up your container.");
+
         progress_image_stack.visible_child = progress_error_image;
         progress_info_stack.visible_child = progress_error_label;
-        progress_error_label.label = @"$(operation.err) ($(operation.status_code)).";
+        progress_error_label.label = error_message;
     }
 }

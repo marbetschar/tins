@@ -16,10 +16,11 @@ packages:
   - lightdm-gtk-greeter
 runcmd:
   - groupmod --gid $GID $USER
-  - usermod --gid $GID --uid $UID $USER
-  - echo '$USER:$USER' | chpasswd
+  - usermod --gid $GID --uid $UID --password $(openssl passwd -1 $USER) $USER
   - sed -i "s/; enable-shm = yes/enable-shm = no/g" /etc/pulse/client.conf
-  - ln --symbolic --force /lib/systemd/system/lightdm.service /etc/systemd/system/display-manager.service
+  - echo "/usr/sbin/lightdm" > /etc/X11/default-display-manager
+  - DEBIAN_FRONTEND=noninteractive DEBCONF_NONINTERACTIVE_SEEN=true dpkg-reconfigure lightdm
+  - echo set shared/default-x-display-manager lightdm | debconf-communicate
 write_files:
   - content: |
       [Seat:*]

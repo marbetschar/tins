@@ -10,5 +10,4 @@ packages:
   - sudo
 runcmd:
   - groupmod --gid $GID $USER
-  - usermod --gid $GID --uid $UID $USER
-  - echo '$USER:$USER' | chpasswd
+  - usermod --gid $GID --uid $UID --password $(openssl passwd -1 $USER) $USER

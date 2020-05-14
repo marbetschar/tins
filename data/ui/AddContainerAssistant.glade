@@ -296,7 +296,7 @@
         <property name="row_spacing">12</property>
         <property name="column_spacing">12</property>
         <child>
-          <object class="GtkLabel">
+          <object class="GtkLabel" id="progress_title_label">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <property name="halign">start</property>
@@ -313,12 +313,13 @@
           </packing>
         </child>
         <child>
-          <object class="GtkLabel">
+          <object class="GtkLabel" id="progress_description_label">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <property name="halign">start</property>
             <property name="valign">center</property>
-            <property name="label" translatable="yes">Stay tuned, your new container will be ready in just a few seconds:</property>
+            <property name="margin_right">12</property>
+            <property name="label" translatable="yes">Stay tuned, your new container will be ready soon. In case you are installing a Desktop Environment, this process can take a few minutes:</property>
             <property name="wrap">True</property>
             <property name="max_width_chars">50</property>
           </object>
@@ -386,7 +387,7 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkLabel" id="progress_label">
+                  <object class="GtkLabel" id="progress_state_label">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="label" translatable="yes">...</property>
@@ -435,6 +436,18 @@
         <property name="page_type">summary</property>
         <property name="has_padding">False</property>
       </packing>
+    </child>
+    <child>
+      <placeholder/>
+    </child>
+    <child>
+      <placeholder/>
+    </child>
+    <child>
+      <placeholder/>
+    </child>
+    <child>
+      <placeholder/>
     </child>
     <child>
       <placeholder/>
