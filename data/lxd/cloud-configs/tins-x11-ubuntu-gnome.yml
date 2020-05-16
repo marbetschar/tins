@@ -1,6 +1,6 @@
 #cloud-config tins-x11-ubuntu-gnome extends tins-x11
 packages:
-  - ubuntu-desktop
+  - ubuntu-desktop-minimal
   - lightdm
   - lightdm-gtk-greeter
 runcmd:
