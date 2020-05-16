@@ -1,17 +1,7 @@
-#cloud-config
-groups:
-  - sudo
-  - wheel
-users:
-  - name: $USER
-    groups: [sudo,wheel]
-    sudo: ALL=(ALL) NOPASSWD:ALL
+#cloud-config tins-x11 extends tins-default
 packages:
-  - sudo
   - x11-apps
   - mesa-utils
   - pulseaudio
 runcmd:
-  - groupmod --gid $GID $USER
-  - usermod --gid $GID --uid $UID --password $(openssl passwd -1 $USER) $USER
   - sed -i "s/; enable-shm = yes/enable-shm = no/g" /etc/pulse/client.conf

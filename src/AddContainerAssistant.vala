@@ -155,31 +155,28 @@ public class Tins.AddContainerAssistant : Gtk.Assistant {
         instance.display_name = name_entry.text;
         instance.architecture = "x86_64";
 
-        var profiles = new GenericArray<string> ();
-        profiles.add ("default");
-        profiles.add ("tins-default");
-        if (desktop_enabled_checkbutton.active) {
-            profiles.add ("tins-x11");
-
-            if (os_image.desktops != null && desktop_combobox.active != 0) {
-                var desktop_name = os_image.desktops.get(desktop_combobox.active - 1);
-                var desktop_profile_name = @"tins-x11-$(os_image.properties.os)-$(desktop_name)";
-
-                try {
-                    var desktop_profile = Application.lxd_client.get_profile (desktop_profile_name);
-
-                    if (desktop_profile != null) {
-                        profiles.add (desktop_profile_name);
-                    }
-
-                } catch (Error e) {
-                    warning (e.message);
-                }
-            }
-        }
-        instance.profiles = profiles;
+        instance.profiles = new GenericArray<string> ();
+        instance.profiles.add ("default");
 
         try {
+            instance_add_tins_profile (instance, "tins-default");
+
+            if (desktop_enabled_checkbutton.active) {
+                instance_add_tins_profile (instance, "tins-x11");
+
+                if (os_image.desktops != null && desktop_combobox.active != 0) {
+                    var desktop_name = os_image.desktops.get(desktop_combobox.active - 1);
+                    var tins_desktop_profile_name = @"tins-x11-$(os_image.properties.os)-$(desktop_name)";
+
+                    try {
+                        instance_add_tins_profile (instance, tins_desktop_profile_name);
+
+                    } catch (Error e) {
+                        warning (e.message);
+                    }
+                }
+            }
+
             var add_operation = Application.lxd_client.add_instance (instance);
             wait_operation.begin (add_operation, (obj, res) => {
                 try {
@@ -281,6 +278,28 @@ public class Tins.AddContainerAssistant : Gtk.Assistant {
         var current_page = get_nth_page (current_index);
 
         set_page_complete (current_page, complete);
+    }
+
+    private void instance_add_tins_profile (LXD.Instance instance, string profile_name) throws Error {
+        if (instance.profiles == null) {
+            instance.profiles = new GenericArray<string> ();
+        }
+        if (instance.config == null) {
+            instance.config = new HashTable<string, string> (str_hash, str_equal);
+        }
+        var profile = LXD.Profile.new_from_template_uri (@"resource:///com/github/marbetschar/tins/lxd/profiles/$profile_name.json");
+
+        if (profile != null && profile.name != null) {
+            instance.profiles.add (profile.name);
+
+            if (profile.config != null && profile.config.get("user.user-data") != null) {
+                if (instance.config.get("user.user-data") == null) {
+                    instance.config.set("user.user-data", profile.config.get("user.user-data"));
+                } else {
+                    instance.config.set("user.user-data", instance.config.get("user.user-data") + "\n" + profile.config.get("user.user-data"));
+                }
+            }
+        }
     }
 
     private async LXD.Operation wait_operation (LXD.Operation operation) throws Error {

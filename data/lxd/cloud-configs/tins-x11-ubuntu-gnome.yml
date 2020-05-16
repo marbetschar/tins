@@ -1,23 +1,9 @@
-#cloud-config
-groups:
-  - sudo
-  - wheel
-users:
-  - name: $USER
-    groups: [sudo,wheel]
-    sudo: ALL=(ALL) NOPASSWD:ALL
+#cloud-config tins-x11-ubuntu-gnome extends tins-x11
 packages:
-  - sudo
-  - x11-apps
-  - mesa-utils
-  - pulseaudio
   - ubuntu-desktop
   - lightdm
   - lightdm-gtk-greeter
 runcmd:
-  - groupmod --gid $GID $USER
-  - usermod --gid $GID --uid $UID --password $(openssl passwd -1 $USER) $USER
-  - sed -i "s/; enable-shm = yes/enable-shm = no/g" /etc/pulse/client.conf
   - echo "/usr/sbin/lightdm" > /etc/X11/default-display-manager
   - DEBIAN_FRONTEND=noninteractive DEBCONF_NONINTERACTIVE_SEEN=true dpkg-reconfigure lightdm
   - echo set shared/default-x-display-manager lightdm | debconf-communicate

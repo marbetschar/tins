@@ -72,10 +72,7 @@ public class LXD.Instance : LXD.Object {
     public string status { get; set; }
 
     public HashTable<string,string> config { get; set; }
-    //public HashTable<string,string> expanded_config { get; set; }
-
     public HashTable<string,HashTable<string,string>> devices { get; set; }
-    //public HashTable<string,HashTable<string,string>> expanded_devices { get; set; }
 
     public Source source { get; set; }
 
@@ -97,12 +94,10 @@ public class LXD.Instance : LXD.Object {
                 boxed_in_array = true;
                 break;
             case "config":
-            //case "expanded-config":
                 boxed_value_type = typeof (string);
                 boxed_in_array = false;
                 break;
             case "devices":
-            //case "expanded-devices":
                 boxed_value_type = typeof (HashTable);
                 boxed_in_array = false;
                 break;
@@ -137,10 +132,6 @@ public class LXD.Instance : LXD.Object {
                 LXD.apply_vars_to_hash_table (instance.config, template_vars);
             }
 
-            // if (instance.expanded_config != null) {
-            //     LXD.apply_vars_to_hash_table (instance.config, template_vars);
-            // }
-
             if (instance.devices != null) {
                 var device_names = instance.devices.get_keys ();
                 device_names.foreach ((device_name) => {
@@ -151,17 +142,6 @@ public class LXD.Instance : LXD.Object {
                     }
                 });
             }
-
-            // if (instance.expanded_devices != null) {
-            //     var device_names = instance.devices.get_keys ();
-            //     device_names.foreach ((device_name) => {
-            //         var device = instance.devices.get (device_name);
-
-            //         if (device != null) {
-            //             LXD.apply_vars_to_hash_table (device, template_vars);
-            //         }
-            //     });
-            // }
         }
 
         return instance;
