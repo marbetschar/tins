@@ -207,8 +207,7 @@
             "release": "bionic",
             "architecture": "amd64",
             "variant": "cloud"
-        },
-        "desktops": ["gnome", "kde"]
+        }
     },{
         "properties": {
             "os": "ubuntu",
@@ -223,7 +222,7 @@
             "architecture": "amd64",
             "variant": "cloud"
         },
-        "desktops": ["gnome", "kde"]
+        "desktops": ["xfce"]
     },{
         "properties": {
             "os": "ubuntu",

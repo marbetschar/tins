@@ -1,8 +1,0 @@
-{
-  "name": "tins-x11-ubuntu-gnome",
-  "description": "Ubuntu GNOME Desktop",
-  "config": {
-    "user.user-data": "resource:///com/github/marbetschar/tins/lxd/cloud-configs/tins-x11-ubuntu-gnome.yml"
-  }
-}
-

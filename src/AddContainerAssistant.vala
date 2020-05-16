@@ -166,14 +166,16 @@ public class Tins.AddContainerAssistant : Gtk.Assistant {
 
                 if (os_image.desktops != null && desktop_combobox.active != 0) {
                     var desktop_name = os_image.desktops.get(desktop_combobox.active - 1);
-                    var tins_desktop_profile_name = @"tins-x11-$(os_image.properties.os)-$(desktop_name)";
+                    instance_source.alias = @"$(os_image.properties.os)/$(os_image.properties.release)/$(os_image.properties.architecture)/$(desktop_name)";
+                    instance_source.server = null;
+                    // var tins_desktop_profile_name = @"tins-x11-$(os_image.properties.os)-$(desktop_name)";
 
-                    try {
-                        instance_add_tins_profile (instance, tins_desktop_profile_name);
+                    // try {
+                    //     instance_add_tins_profile (instance, tins_desktop_profile_name);
 
-                    } catch (Error e) {
-                        warning (e.message);
-                    }
+                    // } catch (Error e) {
+                    //     warning (e.message);
+                    // }
                 }
             }
 
