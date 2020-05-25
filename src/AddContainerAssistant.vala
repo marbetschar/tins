@@ -142,6 +142,13 @@ public class Tins.AddContainerAssistant : Gtk.Assistant {
         var variant = "cloud";
         if (desktop_combobox.active > 0) {
             var variants = Application.lxd_image_store.get_variants (operating_system, release);
+
+            for (int i = 0; i < variants.length; i++) {
+                if( variants.get(i) == variant ) {
+                    variants.remove_index (i);
+                    break;
+                }
+            }
             variant = variants.get(desktop_combobox.active - 1);
         }
 
