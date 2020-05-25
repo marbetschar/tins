@@ -11,5 +11,5 @@ Standards-Version: 4.1.1
 
 Package: com.github.marbetschar.tins
 Architecture: any
-Depends: ${misc:Depends}, ${shlibs:Depends}, lxd, curl
+Depends: ${misc:Depends}, ${shlibs:Depends}, lxd, curl, weston, xwayland
 Description: Containers just like Virtual Machines
