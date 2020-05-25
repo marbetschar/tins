@@ -1,8 +1,8 @@
 # Listing files to compile
 lxd_sources = files (
     'Client.vala',
-    'Image.vala',
     'ImageStore.vala',
+    'ImageSource.vala',
     'Instance.vala',
     'InstanceExec.vala',
     'LXD.vala',

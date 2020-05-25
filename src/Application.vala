@@ -43,7 +43,7 @@ public class Tins.Application : Gtk.Application {
                 json_parser.load_from_stream (image_store_file.read (null), null);
                 lxd_image_store = Json.gobject_deserialize (typeof (LXD.ImageStore), json_parser.get_root ()) as LXD.ImageStore;
 
-                debug ("Loaded images for %u operating systems from store.".printf (lxd_image_store.data.size ()));
+                debug ("Loaded %i images from store.".printf (lxd_image_store.data.length));
 
             } catch (Error e) {
                 critical (e.message);
@@ -52,9 +52,7 @@ public class Tins.Application : Gtk.Application {
             // Update Profiles
             string[] profile_names = {
                 "tins-default",
-                "tins-x11",
-                "tins-x11-ubuntu-gnome",
-                "tins-x11-ubuntu-kde"
+                "tins-x11"
             };
 
             foreach (var profile_name in profile_names) {

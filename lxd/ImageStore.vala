@@ -21,17 +21,81 @@
 
 public class LXD.ImageStore : LXD.Object {
 
-    public string server { get; set; }
     public string created_at { get; set; }
-    public HashTable<string,GenericArray<LXD.Image>> data { get; set; }
+    public GenericArray<LXD.ImageSource> data { get; set; }
 
+    public GenericArray<string> get_operating_systems () {
+        var operating_systems = new GenericArray<string> ();
+
+        data.foreach((image_source) => {
+            if (!operating_systems.find_with_equal_func (image_source.os, str_equal)) {
+                operating_systems.add (image_source.os);
+            }
+        });
+        operating_systems.sort (strcmp);
+
+        return operating_systems;
+    }
+
+    public GenericArray<string> get_releases (string operating_system) {
+        var releases = new GenericArray<string> ();
+
+        data.foreach((image_source) => {
+            if (
+                image_source.os == operating_system &&
+                !releases.find_with_equal_func (image_source.release, str_equal)
+            ) {
+                releases.add (image_source.release);
+            }
+        });
+        releases.sort (strcmp);
+
+        return releases;
+    }
+
+    public GenericArray<string> get_variants (string operating_system, string release) {
+        var variants = new GenericArray<string> ();
+
+        data.foreach((image_source) => {
+            if (
+                image_source.os == operating_system &&
+                image_source.release == release &&
+                !variants.find_with_equal_func (image_source.variant, str_equal)
+            ) {
+                variants.add (image_source.variant);
+            }
+        });
+        variants.sort (strcmp);
+
+        return variants;
+    }
+
+    public LXD.ImageSource? get_image_source (
+        string operating_system,
+        string release,
+        string variant,
+        string architecture
+    ) {
+        for (int i = 0; i < data.length; i++) {
+            var image_source = data.get(i);
+            if (
+                image_source.os == operating_system &&
+                image_source.release == release &&
+                image_source.architecture == architecture &&
+                image_source.variant == variant
+            ) {
+                return image_source;
+            }
+        }
+        return null;
+    }
 
     /* --- Json.Serializable --- */
 
     public override void property_boxed_value_type_with_param_spec (ParamSpec pspec, out Type boxed_value_type, out bool boxed_in_array) {
         switch (pspec.name) {
             case "data":
-                boxed_value_type = typeof (LXD.Image);
+                boxed_value_type = typeof (LXD.ImageSource);
                 boxed_in_array = true;
                 break;
             default:

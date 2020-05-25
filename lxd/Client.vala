@@ -193,36 +193,6 @@ public class LXD.Client {
         return Json.gobject_deserialize (typeof (LXD.Operation), node) as LXD.Operation;
     }
 
-    public uint count_images (string? filter = null) throws Error {
-        var json = api_request ("GET", @"/$version/images", (filter == null ? "" : @"filter=$filter"));
-        var list = json.get_array ();
-
-        return list.get_length ();
-    }
-
-    public GenericArray<Image> get_images (string? filter = null) throws Error {
-        var json = api_request ("GET", @"/$version/images", (filter == null ? "" : @"filter=$filter"));
-        var list = json.get_array ();
-        int i;
-
-        var images = new GLib.GenericArray<Image> ();
-        for (i = 0; i < list.get_length (); i++) {
-            images.add (get_image (list.get_string_element (i)));
-        }
-
-        return images;
-    }
-
-    public Image get_image (string id_or_endpoint) throws Error {
-        var endpoint = id_or_endpoint;
-        if (!endpoint.has_prefix (@"/$version/images/")) {
-            endpoint = @"/$version/images/$id_or_endpoint";
-        }
-        var node = api_request ("GET", endpoint);
-
-        return Json.gobject_deserialize (typeof (LXD.Image), node) as LXD.Image;
-    }
-
     public LXD.Profile get_profile (string id_or_endpoint) throws Error {
         var endpoint = id_or_endpoint;
         if (!endpoint.has_prefix (@"/$version/profiles/")) {

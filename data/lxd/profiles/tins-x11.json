@@ -4,7 +4,6 @@
   "config": {
     "environment.DISPLAY": ":0",
     "environment.PULSE_SERVER": "unix:/home/$USER/pulse-native",
-    "raw.idmap": "both $UID $UID",
     "user.user-data": "resource:///com/github/marbetschar/tins/lxd/cloud-configs/tins-x11.yml"
   },
   "devices": {
@@ -18,4 +17,3 @@
     }
   }
 }
-

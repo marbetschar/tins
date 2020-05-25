@@ -144,10 +144,10 @@
           </packing>
         </child>
         <child>
-          <object class="GtkComboBoxText" id="image_combobox">
+          <object class="GtkComboBoxText" id="release_combobox">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <signal name="changed" handler="on_changed_image" swapped="no"/>
+            <signal name="changed" handler="on_changed_release" swapped="no"/>
             <style>
               <class name="flat"/>
             </style>
@@ -436,6 +436,12 @@
         <property name="page_type">summary</property>
         <property name="has_padding">False</property>
       </packing>
+    </child>
+    <child>
+      <placeholder/>
+    </child>
+    <child>
+      <placeholder/>
     </child>
     <child>
       <placeholder/>
