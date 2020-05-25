@@ -22,15 +22,14 @@
 [GtkTemplate (ui = "/com/github/marbetschar/tins/ui/AddContainerAssistant.glade")]
 public class Tins.AddContainerAssistant : Gtk.Assistant {
 
-    private static List<unowned string> all_os_keys;
+    private static GenericArray<string> operating_systems;
 
     static construct {
-        all_os_keys = Application.lxd_image_store.data.get_keys ();
-        all_os_keys.sort (strcmp);
+        operating_systems = Application.lxd_image_store.get_operating_systems ();
     }
 
     construct {
-        all_os_keys.@foreach ((os) => {
+        operating_systems.@foreach ((os) => {
             operating_system_combobox.append_text (_(os));
         });
         operating_system_combobox.active = 0;
@@ -43,7 +42,7 @@ public class Tins.AddContainerAssistant : Gtk.Assistant {
     private Gtk.ComboBoxText operating_system_combobox;
 
     [GtkChild]
-    private Gtk.ComboBoxText image_combobox;
+    private Gtk.ComboBoxText release_combobox;
 
     [GtkChild]
     private Gtk.CheckButton desktop_enabled_checkbutton;
@@ -80,40 +79,37 @@ public class Tins.AddContainerAssistant : Gtk.Assistant {
 
     [GtkCallback]
     private void on_changed_operating_system (Gtk.Widget source) {
-        image_combobox.remove_all ();
+        release_combobox.remove_all ();
 
-        var os_key = all_os_keys.nth_data (operating_system_combobox.active);
-        var os_images = Application.lxd_image_store.data.get (os_key);
+        var operating_system = operating_systems.get (operating_system_combobox.active);
+        var releases = Application.lxd_image_store.get_releases (operating_system);
 
-        if (os_images != null) {
-            for(var i = 0; i < os_images.length; i++) {
-                var os_image = os_images.get(i);
-                image_combobox.append_text (_(os_image.properties.release));
-            }
-            image_combobox.active = 0;
+        if (releases != null) {
+            releases.foreach ((release) => {
+                release_combobox.append_text (_(release));
+            });
+            release_combobox.active = 0;
         }
 
         validate_current_page ();
     }
 
     [GtkCallback]
-    private void on_changed_image (Gtk.Widget source) {
+    private void on_changed_release (Gtk.Widget source) {
         desktop_combobox.remove_all ();
-        desktop_combobox.append_text (_("other"));
+        desktop_combobox.append_text (_("custom"));
 
-        var os_key = all_os_keys.nth_data (operating_system_combobox.active);
-        var os_images = Application.lxd_image_store.data.get (os_key);
+        var operating_system = operating_systems.get (operating_system_combobox.active);
+        var releases = Application.lxd_image_store.get_releases (operating_system);
+        var release = releases.get (release_combobox.active);
 
-        if (os_images != null) {
-            var os_image = os_images.get (image_combobox.active < 0 ? 0 : image_combobox.active);
+        var variants = Application.lxd_image_store.get_variants (operating_system, release);
 
-            if (os_image.desktops != null) {
-                for(var i = 0; i < os_image.desktops.length; i++) {
-                    var desktop = os_image.desktops.get(i);
-                    desktop_combobox.append_text (_(desktop));
-                }
+        variants.foreach((variant) => {
+            if (variant != "cloud") {
+                desktop_combobox.append_text (_(variant));
             }
-        }
+        });
         desktop_combobox.active = 0;
 
         validate_current_page ();
@@ -139,15 +135,30 @@ public class Tins.AddContainerAssistant : Gtk.Assistant {
     private void on_apply (Gtk.Widget source) {
         set_current_page_complete (false);
 
-        var os_key = all_os_keys.nth_data (operating_system_combobox.active);
-        var all_os_images = Application.lxd_image_store.data.get (os_key);
-        var os_image = all_os_images.get (image_combobox.active);
+        var operating_system = operating_systems.get (operating_system_combobox.active);
+        var releases = Application.lxd_image_store.get_releases (operating_system);
+        var release = releases.get (release_combobox.active);
+
+        var variant = "cloud";
+        if (desktop_combobox.active > 0) {
+            var variants = Application.lxd_image_store.get_variants (operating_system, release);
+            variant = variants.get(desktop_combobox.active - 1);
+        }
+
+        var image_source = Application.lxd_image_store.get_image_source (
+            operating_system,
+            release,
+            variant,
+            "amd64"
+        );
+
+        debug (@"Setting up container for image source: $(image_source)");
 
         var instance_source = new LXD.Instance.Source ();
         instance_source.source_type = "image";
         instance_source.mode = "pull";
-        instance_source.server = Application.lxd_image_store.server;
-        instance_source.alias = @"$(os_image.properties.os)/$(os_image.properties.release)/$(os_image.properties.architecture)/$(os_image.properties.variant)";
+        instance_source.server = image_source.server;
+        instance_source.alias = @"$(image_source.os)/$(image_source.release)/$(image_source.architecture)/$(image_source.variant)";
 
         var instance = new LXD.Instance ();
         instance.source = instance_source;
@@ -163,18 +174,6 @@ public class Tins.AddContainerAssistant : Gtk.Assistant {
 
             if (desktop_enabled_checkbutton.active) {
                 instance_add_tins_profile (instance, "tins-x11");
-
-                if (os_image.desktops != null && desktop_combobox.active != 0) {
-                    var desktop_name = os_image.desktops.get(desktop_combobox.active - 1);
-                    var tins_desktop_profile_name = @"tins-x11-$(os_image.properties.os)-$(desktop_name)";
-
-                    try {
-                        instance_add_tins_profile (instance, tins_desktop_profile_name);
-
-                    } catch (Error e) {
-                        warning (e.message);
-                    }
-                }
             }
 
             var add_operation = Application.lxd_client.add_instance (instance);
@@ -266,7 +265,7 @@ public class Tins.AddContainerAssistant : Gtk.Assistant {
     }
 
     private void validate_current_page () {
-        if (name_entry.text == null || name_entry.text.strip () == "" || image_combobox.get_active_text () == null) {
+        if (name_entry.text == null || name_entry.text.strip () == "" || release_combobox.get_active_text () == null) {
             set_current_page_complete (false);
         } else {
             set_current_page_complete (true);

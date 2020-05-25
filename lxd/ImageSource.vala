@@ -19,30 +19,23 @@
 * Authored by: Marco Betschart <elementary-tins@marco.betschart.name>
 */
 
-public class LXD.Image : LXD.Object {
+public class LXD.ImageSource : LXD.Object {
 
-    public string fingerprint { get; construct set; }
-
-    public string filename { get; set; }
+    public string os { get; set; }
+    public string release { get; set; }
     public string architecture { get; set; }
-    public int size { get; set; }
+    public string variant { get; set; }
+    public string server { get; set; }
 
-    public Properties properties { get; set; }
-    public GenericArray<string> desktops { get; set; }
-
-    public class Properties : LXD.Object {
-        public string architecture { get; set; }
-        public string description { get; set; }
-        public string os { get; set; }
-        public string release { get; set; }
-        public string variant { get; set; }
+    public string to_string () {
+        return @"[os=$os, release=$release, variant=$variant, arch=$architecture, server=$server]";
     }
 
     /* --- Json.Serializable --- */
 
     public override void property_boxed_value_type_with_param_spec (ParamSpec pspec, out Type boxed_value_type, out bool boxed_in_array) {
         switch (pspec.name) {
-            case "desktops":
+            case "profiles":
                 boxed_value_type = typeof (string);
                 boxed_in_array = true;
                 break;

@@ -28,13 +28,9 @@
     <file compressed="true">lxd/image-store.json</file>
     <file compressed="true">lxd/profiles/tins-default.json</file>
     <file compressed="true">lxd/profiles/tins-x11.json</file>
-    <file compressed="true">lxd/profiles/tins-x11-ubuntu-gnome.json</file>
-    <file compressed="true">lxd/profiles/tins-x11-ubuntu-kde.json</file>
     <file compressed="true">lxd/instances/tins-x11.json</file>
     <file>lxd/cloud-configs/tins-default.yml</file>
     <file>lxd/cloud-configs/tins-x11.yml</file>
-    <file>lxd/cloud-configs/tins-x11-ubuntu-gnome.yml</file>
-    <file>lxd/cloud-configs/tins-x11-ubuntu-kde.yml</file>
   </gresource>
 </gresources>
 
