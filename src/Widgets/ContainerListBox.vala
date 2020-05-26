@@ -257,7 +257,7 @@ public class Tins.Widgets.ContainerListBox : Gtk.ListBox {
                     "-extension", "XTEST", "-tst",
                     "-dpms",
                     "-s", "off",
-                    "-auth", work_dir.get_path () + "Xauthority.server",
+                    "-auth", work_dir.get_path () + "/Xauthority.server",
                     "-nolisten", "tcp",
                     "-dpi", "96"
                 };
