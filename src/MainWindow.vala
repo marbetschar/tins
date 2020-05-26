@@ -69,7 +69,7 @@ public class Tins.MainWindow : Gtk.ApplicationWindow {
          */
         Timeout.add_seconds (3, () => {
             try {
-                list_box.instances = Application.lxd_client.get_instances ();
+                list_box.instances = Application.lxd_client.get_instances (true);
             } catch (Error e) {
                 critical (e.message);
             }

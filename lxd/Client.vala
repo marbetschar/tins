@@ -35,25 +35,25 @@ public class LXD.Client {
         this.version = version;
     }
 
-    public GenericArray<Instance> get_instances () throws Error {
-        var json = api_request ("GET", @"/$version/containers");
+    public GenericArray<Instance> get_instances (bool quiet = false) throws Error {
+        var json = api_request ("GET", @"/$version/containers", null, quiet);
         var list = json.get_array ();
         int i;
 
         var instances = new GLib.GenericArray<Instance> ();
         for (i = 0; i < list.get_length (); i++) {
-            instances.add (get_instance (list.get_string_element (i)));
+            instances.add (get_instance (list.get_string_element (i), quiet));
         }
 
         return instances;
     }
 
-    public LXD.Instance get_instance (string id_or_endpoint) throws Error {
+    public LXD.Instance get_instance (string id_or_endpoint, bool quiet = false) throws Error {
         var endpoint = id_or_endpoint;
         if (!endpoint.has_prefix (@"/$version/containers/")) {
             endpoint = @"/$version/containers/$id_or_endpoint";
         }
-        var node = api_request ("GET", endpoint);
+        var node = api_request ("GET", endpoint, null, quiet);
 
         return Json.gobject_deserialize (typeof (LXD.Instance), node) as LXD.Instance;
     }
@@ -237,21 +237,21 @@ public class LXD.Client {
         return Json.gobject_deserialize (typeof (LXD.Operation), node) as LXD.Operation;
     }
 
-    private Json.Node api_request (string method, string endpoint, string? data = null) throws Error {
+    private Json.Node api_request (string method, string endpoint, string? data = null, bool quiet = false) throws Error {
         int exit_code;
         string stdout;
         string stderr;
         File data_file;
 
         Process.spawn_command_line_sync (
-            curl_command_line (method, endpoint, data, out data_file),
+            curl_command_line (method, endpoint, data, out data_file, quiet),
             out stdout,
             out stderr,
             out exit_code
         );
 
         if (exit_code == 0 && stdout != null && stdout != "") {
-            debug (@"lxd-client: $stdout");
+            if (!quiet) { debug (@"lxd-client: $stdout"); }
 
             var parser = new Json.Parser ();
             parser.load_from_data (stdout, -1);
@@ -283,7 +283,7 @@ public class LXD.Client {
         throw new LXDClientError.CURL(stderr);
     }
 
-    private string curl_command_line (string method, string endpoint, string? data = null, out File? data_file = null) {
+    private string curl_command_line (string method, string endpoint, string? data = null, out File? data_file = null, bool quiet = false) {
         var args = "--silent --show-error --location --request " + method;
         if (method == "POST") {
             args += @" --header \"Content-Type: application/json\"";
@@ -310,10 +310,13 @@ public class LXD.Client {
             args += " --unix-socket /var/lib/lxd/unix.socket";
         }
         var command_line = @"curl $args \"$host$endpoint\"";
-        if (data == null) {
-            debug (@"lxd-client: $command_line");
-        } else {
-            debug (@"lxd-client: $command_line -- data: $data");
+
+        if (!quiet) {
+            if (data == null) {
+                debug (@"lxd-client: $command_line");
+            } else {
+                debug (@"lxd-client: $command_line -- data: $data");
+            }
         }
         return command_line;
     }

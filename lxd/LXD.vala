@@ -60,7 +60,7 @@ namespace LXD {
         HashTable<string,string> template,
         HashTable<string, string> vars = new HashTable<string, string> (str_hash, str_equal)
     ) {
-        if (template == null) {
+        if (template == null || vars == null) {
             return;
         }
         vars_set_well_known (vars);
@@ -78,7 +78,7 @@ namespace LXD {
         string template,
         HashTable<string, string> vars = new HashTable<string, string> (str_hash, str_equal)
     ) {
-        if (template == null) {
+        if (template == null || vars == null) {
             return template;
         }
         var new_template = template;

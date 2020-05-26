@@ -116,20 +116,22 @@ public class LXD.Instance : LXD.Object {
         var instance = Json.gobject_deserialize (typeof (LXD.Instance), json_parser.get_root ()) as LXD.Instance;
 
         if (instance != null) {
-            if (instance.config.get("user.user-data") != null) {
-                try {
-                    var user_data = LXD.read_file_from_uri (instance.config.get("user.user-data"));
-                    if (user_data != null) {
-                        instance.config.set("user.user-data", user_data);
-                    }
-
-                } catch (Error e) {
-                    warning (e.message);
-                }
-            }
-
             if (instance.config != null) {
-                LXD.apply_vars_to_hash_table (instance.config, template_vars);
+                if (instance.config.get("user.user-data") != null) {
+                    try {
+                        var user_data = LXD.read_file_from_uri (instance.config.get("user.user-data"));
+                        if (user_data != null) {
+                            instance.config.set("user.user-data", user_data);
+                        }
+
+                    } catch (Error e) {
+                        warning (e.message);
+                    }
+                }
+
+                if (template_vars != null) {
+                    LXD.apply_vars_to_hash_table (instance.config, template_vars);
+                }
             }
 
             if (instance.devices != null) {
@@ -137,7 +139,7 @@ public class LXD.Instance : LXD.Object {
                 device_names.foreach ((device_name) => {
                     var device = instance.devices.get (device_name);
 
-                    if (device != null) {
+                    if (device != null && template_vars != null) {
                         LXD.apply_vars_to_hash_table (device, template_vars);
                     }
                 });

@@ -20,7 +20,8 @@
 */
 
 errordomain TinsError {
-    X11
+    XSERVER,
+    COMPOSITOR
 }
 
 
@@ -163,35 +164,109 @@ public class Tins.Widgets.ContainerListBox : Gtk.ListBox {
             }
 
             if (instance.profiles.find_with_equal_func ("tins-x11", str_equal)) {
-                var x11_vars = new HashTable<string, string> (str_hash, str_equal);
-                x11_vars.set("$INSTANCE", instance.display_name);
+                var xenv_vars = new HashTable<string, string> (str_hash, str_equal);
+                xenv_vars.set("$INSTANCE", instance.display_name);
 
-                int x11_display;
+                int xenv_display_var;
                 try {
-                    x11_display = LXD.count_files_in_path ("/tmp/.X11-unix");
+                    xenv_display_var = LXD.count_files_in_path ("/tmp/.X11-unix");
                 } catch (Error e) {
                     warning (e.message);
-                    x11_display = Random.int_range(50,99);
+                    xenv_display_var = Random.int_range(50,99);
                 }
-                x11_vars.set("$DISPLAY", @"$x11_display");
+                xenv_vars.set("$DISPLAY", @"$xenv_display_var");
 
-                var xephyr_command_line = LXD.apply_vars_to_string (
-                """Xephyr :$DISPLAY \
-                        -resizeable \
-                        -glamor \
-                        -no-host-grab \
-                        -title 'Tins -- $INSTANCE' \
-                        -screen 1024x768 \
-                        -br \
-                        -terminate \
-                        -noreset \
-                        +extension GLX \
-                        +extension RANDR \
-                        +extension RENDER"""
-                , x11_vars);
+                var home_dir_path = Environ.get_variable (Environ.@get (), "HOME");
+                var work_dir_path = home_dir_path + LXD.apply_vars_to_string ("/.cache/com.github.marbetschar.tins/$INSTANCE", xenv_vars);
 
-                debug (xephyr_command_line);
-                Process.spawn_command_line_async (xephyr_command_line);
+                var work_dir = File.new_for_path (work_dir_path);
+                if (!work_dir.query_exists ()) {
+                    work_dir.make_directory_with_parents ();
+                }
+
+                var work_share_dir = File.new_for_path (work_dir.get_path () + "/share");
+                if (!work_share_dir.query_exists ()) {
+                    work_share_dir.make_directory_with_parents ();
+                }
+
+                string[] xenvp = {};
+                xenvp = Environ.set_variable (xenvp, "DISPLAY", LXD.apply_vars_to_string (":$DISPLAY", xenv_vars), true);
+                xenvp = Environ.set_variable (xenvp, "XAUTHORITY", Environ.get_variable (Environ.@get (), "XAUTHORITY"), true);
+                xenvp = Environ.set_variable (xenvp, "XSOCKET", LXD.apply_vars_to_string ("/tmp/.X11-unix/X$DISPLAY", xenv_vars), true);
+                xenvp = Environ.set_variable (xenvp, "WAYLAND_DISPLAY", LXD.apply_vars_to_string ("wayland-$DISPLAY", xenv_vars), true);
+                xenvp = Environ.set_variable (xenvp, "XDG_RUNTIME_DIR", LXD.apply_vars_to_string ("/run/user/$UID", xenv_vars), true);
+
+                var compositor_config_file = File.new_for_path (work_dir_path + "/weston.ini");
+
+                string[] compositor_config = {
+                    "[core]",
+                    "shell=desktop-shell.so",
+                    "backend=x11-backend.so",
+                    "xwayland=false",
+                    "idle-time=0",
+                    "",
+                    "[xwayland]",
+                    "path=/usr/bin/Xwayland",
+                    "",
+                    "[shell]",
+                    "panel-location=none",
+                    "panel-position=none",
+                    "locking=false",
+                    "background-color=0xff002244",
+                    "animation=fade",
+                    "startup-animation=fade",
+                    "",
+                    "[keyboard]",
+                    "",
+                    "[output]",
+                    LXD.apply_vars_to_string ("name=X$DISPLAY", xenv_vars),
+                    "mode=1024x768",
+                    "scale=1",
+                    "transform=normal"
+                };
+
+                if (compositor_config_file.query_exists ()) {
+                    compositor_config_file.@delete ();
+                }
+
+                var compositor_config_file_stream = compositor_config_file.create (FileCreateFlags.REPLACE_DESTINATION, null);
+                var compositor_config_data_stream = new DataOutputStream (compositor_config_file_stream);
+                compositor_config_data_stream.put_string (string.joinv ("\n", compositor_config) + "\n");
+
+                string[] compositor_argv = {
+                    "/usr/bin/weston",
+                    LXD.apply_vars_to_string ("--socket=wayland-$DISPLAY", xenv_vars),
+                    @"--config=$(compositor_config_file.get_path())"
+                };
+
+                string[] xserver_argv = {
+                    "/usr/bin/Xwayland",
+                    LXD.apply_vars_to_string (":$DISPLAY", xenv_vars),
+                    "-retro",
+                    "+extension", "RANDR",
+                    "+extension", "RENDER",
+                    "+extension", "GLX",
+                    "+extension", "XVideo",
+                    "+extension", "DOUBLE-BUFFER",
+                    "+extension", "SECURITY",
+                    "+extension", "DAMAGE",
+                    "+extension", "X-Resource",
+                    "-extension", "XINERAMA", "-xinerama",
+                    "-extension", "MIT-SHM",
+                    "+extension", "Composite",
+                    "-extension", "XTEST", "-tst",
+                    "-dpms",
+                    "-s", "off",
+                    "-auth", work_dir.get_path () + "Xauthority.server",
+                    "-nolisten", "tcp",
+                    "-dpi", "96"
+                };
+
+                debug (LXD.apply_vars_to_string("Environment [DISPLAY=:$DISPLAY, WAYLAND_DISPLAY=wayland-$DISPLAY]:\n\t", xenv_vars) +
+                    string.joinv("\n\t", xenvp)
+                );
+
+                var process_spawn_flags = SpawnFlags.SEARCH_PATH_FROM_ENVP;
 
                 var stop_operation = Application.lxd_client.stop_instance (instance.name);
                 try {
@@ -200,9 +275,41 @@ public class Tins.Widgets.ContainerListBox : Gtk.ListBox {
                     warning (e.message);
                 }
 
-                var template = LXD.Instance.new_from_template_uri ("resource:///com/github/marbetschar/tins/lxd/instances/tins-x11.json", x11_vars);
+                var template = LXD.Instance.new_from_template_uri ("resource:///com/github/marbetschar/tins/lxd/instances/tins-x11.json", xenv_vars);
                 template.name = instance.name;
                 Application.lxd_client.update_instance (template);
+
+                debug (LXD.apply_vars_to_string("Starting Compositor [WAYLAND_DISPLAY=wayland-$DISPLAY]:\n\t",xenv_vars) +
+                    string.joinv("\n\t", compositor_argv)
+                );
+
+                Pid compositor_pid;
+                Process.spawn_async (work_dir.get_path (), compositor_argv, xenvp, process_spawn_flags, null, out compositor_pid);
+                // ChildWatch.add (compositor_pid, (pid, status) => {
+                //     Process.close_pid (pid);
+                //     try {
+                //         Process.check_exit_status (status);
+                //         debug (LXD.apply_vars_to_string("Closed Compositor [WAYLAND_DISPLAY=wayland-$DISPLAY].", xenv_vars));
+                //     } catch (Error e) {
+                //         critical (LXD.apply_vars_to_string("Error Compositor [WAYLAND_DISPLAY=wayland-$DISPLAY]:", xenv_vars) + e.message);
+                //     }
+                // });
+
+                debug (LXD.apply_vars_to_string("Starting X server [DISPLAY=:$DISPLAY]:\n\t", xenv_vars) +
+                    string.joinv("\n\t", xserver_argv)
+                );
+
+                Pid xserver_pid;
+                Process.spawn_async (work_dir.get_path (), xserver_argv, xenvp, process_spawn_flags, null, out xserver_pid);
+                // ChildWatch.add (xserver_pid, (pid, status) => {
+                //     Process.close_pid (pid);
+                //     try {
+                //         Process.check_exit_status (status);
+                //         debug (LXD.apply_vars_to_string("Closed X server [DISPLAY=:$DISPLAY].", xenv_vars));
+                //     } catch (Error e) {
+                //         critical (LXD.apply_vars_to_string("Error X server [DISPLAY=:$DISPLAY]:", xenv_vars) + e.message);
+                //     }
+                // });
 
                 var start_operation = Application.lxd_client.start_instance (instance.name);
                 try {
@@ -210,26 +317,6 @@ public class Tins.Widgets.ContainerListBox : Gtk.ListBox {
                 } catch (Error e) {
                     warning (e.message);
                 }
-
-                string stdout;
-                string stderr;
-                int exit_status = 0;
-
-                // TODO: Run this command via REST API
-                try {
-                    Process.spawn_command_line_sync (
-                        "lxc exec $(instance.name) -- systemctl restart display-manager",
-                        out stdout,
-                        out stderr,
-                        out exit_status
-                    );
-                } catch (Error e) {
-                    warning (e.message);
-                }
-
-                // if (exit_status != 0) {
-                //     throw new TinsError.X11 ("%s %s".printf (stderr, stdout));
-                // }
 
                 // make sure we don't open any terminal if we get here
                 // so jump out of the function
