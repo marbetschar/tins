@@ -298,11 +298,20 @@ public class Tins.AddContainerAssistant : Gtk.Assistant {
         if (profile != null && profile.name != null) {
             instance.profiles.add (profile.name);
 
-            if (profile.config != null && profile.config.get("user.user-data") != null) {
-                if (instance.config.get("user.user-data") == null) {
-                    instance.config.set("user.user-data", profile.config.get("user.user-data"));
-                } else {
-                    instance.config.set("user.user-data", instance.config.get("user.user-data") + "\n" + profile.config.get("user.user-data"));
+            if (profile.config != null) {
+                profile.config.for_each ((key, val) => {
+                    if (key == "user.user-data") {
+                        return;
+                    }
+                    instance.config.set (key, val);
+                });
+
+                if (profile.config.get("user.user-data") != null) {
+                    if (instance.config.get("user.user-data") == null) {
+                        instance.config.set("user.user-data", profile.config.get("user.user-data"));
+                    } else {
+                        instance.config.set("user.user-data", instance.config.get("user.user-data") + "\n" + profile.config.get("user.user-data"));
+                    }
                 }
             }
         }
