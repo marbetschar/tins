@@ -121,6 +121,8 @@ public class Tins.Widgets.ContainerListBox : Gtk.ListBox {
                 }
 
             } catch (Error e) {
+                critical (e.message);
+
                 var error_dialog = new Granite.MessageDialog.with_image_from_icon_name (
                     _("Error"),
                     _(e.message),
@@ -138,6 +140,8 @@ public class Tins.Widgets.ContainerListBox : Gtk.ListBox {
                     open_instance.end (res);
 
                 } catch (Error e) {
+                    critical (e.message);
+
                     var error_dialog = new Granite.MessageDialog.with_image_from_icon_name (
                         _("Error"),
                         _(e.message),
@@ -200,11 +204,6 @@ public class Tins.Widgets.ContainerListBox : Gtk.ListBox {
                     work_dir.make_directory_with_parents ();
                 }
 
-                var work_share_dir = File.new_for_path (work_dir.get_path () + "/share");
-                if (!work_share_dir.query_exists ()) {
-                    work_share_dir.make_directory_with_parents ();
-                }
-
                 var compositor_config_file = File.new_for_path (work_dir_path + "/weston.ini");
                 string[] compositor_config = {
                     "[core]",
@@ -257,6 +256,7 @@ public class Tins.Widgets.ContainerListBox : Gtk.ListBox {
                     "-extension", "XTEST", "-tst",
                     "-dpms",
                     "-s", "off",
+                    "-auth", work_dir.get_path () + "/Xauthority.server",
                     "-nolisten", "tcp",
                     "-dpi", "96"
                 };
@@ -296,7 +296,6 @@ public class Tins.Widgets.ContainerListBox : Gtk.ListBox {
                 //     }
                 // });
 
-
                 var stop_operation = Application.lxd_client.stop_instance (instance.name);
                 try {
                     Application.lxd_client.wait_operation (stop_operation.id);
@@ -317,6 +316,8 @@ public class Tins.Widgets.ContainerListBox : Gtk.ListBox {
                 } catch (Error e) {
                     warning (e.message);
                 }
+
+
 
                 // make sure we don't open any terminal if we get here
                 // so jump out of the function

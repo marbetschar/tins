@@ -2,10 +2,17 @@
 groups:
   - sudo
   - wheel
+  - $USER
+  - lxd
 users:
   - name: $USER
-    groups: [sudo,wheel]
+    primary_group: $USER
+    groups: [sudo,wheel,lxd]
     sudo: ALL=(ALL) NOPASSWD:ALL
+  - name: lxd
+    primary_group: lxd
+    inactive: true
+    system: true
 packages:
   - sudo
 runcmd:

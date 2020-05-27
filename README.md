@@ -22,11 +22,14 @@ In case you want to learn more about LXD, there is a pretty good documentation o
 Tins will be available in elementary AppCenter soon!
 
 **PLEASE NOTE:** Until [issue #7](https://github.com/marbetschar/tins/issues/7) is fixed, Tins expects LXD to be initialized on the host system.
-To do so, please execute the following command in your terminal:
+To do so, please execute the following commands in your terminal:
 
 ```
 # use default values everywhere:
 lxd init
+
+# allow lxd to remap your user id into a container:
+echo "root:$UID:1" | sudo tee -a /etc/subuid /etc/subgid
 ```
 
 ## Building
