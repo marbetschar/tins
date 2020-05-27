@@ -114,13 +114,16 @@ namespace LXD {
         return null;
     }
 
-    public int count_files_in_path (string path) throws Error {
+    public int count_files_in_path (string path, string regex_pattern = ".*") throws Error {
+        var regex = new Regex (regex_pattern);
         Dir dir = Dir.open (path);
         string? name = null;
 
         int i = 0;
         while ((name = dir.read_name ()) != null) {
-            i++;
+            if (regex.match (name)) {
+                i++;
+            }
         }
         return i;
     }
