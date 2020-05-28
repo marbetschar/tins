@@ -19,6 +19,11 @@
       "path": "/tmp/.X11-unix/X$DISPLAY",
       "source": "/tmp/.X11-unix/X$DISPLAY",
       "type": "disk"
+    },
+    "Xauthority": {
+      "path": "/home/$USER/.Xauthority",
+      "source": "$XAUTHORITY",
+      "type": "disk"
     }
   }
 }

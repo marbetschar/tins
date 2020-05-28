@@ -196,7 +196,7 @@ public class Tins.Widgets.ContainerListBox : Gtk.ListBox {
                     work_dir.make_directory_with_parents ();
                 }
 
-                //var xauth_cookie_file = File.new_for_path (home_dir_path + "/.Xauthority");
+                var xauth_cookie_file = File.new_for_path (home_dir_path + "/.Xauthority");
 
                 /*// Create X auth cookie for secure authentication:
                 string mcookie_stdout, mcookie_stderr;
@@ -244,6 +244,7 @@ public class Tins.Widgets.ContainerListBox : Gtk.ListBox {
 
                 var instance_xenv_vars = new HashTable<string, string> (str_hash, str_equal);
                 instance_xenv_vars.set("$DISPLAY", @"$host_xserver_envp_display_number");
+                instance_xenv_vars.set("$XAUTHORITY", xauth_cookie_file.get_path ());
 
                 var host_compositor_config_file = File.new_for_path (work_dir_path + "/weston.ini");
                 string[] host_compositor_config = {
@@ -297,7 +298,7 @@ public class Tins.Widgets.ContainerListBox : Gtk.ListBox {
                     "-extension", "XTEST", "-tst",
                     "-dpms",
                     "-s", "off",
-                    //"-auth", xauth_cookie_file.get_path (),
+                    "-auth", xauth_cookie_file.get_path (),
                     "-nolisten", "tcp",
                     "-dpi", "96"
                 };
@@ -343,8 +344,6 @@ public class Tins.Widgets.ContainerListBox : Gtk.ListBox {
                 } catch (Error e) {
                     warning (e.message);
                 }
-
-                //template_xenv_vars.set("$XAUTHORITY", xauth_cookie_file.get_path ());
 
                 var template = LXD.Instance.new_from_template_uri ("resource:///com/github/marbetschar/tins/lxd/instances/tins-x11.json", instance_xenv_vars);
                 template.name = instance.name;
