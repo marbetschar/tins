@@ -293,7 +293,7 @@ public class Tins.Widgets.ContainerListBox : Gtk.ListBox {
                     "+extension", "DAMAGE",
                     "+extension", "X-Resource",
                     "-extension", "XINERAMA", "-xinerama",
-                    "-extension", "MIT-SHM",
+                    "+extension", "MIT-SHM",
                     "+extension", "Composite",
                     "-extension", "XTEST", "-tst",
                     "-dpms",
@@ -357,7 +357,9 @@ public class Tins.Widgets.ContainerListBox : Gtk.ListBox {
                 }
 
                 var instance_x11_profile_file_content = LXD.read_template_from_uri ("resource:///com/github/marbetschar/tins/lxd/instances/tins-x11-profile.sh", instance_xenv_vars);
-                Application.lxd_client.upload_file_instance (instance.name, "/etc/profile.d/99-tins-x11-profile.sh", instance_x11_profile_file_content);
+                Application.lxd_client.upload_file_content_instance (instance.name, "/etc/profile.d/99-tins-x11-profile.sh", instance_x11_profile_file_content);
+
+                Application.lxd_client.upload_file_instance (instance.name, LXD.apply_vars_to_string ("/home/$USER/.Xauthority", instance_xenv_vars), xauth_cookie_file);
 
                 // make sure we don't open any terminal if we get here
                 // so jump out of the function

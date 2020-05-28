@@ -175,9 +175,14 @@ public class LXD.Client {
         return Json.gobject_deserialize (typeof (LXD.Operation), node) as LXD.Operation;
     }
 
-    public void upload_file_instance (string id, string instance_path, string file_content) throws Error {
+    public void upload_file_content_instance (string id, string instance_path, string file_content) throws Error {
         var endpoint = @"/$version/containers/$id/files?path=$instance_path";
         api_request ("POST", endpoint, file_content);
+    }
+
+    public void upload_file_instance (string id, string instance_path, File file) throws Error {
+        var endpoint = @"/$version/containers/$id/files?path=$instance_path";
+        api_request ("POST", endpoint, "@" + file.get_path ());
     }
 
     public Operation get_operation (string id_or_endpoint) throws Error {
@@ -308,7 +313,12 @@ public class LXD.Client {
                 out_stream.put_string (data);
 
                 if (method == "POST" && endpoint.contains("/files")) {
-                    args += " --data-binary @" + data_file.get_path ();
+                    if (data.has_prefix("@")) {
+                        args += " --data-binary " + data;
+                    } else {
+                        args += " --data-binary @" + data_file.get_path ();
+                    }
+
                 } else {
                     args += " --data @" + data_file.get_path ();
                 }
