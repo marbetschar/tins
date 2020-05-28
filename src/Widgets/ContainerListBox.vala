@@ -196,12 +196,9 @@ public class Tins.Widgets.ContainerListBox : Gtk.ListBox {
                     work_dir.make_directory_with_parents ();
                 }
 
-                var xauth_file = File.new_for_path (work_dir.get_path () + "/Xauthority");
-                if (xauth_file.query_exists ()) {
-                    xauth_file.@delete ();
-                }
+                var xauth_cookie_file = File.new_for_path (home_dir_path + "/.Xauthority");
 
-                // Create X auth cookie for secure authentication:
+                /*// Create X auth cookie for secure authentication:
                 string mcookie_stdout, mcookie_stderr;
                 int mcookie_exit_status;
 
@@ -228,7 +225,7 @@ public class Tins.Widgets.ContainerListBox : Gtk.ListBox {
 
                 if (xauth_exit_status != 0) {
                     throw new TinsError.XAUTH (xauth_stderr + "\n" + _("Command failed:") + " " + xauth_command_line);
-                }
+                }*/
 
                 string[] xserver_envp = {};
                 xserver_envp = Environ.set_variable (xserver_envp, "DISPLAY", @":$xserver_envp_display_number", true);
@@ -292,7 +289,7 @@ public class Tins.Widgets.ContainerListBox : Gtk.ListBox {
                     "-extension", "XTEST", "-tst",
                     "-dpms",
                     "-s", "off",
-                    "-auth", xauth_file.get_path (),
+                    //"-auth", xauth_cookie_file.get_path (),
                     "-nolisten", "tcp",
                     "-dpi", "96"
                 };
@@ -341,7 +338,7 @@ public class Tins.Widgets.ContainerListBox : Gtk.ListBox {
 
                 var template_xenv_vars = new HashTable<string, string> (str_hash, str_equal);
                 template_xenv_vars.set("$DISPLAY", @"$xserver_envp_display_number");
-                template_xenv_vars.set("$XAUTHORITY", xauth_file.get_path ());
+                template_xenv_vars.set("$XAUTHORITY", xauth_cookie_file.get_path ());
 
                 var template = LXD.Instance.new_from_template_uri ("resource:///com/github/marbetschar/tins/lxd/instances/tins-x11.json", template_xenv_vars);
                 template.name = instance.name;
