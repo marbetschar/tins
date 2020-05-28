@@ -1,7 +1,16 @@
 #cloud-config tins-x11 extends tins-default
+# IMPORTANT: already existing configuration
+# sections of tins-default are overwritten
+# by the ones present in this file. To
+# ensure everything works correctly, make sure
+# to add the needed lines here as well.
 packages:
+  - sudo
   - x11-apps
   - mesa-utils
   - pulseaudio
 runcmd:
+  - usermod --uid $UID $USER
+  - groupmod --gid $GID $USER
+  - usermod --gid $GID $USER
   - sed -i "s/; enable-shm = yes/enable-shm = no/g" /etc/pulse/client.conf

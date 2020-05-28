@@ -319,7 +319,7 @@
             <property name="halign">start</property>
             <property name="valign">center</property>
             <property name="margin_right">12</property>
-            <property name="label" translatable="yes">Stay tuned, your new container will be ready soon. In case you are installing a Desktop Environment, this process can take a few minutes:</property>
+            <property name="label" translatable="yes">Stay tuned, your new container will be ready soon. In case you are installing a Desktop Environment, this process can take a while:</property>
             <property name="wrap">True</property>
             <property name="max_width_chars">50</property>
           </object>
@@ -436,6 +436,9 @@
         <property name="page_type">summary</property>
         <property name="has_padding">False</property>
       </packing>
+    </child>
+    <child>
+      <placeholder/>
     </child>
     <child>
       <placeholder/>
