@@ -196,9 +196,9 @@ public class Tins.Widgets.ContainerListBox : Gtk.ListBox {
                     work_dir.make_directory_with_parents ();
                 }
 
-                var xauth_cookie_file = File.new_for_path (home_dir_path + "/.Xauthority");
+                var xauth_cookie_file = File.new_for_path (work_dir_path + "/.Xauthority");
 
-                /*// Create X auth cookie for secure authentication:
+                // Create X auth cookie for secure authentication:
                 string mcookie_stdout, mcookie_stderr;
                 int mcookie_exit_status;
 
@@ -213,7 +213,7 @@ public class Tins.Widgets.ContainerListBox : Gtk.ListBox {
                     throw new TinsError.MCOOKIE (mcookie_stderr);
                 }
 
-                string xauth_command_line = @"xauth -v -i -f '$(xauth_file.get_path())' add :$xserver_envp_display_number . '$mcookie_stdout'";
+                string xauth_command_line = @"xauth -v -i -f '$(xauth_cookie_file.get_path())' add :$host_xserver_envp_display_number . '$mcookie_stdout'";
                 string xauth_stdout, xauth_stderr;
                 int xauth_exit_status;
                 Process.spawn_command_line_sync (
@@ -225,7 +225,7 @@ public class Tins.Widgets.ContainerListBox : Gtk.ListBox {
 
                 if (xauth_exit_status != 0) {
                     throw new TinsError.XAUTH (xauth_stderr + "\n" + _("Command failed:") + " " + xauth_command_line);
-                }*/
+                }
 
                 string[] host_xserver_envp = {};
                 host_xserver_envp = Environ.set_variable (host_xserver_envp, "DISPLAY", @":$host_xserver_envp_display_number", true);
