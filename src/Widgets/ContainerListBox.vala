@@ -172,20 +172,20 @@ public class Tins.Widgets.ContainerListBox : Gtk.ListBox {
             if (instance.profiles.find_with_equal_func ("tins-x11", str_equal)) {
                 string[] host_envp = Environ.@get ();
 
-                int xserver_envp_display_number;
+                int host_xserver_envp_display_number;
                 try {
-                    xserver_envp_display_number = LXD.count_files_in_path ("/tmp/.X11-unix", "X[0-9]+");
+                    host_xserver_envp_display_number = LXD.count_files_in_path ("/tmp/.X11-unix", "X[0-9]+");
                 } catch (Error e) {
                     warning (e.message);
-                    xserver_envp_display_number = Random.int_range(50,99);
+                    host_xserver_envp_display_number = Random.int_range(50,99);
                 }
 
-                int compositor_envp_display_number;
+                int host_compositor_envp_display_number;
                 try {
-                    compositor_envp_display_number = LXD.count_files_in_path (Environ.get_variable (host_envp, "XDG_RUNTIME_DIR"), "wayland-[0-9]+");
+                    host_compositor_envp_display_number = LXD.count_files_in_path (Environ.get_variable (host_envp, "XDG_RUNTIME_DIR"), "wayland-[0-9]+");
                 } catch (Error e) {
                     warning (e.message);
-                    compositor_envp_display_number = Random.int_range(50,99);
+                    host_compositor_envp_display_number = Random.int_range(50,99);
                 }
 
                 var home_dir_path = Environ.get_variable (host_envp, "HOME");
@@ -196,7 +196,7 @@ public class Tins.Widgets.ContainerListBox : Gtk.ListBox {
                     work_dir.make_directory_with_parents ();
                 }
 
-                var xauth_cookie_file = File.new_for_path (home_dir_path + "/.Xauthority");
+                //var xauth_cookie_file = File.new_for_path (home_dir_path + "/.Xauthority");
 
                 /*// Create X auth cookie for secure authentication:
                 string mcookie_stdout, mcookie_stderr;
@@ -227,18 +227,26 @@ public class Tins.Widgets.ContainerListBox : Gtk.ListBox {
                     throw new TinsError.XAUTH (xauth_stderr + "\n" + _("Command failed:") + " " + xauth_command_line);
                 }*/
 
-                string[] xserver_envp = {};
-                xserver_envp = Environ.set_variable (xserver_envp, "DISPLAY", @":$xserver_envp_display_number", true);
-                xserver_envp = Environ.set_variable (xserver_envp, "WAYLAND_DISPLAY", @"wayland-$compositor_envp_display_number", true);
-                xserver_envp = Environ.set_variable (xserver_envp, "XDG_RUNTIME_DIR", Environ.get_variable (host_envp, "XDG_RUNTIME_DIR"), true);
+                string[] host_xserver_envp = {};
+                host_xserver_envp = Environ.set_variable (host_xserver_envp, "DISPLAY", @":$host_xserver_envp_display_number", true);
+                host_xserver_envp = Environ.set_variable (host_xserver_envp, "WAYLAND_DISPLAY", @"wayland-$host_compositor_envp_display_number", true);
+                host_xserver_envp = Environ.set_variable (host_xserver_envp, "XDG_RUNTIME_DIR", Environ.get_variable (host_envp, "XDG_RUNTIME_DIR"), true);
 
-                string[] compositor_envp = {};
-                compositor_envp = Environ.set_variable (compositor_envp, "DISPLAY", Environ.get_variable (host_envp, "DISPLAY"), true);
-                compositor_envp = Environ.set_variable (compositor_envp, "WAYLAND_DISPLAY", @"wayland-$compositor_envp_display_number", true);
-                compositor_envp = Environ.set_variable (compositor_envp, "XDG_RUNTIME_DIR", Environ.get_variable (host_envp, "XDG_RUNTIME_DIR"), true);
+                string[] host_compositor_envp = {};
+                host_compositor_envp = Environ.set_variable (host_compositor_envp, "DISPLAY", Environ.get_variable (host_envp, "DISPLAY"), true);
+                host_compositor_envp = Environ.set_variable (host_compositor_envp, "WAYLAND_DISPLAY", @"wayland-$host_compositor_envp_display_number", true);
+                host_compositor_envp = Environ.set_variable (host_compositor_envp, "XDG_RUNTIME_DIR", Environ.get_variable (host_envp, "XDG_RUNTIME_DIR"), true);
 
-                var compositor_config_file = File.new_for_path (work_dir_path + "/weston.ini");
-                string[] compositor_config = {
+                // We need to set the user environment variables
+                // manually, because they don't survive init
+                // when we set them using LXD's config.environment.XYZ
+                // @see: https://github.com/lxc/lxd/issues/910#issuecomment-125870419
+
+                var instance_xenv_vars = new HashTable<string, string> (str_hash, str_equal);
+                instance_xenv_vars.set("$DISPLAY", @"$host_xserver_envp_display_number");
+
+                var host_compositor_config_file = File.new_for_path (work_dir_path + "/weston.ini");
+                string[] host_compositor_config = {
                     "[core]",
                     "shell=desktop-shell.so",
                     "backend=x11-backend.so",
@@ -253,27 +261,27 @@ public class Tins.Widgets.ContainerListBox : Gtk.ListBox {
                     "startup-animation=fade",
                     "",
                     "[output]",
-                    @"name=X$xserver_envp_display_number",
+                    @"name=X$host_xserver_envp_display_number",
                     "mode=1024x768"
                 };
 
-                if (compositor_config_file.query_exists ()) {
-                    compositor_config_file.@delete ();
+                if (host_compositor_config_file.query_exists ()) {
+                    host_compositor_config_file.@delete ();
                 }
 
-                var compositor_config_file_stream = compositor_config_file.create (FileCreateFlags.REPLACE_DESTINATION, null);
-                var compositor_config_data_stream = new DataOutputStream (compositor_config_file_stream);
-                compositor_config_data_stream.put_string (string.joinv ("\n", compositor_config) + "\n");
+                var host_compositor_config_file_stream = host_compositor_config_file.create (FileCreateFlags.REPLACE_DESTINATION, null);
+                var host_compositor_config_data_stream = new DataOutputStream (host_compositor_config_file_stream);
+                host_compositor_config_data_stream.put_string (string.joinv ("\n", host_compositor_config) + "\n");
 
-                string[] compositor_argv = {
+                string[] host_compositor_argv = {
                     "/usr/bin/weston",
-                    @"--socket=wayland-$compositor_envp_display_number",
-                    @"--config=$(compositor_config_file.get_path())"
+                    @"--socket=wayland-$host_compositor_envp_display_number",
+                    @"--config=$(host_compositor_config_file.get_path())"
                 };
 
-                string[] xserver_argv = {
+                string[] host_xserver_argv = {
                     "/usr/bin/Xwayland",
-                    Environ.get_variable (xserver_envp, "DISPLAY"),
+                    Environ.get_variable (host_xserver_envp, "DISPLAY"),
                     "-retro",
                     "+extension", "RANDR",
                     "+extension", "RENDER",
@@ -294,13 +302,13 @@ public class Tins.Widgets.ContainerListBox : Gtk.ListBox {
                     "-dpi", "96"
                 };
 
-                var process_spawn_flags = SpawnFlags.SEARCH_PATH_FROM_ENVP;
+                var host_process_spawn_flags = SpawnFlags.SEARCH_PATH_FROM_ENVP;
 
-                debug ("Environment Compositor:\n\t" + string.joinv("\n\t", compositor_envp));
-                debug (@"Starting Compositor [$(Environ.get_variable (compositor_envp, "WAYLAND_DISPLAY"))]:\n\t" + string.joinv("\n\t", compositor_argv));
+                debug ("Environment Compositor:\n\t" + string.joinv("\n\t", host_compositor_envp));
+                debug (@"Starting Compositor [$(Environ.get_variable (host_compositor_envp, "WAYLAND_DISPLAY"))]:\n\t" + string.joinv("\n\t", host_compositor_argv));
 
-                Pid compositor_pid;
-                Process.spawn_async (work_dir.get_path (), compositor_argv, compositor_envp, process_spawn_flags, null, out compositor_pid);
+                Pid host_compositor_pid;
+                Process.spawn_async (work_dir.get_path (), host_compositor_argv, host_compositor_envp, host_process_spawn_flags, null, out host_compositor_pid);
                 // ChildWatch.add (compositor_pid, (pid, status) => {
                 //     Process.close_pid (pid);
                 //     try {
@@ -314,11 +322,11 @@ public class Tins.Widgets.ContainerListBox : Gtk.ListBox {
                 // TODO: We need to use something better than just sleep here.
                 Thread.usleep (1000000);
 
-                debug ("Environment X server:\n\t" + string.joinv("\n\t", xserver_envp));
-                debug (@"Starting X server [$(Environ.get_variable (xserver_envp, "DISPLAY"))]:\n\t" + string.joinv("\n\t", xserver_argv));
+                debug ("Environment X server:\n\t" + string.joinv("\n\t", host_xserver_envp));
+                debug (@"Starting X server [$(Environ.get_variable (host_xserver_envp, "DISPLAY"))]:\n\t" + string.joinv("\n\t", host_xserver_argv));
 
-                Pid xserver_pid;
-                Process.spawn_async (work_dir.get_path (), xserver_argv, xserver_envp, process_spawn_flags, null, out xserver_pid);
+                Pid host_xserver_pid;
+                Process.spawn_async (work_dir.get_path (), host_xserver_argv, host_xserver_envp, host_process_spawn_flags, null, out host_xserver_pid);
                 // ChildWatch.add (xserver_pid, (pid, status) => {
                 //     Process.close_pid (pid);
                 //     try {
@@ -336,11 +344,9 @@ public class Tins.Widgets.ContainerListBox : Gtk.ListBox {
                     warning (e.message);
                 }
 
-                var template_xenv_vars = new HashTable<string, string> (str_hash, str_equal);
-                template_xenv_vars.set("$DISPLAY", @"$xserver_envp_display_number");
-                template_xenv_vars.set("$XAUTHORITY", xauth_cookie_file.get_path ());
+                //template_xenv_vars.set("$XAUTHORITY", xauth_cookie_file.get_path ());
 
-                var template = LXD.Instance.new_from_template_uri ("resource:///com/github/marbetschar/tins/lxd/instances/tins-x11.json", template_xenv_vars);
+                var template = LXD.Instance.new_from_template_uri ("resource:///com/github/marbetschar/tins/lxd/instances/tins-x11.json", instance_xenv_vars);
                 template.name = instance.name;
                 Application.lxd_client.update_instance (template);
 
@@ -350,6 +356,9 @@ public class Tins.Widgets.ContainerListBox : Gtk.ListBox {
                 } catch (Error e) {
                     warning (e.message);
                 }
+
+                var instance_x11_profile_file_content = LXD.read_template_from_uri ("resource:///com/github/marbetschar/tins/lxd/instances/tins-x11-profile.sh", instance_xenv_vars);
+                Application.lxd_client.upload_file_instance (instance.name, "/etc/profile.d/99-tins-x11-profile.sh", instance_x11_profile_file_content);
 
                 // make sure we don't open any terminal if we get here
                 // so jump out of the function

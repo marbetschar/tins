@@ -114,6 +114,10 @@ namespace LXD {
         return null;
     }
 
+    public string? read_template_from_uri (string uri, HashTable<string, string> template_vars = new HashTable<string, string> (str_hash, str_equal)) throws Error {
+        return apply_vars_to_string (read_file_from_uri (uri), template_vars);
+    }
+
     public int count_files_in_path (string path, string regex_pattern = ".*") throws Error {
         var regex = new Regex (regex_pattern);
         Dir dir = Dir.open (path);

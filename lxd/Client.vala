@@ -175,6 +175,11 @@ public class LXD.Client {
         return Json.gobject_deserialize (typeof (LXD.Operation), node) as LXD.Operation;
     }
 
+    public void upload_file_instance (string id, string instance_path, string file_content) throws Error {
+        var endpoint = @"/$version/containers/$id/files?path=$instance_path";
+        api_request ("POST", endpoint, file_content);
+    }
+
     public Operation get_operation (string id_or_endpoint) throws Error {
         var endpoint = id_or_endpoint;
         if (!endpoint.has_prefix (@"/$version/operations/")) {
@@ -286,7 +291,13 @@ public class LXD.Client {
     private string curl_command_line (string method, string endpoint, string? data = null, out File? data_file = null, bool quiet = false) {
         var args = "--silent --show-error --location --request " + method;
         if (method == "POST") {
-            args += @" --header \"Content-Type: application/json\"";
+            if (endpoint.contains("/files")) {
+                args += @" --header \"Content-Type: multipart/form-data\"";
+                args += @" --header \"X-LXD-type: file\"";
+                args += @" --header \"X-LXD-mode: 0644\"";
+            } else {
+                args += @" --header \"Content-Type: application/json\"";
+            }
         }
         if (data != null) {
             try {
