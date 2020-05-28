@@ -1,8 +1,32 @@
 {
+  "//WIP": {
+    "X0": {
+      "bind": "container",
+      "connect": "unix:@/tmp/.X11-unix/X$DISPLAY",
+      "listen": "unix:@/tmp/.X11-unix/X0",
+      "security.gid": "$GID",
+      "security.uid": "$UID",
+      "type": "proxy"
+    },
+    "Xauthority": {
+      "path": "/home/$USER/.Xauthority",
+      "source": "$XAUTHORITY",
+      "type": "disk"
+    }
+  },
+  "config": {
+    "environment.DISPLAY": ":$DISPLAY",
+    "environment.XAUTHORITY": "/home/$USER/.Xauthority"
+  },
   "devices": {
     "X0": {
-      "path": "/tmp/.X11-unix/X0",
+      "path": "/tmp/.X11-unix/X$DISPLAY",
       "source": "/tmp/.X11-unix/X$DISPLAY",
+      "type": "disk"
+    },
+    "Xauthority": {
+      "path": "/home/$USER/.Xauthority",
+      "source": "$XAUTHORITY",
       "type": "disk"
     }
   }

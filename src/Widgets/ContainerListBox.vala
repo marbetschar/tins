@@ -20,6 +20,8 @@
 */
 
 errordomain TinsError {
+    MCOOKIE,
+    XAUTH,
     XSERVER,
     COMPOSITOR
 }
@@ -186,6 +188,48 @@ public class Tins.Widgets.ContainerListBox : Gtk.ListBox {
                     compositor_envp_display_number = Random.int_range(50,99);
                 }
 
+                var home_dir_path = Environ.get_variable (host_envp, "HOME");
+                var work_dir_path = home_dir_path + @"/.cache/com.github.marbetschar.tins/$(instance.name)";
+
+                var work_dir = File.new_for_path (work_dir_path);
+                if (!work_dir.query_exists ()) {
+                    work_dir.make_directory_with_parents ();
+                }
+
+                var xauth_file = File.new_for_path (work_dir.get_path () + "/Xauthority");
+                if (xauth_file.query_exists ()) {
+                    xauth_file.@delete ();
+                }
+
+                // Create X auth cookie for secure authentication:
+                string mcookie_stdout, mcookie_stderr;
+                int mcookie_exit_status;
+
+                Process.spawn_command_line_sync (
+                    "mcookie",
+                    out mcookie_stdout,
+                    out mcookie_stderr,
+                    out mcookie_exit_status
+                );
+
+                if (mcookie_exit_status != 0) {
+                    throw new TinsError.MCOOKIE (mcookie_stderr);
+                }
+
+                string xauth_command_line = @"xauth -v -i -f '$(xauth_file.get_path())' add :$xserver_envp_display_number . '$mcookie_stdout'";
+                string xauth_stdout, xauth_stderr;
+                int xauth_exit_status;
+                Process.spawn_command_line_sync (
+                    xauth_command_line,
+                    out xauth_stdout,
+                    out xauth_stderr,
+                    out xauth_exit_status
+                );
+
+                if (xauth_exit_status != 0) {
+                    throw new TinsError.XAUTH (xauth_stderr + "\n" + _("Command failed:") + " " + xauth_command_line);
+                }
+
                 string[] xserver_envp = {};
                 xserver_envp = Environ.set_variable (xserver_envp, "DISPLAY", @":$xserver_envp_display_number", true);
                 xserver_envp = Environ.set_variable (xserver_envp, "WAYLAND_DISPLAY", @"wayland-$compositor_envp_display_number", true);
@@ -195,14 +239,6 @@ public class Tins.Widgets.ContainerListBox : Gtk.ListBox {
                 compositor_envp = Environ.set_variable (compositor_envp, "DISPLAY", Environ.get_variable (host_envp, "DISPLAY"), true);
                 compositor_envp = Environ.set_variable (compositor_envp, "WAYLAND_DISPLAY", @"wayland-$compositor_envp_display_number", true);
                 compositor_envp = Environ.set_variable (compositor_envp, "XDG_RUNTIME_DIR", Environ.get_variable (host_envp, "XDG_RUNTIME_DIR"), true);
-
-                var home_dir_path = Environ.get_variable (host_envp, "HOME");
-                var work_dir_path = home_dir_path + @"/.cache/com.github.marbetschar.tins/$(instance.name)";
-
-                var work_dir = File.new_for_path (work_dir_path);
-                if (!work_dir.query_exists ()) {
-                    work_dir.make_directory_with_parents ();
-                }
 
                 var compositor_config_file = File.new_for_path (work_dir_path + "/weston.ini");
                 string[] compositor_config = {
@@ -256,7 +292,7 @@ public class Tins.Widgets.ContainerListBox : Gtk.ListBox {
                     "-extension", "XTEST", "-tst",
                     "-dpms",
                     "-s", "off",
-                    "-auth", work_dir.get_path () + "/Xauthority.server",
+                    "-auth", xauth_file.get_path (),
                     "-nolisten", "tcp",
                     "-dpi", "96"
                 };
@@ -305,6 +341,7 @@ public class Tins.Widgets.ContainerListBox : Gtk.ListBox {
 
                 var template_xenv_vars = new HashTable<string, string> (str_hash, str_equal);
                 template_xenv_vars.set("$DISPLAY", @"$xserver_envp_display_number");
+                template_xenv_vars.set("$XAUTHORITY", xauth_file.get_path ());
 
                 var template = LXD.Instance.new_from_template_uri ("resource:///com/github/marbetschar/tins/lxd/instances/tins-x11.json", template_xenv_vars);
                 template.name = instance.name;
@@ -316,8 +353,6 @@ public class Tins.Widgets.ContainerListBox : Gtk.ListBox {
                 } catch (Error e) {
                     warning (e.message);
                 }
-
-
 
                 // make sure we don't open any terminal if we get here
                 // so jump out of the function

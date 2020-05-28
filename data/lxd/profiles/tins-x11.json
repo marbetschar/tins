@@ -3,7 +3,6 @@
   "description": "Desktop Support",
   "config": {
     "raw.idmap": "both $UID $UID",
-    "environment.DISPLAY": ":0",
     "environment.PULSE_SERVER": "unix:/home/$USER/pulse-native",
     "user.user-data": "resource:///com/github/marbetschar/tins/lxd/cloud-configs/tins-x11.yml"
   },
