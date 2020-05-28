@@ -302,12 +302,16 @@ public class LXD.Client {
         if (data != null) {
             try {
                 FileIOStream streams;
-                data_file = File.new_tmp ("lxd-XXXXXX.json", out streams);
+                data_file = File.new_tmp ("lxd-XXXXXX.data", out streams);
 
                 DataOutputStream out_stream = new DataOutputStream (streams.output_stream);
                 out_stream.put_string (data);
 
-                args += " --data @" + data_file.get_path ();
+                if (method == "POST" && endpoint.contains("/files")) {
+                    args += " --data-binary @" + data_file.get_path ();
+                } else {
+                    args += " --data @" + data_file.get_path ();
+                }
 
             } catch (Error e) {
                 warning (e.message);
