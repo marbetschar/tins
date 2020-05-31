@@ -1,2 +1,2 @@
 export DISPLAY=:$DISPLAY
-export XAUTHORITY=~/.Xauthority
+export XAUTHORITY=/home/$USER/.Xauthority

@@ -213,9 +213,10 @@ public class Tins.Widgets.ContainerListBox : Gtk.ListBox {
                     throw new TinsError.MCOOKIE (mcookie_stderr);
                 }
 
-                string xauth_command_line = @"xauth -v -i -f '$(xauth_cookie_file.get_path())' add :$host_xserver_envp_display_number . '$mcookie_stdout'";
+                var xauth_command_line = @"xauth -v -i -f '$(xauth_cookie_file.get_path())' add :$host_xserver_envp_display_number . '$mcookie_stdout'";
                 string xauth_stdout, xauth_stderr;
                 int xauth_exit_status;
+
                 Process.spawn_command_line_sync (
                     xauth_command_line,
                     out xauth_stdout,
@@ -225,6 +226,53 @@ public class Tins.Widgets.ContainerListBox : Gtk.ListBox {
 
                 if (xauth_exit_status != 0) {
                     throw new TinsError.XAUTH (xauth_stderr + "\n" + _("Command failed:") + " " + xauth_command_line);
+                }
+
+                xauth_command_line = @"xauth -i -f '$(xauth_cookie_file.get_path())' nlist";
+                Process.spawn_command_line_sync (
+                    xauth_command_line,
+                    out xauth_stdout,
+                    out xauth_stderr,
+                    out xauth_exit_status
+                );
+
+                if (xauth_exit_status != 0) {
+                    throw new TinsError.XAUTH (xauth_stderr + "\n" + _("Command failed:") + " " + xauth_command_line);
+                }
+
+                var xauth_cookie_content = xauth_stdout;
+                try {
+                    // There is some network specific information in the first 4 bytes of the cookie.
+                    // You can replace them with ffff to allow the cookie for other networks.
+                    var xauth_cookie_regex = new Regex ("^....");
+                    xauth_cookie_content = xauth_cookie_regex.replace_literal (xauth_cookie_content, -1, 0, "ffff");
+                } catch (Error e) {
+                    warning (e.message);
+                }
+
+                FileIOStream xauth_cookie_tmp_file_streams;
+                var xauth_cookie_tmp_file = File.new_tmp ("xauth-XXXXXX.cookie", out xauth_cookie_tmp_file_streams);
+                DataOutputStream xauth_cookie_tmp_file_out_stream = new DataOutputStream (xauth_cookie_tmp_file_streams.output_stream);
+                xauth_cookie_tmp_file_out_stream.put_string (xauth_cookie_content);
+
+                xauth_command_line = @"xauth -v -i -f '$(xauth_cookie_file.get_path())' nmerge '$(xauth_cookie_tmp_file.get_path())'";
+                Process.spawn_command_line_sync (
+                    xauth_command_line,
+                    out xauth_stdout,
+                    out xauth_stderr,
+                    out xauth_exit_status
+                );
+
+                if (xauth_exit_status != 0) {
+                    throw new TinsError.XAUTH (xauth_stderr + "\n" + _("Command failed:") + " " + xauth_command_line);
+                }
+
+                try {
+                    if (xauth_cookie_tmp_file.query_exists ()) {
+                        xauth_cookie_tmp_file.@delete ();
+                    }
+                } catch (Error e) {
+                    warning (e.message);
                 }
 
                 string[] host_xserver_envp = {};
@@ -360,6 +408,9 @@ public class Tins.Widgets.ContainerListBox : Gtk.ListBox {
                 Application.lxd_client.upload_file_content_instance (instance.name, "/etc/profile.d/99-tins-x11-profile.sh", instance_x11_profile_file_content);
 
                 Application.lxd_client.upload_file_instance (instance.name, LXD.apply_vars_to_string ("/home/$USER/.Xauthority", instance_xenv_vars), xauth_cookie_file);
+
+                // start desktop environment if known:
+                // TODO ...
 
                 // make sure we don't open any terminal if we get here
                 // so jump out of the function
