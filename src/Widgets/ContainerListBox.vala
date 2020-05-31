@@ -294,6 +294,9 @@ public class Tins.Widgets.ContainerListBox : Gtk.ListBox {
                 instance_xenv_vars.set("$DISPLAY", @"$host_xserver_envp_display_number");
                 instance_xenv_vars.set("$XAUTHORITY", xauth_cookie_file.get_path ());
 
+                var monitor = Gdk.Display.get_default ().get_primary_monitor ();
+                var monitor_geometry = monitor.get_geometry();
+
                 var host_compositor_config_file = File.new_for_path (work_dir_path + "/weston.ini");
                 string[] host_compositor_config = {
                     "[core]",
@@ -311,7 +314,8 @@ public class Tins.Widgets.ContainerListBox : Gtk.ListBox {
                     "",
                     "[output]",
                     @"name=X$host_xserver_envp_display_number",
-                    "mode=preferred"
+                    @"mode=$(monitor_geometry.width - 25)x$(monitor_geometry.height - 75)",
+                    @"scale=$(monitor.scale_factor)"
                 };
 
                 if (host_compositor_config_file.query_exists ()) {
@@ -348,7 +352,7 @@ public class Tins.Widgets.ContainerListBox : Gtk.ListBox {
                     "-s", "off",
                     "-auth", xauth_cookie_file.get_path (),
                     "-nolisten", "tcp",
-                    "-dpi", "96"
+                    "-dpi", "%i".printf (monitor_geometry.width / (monitor.width_mm / 26))
                 };
 
                 var host_process_spawn_flags = SpawnFlags.SEARCH_PATH_FROM_ENVP;
