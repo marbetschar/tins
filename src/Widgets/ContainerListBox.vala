@@ -311,7 +311,7 @@ public class Tins.Widgets.ContainerListBox : Gtk.ListBox {
                     "",
                     "[output]",
                     @"name=X$host_xserver_envp_display_number",
-                    "mode=1024x768"
+                    "mode=preferred"
                 };
 
                 if (host_compositor_config_file.query_exists ()) {
@@ -410,7 +410,33 @@ public class Tins.Widgets.ContainerListBox : Gtk.ListBox {
                 Application.lxd_client.upload_file_instance (instance.name, LXD.apply_vars_to_string ("/home/$USER/.Xauthority", instance_xenv_vars), xauth_cookie_file);
 
                 // start desktop environment if known:
-                // TODO ...
+                if (instance.config != null) {
+                    var variant = instance.config.get("image.variant");
+
+                    string? startx_command = null;
+                    if (variant != null) {
+                        switch (variant.down ()) {
+                            case "xfce":
+                                startx_command = "startxfce4";
+                                break;
+                        }
+                    }
+
+                    if (startx_command != null) {
+                        var startx_exec = new LXD.InstanceExec ();
+                        startx_exec.command = new GenericArray<string> ();
+                        startx_exec.command.add("su");
+                        startx_exec.command.add("--login");
+                        startx_exec.command.add(LXD.apply_vars_to_string ("$USER", instance_xenv_vars));
+                        startx_exec.command.add("--command");
+                        startx_exec.command.add (startx_command);
+
+                        startx_exec.user = int.parse (LXD.get_uid ());
+                        startx_exec.group = int.parse (LXD.get_gid ());
+
+                        Application.lxd_client.exec_instance (instance.name, startx_exec);
+                    }
+                }
 
                 // make sure we don't open any terminal if we get here
                 // so jump out of the function
