@@ -362,15 +362,6 @@ public class Tins.Widgets.ContainerListBox : Gtk.ListBox {
 
                 Pid host_compositor_pid;
                 Process.spawn_async (work_dir.get_path (), host_compositor_argv, host_compositor_envp, host_process_spawn_flags, null, out host_compositor_pid);
-                // ChildWatch.add (compositor_pid, (pid, status) => {
-                //     Process.close_pid (pid);
-                //     try {
-                //         Process.check_exit_status (status);
-                //         debug (@"Closed Compositor [$(Environ.get_variable (compositor_envp, "WAYLAND_DISPLAY"))].");
-                //     } catch (Error e) {
-                //         critical (@"Error Compositor [$(Environ.get_variable (compositor_envp, "WAYLAND_DISPLAY")):" + e.message);
-                //     }
-                // });
 
                 // TODO: We need to use something better than just sleep here.
                 Thread.usleep (1000000);
@@ -380,15 +371,6 @@ public class Tins.Widgets.ContainerListBox : Gtk.ListBox {
 
                 Pid host_xserver_pid;
                 Process.spawn_async (work_dir.get_path (), host_xserver_argv, host_xserver_envp, host_process_spawn_flags, null, out host_xserver_pid);
-                // ChildWatch.add (xserver_pid, (pid, status) => {
-                //     Process.close_pid (pid);
-                //     try {
-                //         Process.check_exit_status (status);
-                //         debug (@"Closed X server [$(Environ.get_variable (xserver_envp, "DISPLAY"))].");
-                //     } catch (Error e) {
-                //         critical (@"Error X server [$(Environ.get_variable (xserver_envp, "DISPLAY"))]:" + e.message);
-                //     }
-                // });
 
                 var stop_operation = Application.lxd_client.stop_instance (instance.name);
                 try {
