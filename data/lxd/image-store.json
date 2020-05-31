@@ -11,9 +11,6 @@
       "release": "focal",
       "architecture": "amd64",
       "variant": "xfce",
-      "//": "For now we are not using any server for this image",
-      "//": "This means it is expected to be available locally",
-      "//": "For getting things up & running thats ok."
+      "server": "https://images.desktop-linuxcontainers.org"
   }]
 }
-
