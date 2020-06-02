@@ -79,6 +79,9 @@ public class Tins.AddContainerAssistant : Gtk.Assistant {
 
     [GtkCallback]
     private void on_changed_operating_system (Gtk.Widget source) {
+        if (operating_system_combobox.active < 0) {
+            return;
+        }
         release_combobox.remove_all ();
 
         var operating_system = operating_systems.get (operating_system_combobox.active);
@@ -96,6 +99,9 @@ public class Tins.AddContainerAssistant : Gtk.Assistant {
 
     [GtkCallback]
     private void on_changed_release (Gtk.Widget source) {
+        if (release_combobox.active < 0) {
+            return;
+        }
         desktop_combobox.remove_all ();
         desktop_combobox.append_text (_("custom"));
 

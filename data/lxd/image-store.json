@@ -27,5 +27,32 @@
       "variant": "xfce",
       "server": "https://images.desktop-linuxcontainers.org",
       "protocol": "simplestreams"
+  },{
+      "os": "fedora",
+      "release": "32",
+      "architecture": "amd64",
+      "variant": "cloud",
+      "server": "https://images.linuxcontainers.org"
+  },{
+      "os": "fedora",
+      "release": "32",
+      "architecture": "amd64",
+      "variant": "gnome",
+      "server": "https://images.desktop-linuxcontainers.org",
+      "protocol": "simplestreams"
+  },{
+      "os": "fedora",
+      "release": "32",
+      "architecture": "amd64",
+      "variant": "kde",
+      "server": "https://images.desktop-linuxcontainers.org",
+      "protocol": "simplestreams"
+  },{
+      "os": "fedora",
+      "release": "32",
+      "architecture": "amd64",
+      "variant": "xfce",
+      "server": "https://images.desktop-linuxcontainers.org",
+      "protocol": "simplestreams"
   }]
 }
