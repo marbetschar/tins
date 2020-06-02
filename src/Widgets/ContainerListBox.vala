@@ -402,6 +402,12 @@ public class Tins.Widgets.ContainerListBox : Gtk.ListBox {
                     string? startx_command = null;
                     if (variant != null) {
                         switch (variant.down ()) {
+                            case "gnome":
+                                startx_command = "gnome-session";
+                                break;
+                            case "kde":
+                                startx_command = "startkde";
+                                break;
                             case "xfce":
                                 startx_command = "startxfce4";
                                 break;
