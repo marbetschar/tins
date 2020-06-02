@@ -26,9 +26,10 @@ public class LXD.ImageSource : LXD.Object {
     public string architecture { get; set; }
     public string variant { get; set; }
     public string server { get; set; }
+    public string protocol { get; set; }
 
     public string to_string () {
-        return @"[os=$os, release=$release, variant=$variant, arch=$architecture, server=$server]";
+        return @"[os=$os, release=$release, variant=$variant, arch=$architecture, server=$server, protocol=$protocol]";
     }
 
     /* --- Json.Serializable --- */

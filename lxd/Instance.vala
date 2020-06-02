@@ -81,6 +81,7 @@ public class LXD.Instance : LXD.Object {
         public string source_type { get; set; }
         public string mode { get; set; }
         public string server { get; set; }
+        public string protocol { get; set; }
         public string alias { get; set; }
     }
 

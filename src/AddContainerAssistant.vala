@@ -165,6 +165,7 @@ public class Tins.AddContainerAssistant : Gtk.Assistant {
         instance_source.source_type = "image";
         instance_source.mode = "pull";
         instance_source.server = image_source.server;
+        instance_source.protocol = image_source.protocol;
         instance_source.alias = @"$(image_source.os)/$(image_source.release)/$(image_source.architecture)/$(image_source.variant)";
 
         var instance = new LXD.Instance ();
