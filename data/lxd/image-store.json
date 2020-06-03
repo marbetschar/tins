@@ -54,5 +54,17 @@
       "variant": "xfce",
       "server": "https://images.desktop-linuxcontainers.org",
       "protocol": "simplestreams"
+  },{
+      "os": "centos",
+      "release": "7",
+      "architecture": "amd64",
+      "variant": "cloud",
+      "server": "https://images.linuxcontainers.org"
+  },{
+      "os": "centos",
+      "release": "8",
+      "architecture": "amd64",
+      "variant": "cloud",
+      "server": "https://images.linuxcontainers.org"
   }]
 }
