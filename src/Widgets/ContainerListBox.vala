@@ -406,7 +406,7 @@ public class Tins.Widgets.ContainerListBox : Gtk.ListBox {
                                 startx_command = "gnome-session";
                                 break;
                             case "kde":
-                                startx_command = "startkde";
+                                startx_command = "startplasma-x11";
                                 break;
                             case "xfce":
                                 startx_command = "startxfce4";
@@ -421,7 +421,7 @@ public class Tins.Widgets.ContainerListBox : Gtk.ListBox {
                         startx_exec.command.add("--login");
                         startx_exec.command.add(LXD.apply_vars_to_string ("$USER", instance_xenv_vars));
                         startx_exec.command.add("--command");
-                        startx_exec.command.add (startx_command);
+                        startx_exec.command.add (@"'$startx_command'");
 
                         startx_exec.user = int.parse (LXD.get_uid ());
                         startx_exec.group = int.parse (LXD.get_gid ());
