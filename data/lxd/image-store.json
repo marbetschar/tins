@@ -66,5 +66,26 @@
       "architecture": "amd64",
       "variant": "cloud",
       "server": "https://images.linuxcontainers.org"
+  },{
+      "os": "elementary",
+      "release": "bionic",
+      "architecture": "amd64",
+      "variant": "cloud",
+      "server": "https://images.desktop-linuxcontainers.org",
+      "protocol": "simplestreams"
+  },{
+      "os": "elementary",
+      "release": "bionic",
+      "architecture": "amd64",
+      "variant": "stable",
+      "server": "https://images.desktop-linuxcontainers.org",
+      "protocol": "simplestreams"
+  },{
+      "os": "elementary",
+      "release": "focal",
+      "architecture": "amd64",
+      "variant": "daily",
+      "server": "https://images.desktop-linuxcontainers.org",
+      "protocol": "simplestreams"
   }]
 }
