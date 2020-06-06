@@ -397,11 +397,16 @@ public class Tins.Widgets.ContainerListBox : Gtk.ListBox {
 
                 // start desktop environment if known:
                 if (instance.config != null) {
-                    var variant = instance.config.get("image.variant");
-
                     string? startx_command = null;
-                    if (variant != null) {
-                        switch (variant.down ()) {
+
+                    var image_os = instance.config.get("image.os");
+                    var image_variant = instance.config.get("image.variant");
+
+                    if (image_os == "elementary") {
+                        startx_command = "gnome-session --session=pantheon";
+
+                    } else if (image_variant != null){
+                        switch (image_variant.down ()) {
                             case "gnome":
                                 startx_command = "gnome-session";
                                 break;
@@ -425,6 +430,9 @@ public class Tins.Widgets.ContainerListBox : Gtk.ListBox {
 
                         startx_exec.user = int.parse (LXD.get_uid ());
                         startx_exec.group = int.parse (LXD.get_gid ());
+
+                        // TODO: We need to use something better than just sleep here.
+                        Thread.usleep (1000000);
 
                         Application.lxd_client.exec_instance (instance.name, startx_exec);
                     }
