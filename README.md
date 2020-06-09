@@ -1,6 +1,6 @@
 # <img src="data/icons/128/com.github.marbetschar.tins.svg?raw=true" width="42" height="42" align="left" /> Tins
 
-Containers just like Virtual Machines
+Containers just like Virtual Machines - but with native performance
 
 > **Tins:** tinplate containers - often used to package breath mints.
 > In some cultures, these boxes are referred to as "tins".
